@@ -2,22 +2,26 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth';
 
 // Your Firebase configuration
-// Updated with actual Firebase project credentials
+// Using environment variables from .env file
 const firebaseConfig = {
-  apiKey: "AIzaSyAobKh7Dr7sVFvqLB4PzgncM1ke506XjJo",
-  authDomain: "ecommerce-website-36bb8.firebaseapp.com",
-  projectId: "ecommerce-website-36bb8",
-  storageBucket: "ecommerce-website-36bb8.firebasestorage.app",
-  messagingSenderId: "80106454546",
-  appId: "1:80106454546:web:44d51c5ee9ff02653362cb",
-  measurementId: "G-8P9XRJ8EVJ"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
+
+console.log('Firebase config:', firebaseConfig);
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+console.log('Firebase app initialized:', app);
 
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);
+console.log('Firebase auth initialized:', auth);
 
 // Initialize providers
 export const googleProvider = new GoogleAuthProvider();
@@ -31,5 +35,7 @@ googleProvider.setCustomParameters({
 facebookProvider.setCustomParameters({
   display: 'popup'
 });
+
+console.log('Firebase providers initialized');
 
 export default app; 

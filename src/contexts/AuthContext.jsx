@@ -72,32 +72,112 @@ const authReducer = (state, action) => {
   }
 };
 
+// API base URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// Helper function to make API calls
+const apiCall = async (endpoint, options = {}) => {
+  const token = localStorage.getItem('token');
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...options.headers,
+    },
+    ...options,
+  };
+
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Erreur de requête');
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
+  // Sync user with database
+  const syncUserWithDatabase = async (firebaseUser) => {
+    try {
+      const userData = {
+        firebaseUid: firebaseUser.uid,
+        email: firebaseUser.email,
+        firstName: firebaseUser.displayName?.split(' ')[0] || '',
+        lastName: firebaseUser.displayName?.split(' ').slice(1).join(' ') || '',
+        emailVerified: firebaseUser.emailVerified,
+        photoURL: firebaseUser.photoURL,
+      };
+
+      // Try to get existing user from database
+      try {
+        const existingUser = await apiCall('/auth/user', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${await firebaseUser.getIdToken()}`
+          }
+        });
+
+        if (existingUser.success) {
+          return existingUser.user;
+        }
+      } catch (error) {
+        // User doesn't exist in database, continue to create them
+        console.log('User not found in database, creating new user...');
+      }
+
+      // If user doesn't exist in database, create them
+      const newUser = await apiCall('/auth/register-firebase', {
+        method: 'POST',
+        body: JSON.stringify(userData),
+        headers: {
+          'Authorization': `Bearer ${await firebaseUser.getIdToken()}`
+        }
+      });
+
+      return newUser.user;
+    } catch (error) {
+      console.error('Error syncing user with database:', error);
+      // Return basic user data if database sync fails
+      return {
+        firebaseUid: firebaseUser.uid,
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName,
+        photoURL: firebaseUser.photoURL,
+        emailVerified: firebaseUser.emailVerified,
+      };
+    }
+  };
+
   // Listen for Firebase auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
         // User is signed in
-        const userData = {
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          emailVerified: user.emailVerified,
-        };
-        
-        // Get the user's ID token
-        user.getIdToken().then((token) => {
+        try {
+          const token = await firebaseUser.getIdToken();
           localStorage.setItem('token', token);
+          
+          // Sync with database
+          const userData = await syncUserWithDatabase(firebaseUser);
           localStorage.setItem('user', JSON.stringify(userData));
           
           dispatch({
             type: 'AUTH_SUCCESS',
             payload: { user: userData, token },
           });
-        });
+        } catch (error) {
+          console.error('Error in auth state change:', error);
+          dispatch({ type: 'AUTH_FAILURE', payload: 'Erreur de synchronisation' });
+        }
       } else {
         // User is signed out
         localStorage.removeItem('token');
@@ -109,24 +189,19 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  // Login function with Firebase
+  // Login function with Firebase and database sync
   const login = async (email, password) => {
     try {
       dispatch({ type: 'AUTH_START' });
       
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      const firebaseUser = userCredential.user;
       
-      const userData = {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        emailVerified: user.emailVerified,
-      };
-      
-      const token = await user.getIdToken();
+      const token = await firebaseUser.getIdToken();
       localStorage.setItem('token', token);
+      
+      // Sync with database
+      const userData = await syncUserWithDatabase(firebaseUser);
       localStorage.setItem('user', JSON.stringify(userData));
       
       dispatch({
@@ -165,7 +240,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Register function with Firebase
+  // Register function with Firebase and database sync
   const register = async (userData) => {
     try {
       dispatch({ type: 'AUTH_START' });
@@ -173,23 +248,18 @@ export const AuthProvider = ({ children }) => {
       const { email, password, firstName, lastName } = userData;
       
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      const firebaseUser = userCredential.user;
       
-      // Update the user's display name
-      await updateFirebaseProfile(user, {
+      // Update the user's display name in Firebase
+      await updateFirebaseProfile(firebaseUser, {
         displayName: `${firstName} ${lastName}`,
       });
       
-      const updatedUserData = {
-        uid: user.uid,
-        email: user.email,
-        displayName: `${firstName} ${lastName}`,
-        photoURL: user.photoURL,
-        emailVerified: user.emailVerified,
-      };
-      
-      const token = await user.getIdToken();
+      const token = await firebaseUser.getIdToken();
       localStorage.setItem('token', token);
+      
+      // Sync with database
+      const updatedUserData = await syncUserWithDatabase(firebaseUser);
       localStorage.setItem('user', JSON.stringify(updatedUserData));
       
       dispatch({
@@ -200,7 +270,7 @@ export const AuthProvider = ({ children }) => {
       toast.success('Compte créé avec succès !');
       return { success: true };
     } catch (error) {
-      let errorMessage = 'Erreur lors de l\'inscription';
+      let errorMessage = 'Erreur lors de la création du compte';
       
       switch (error.code) {
         case 'auth/email-already-in-use':
@@ -212,9 +282,6 @@ export const AuthProvider = ({ children }) => {
         case 'auth/weak-password':
           errorMessage = 'Le mot de passe doit contenir au moins 6 caractères';
           break;
-        case 'auth/operation-not-allowed':
-          errorMessage = 'L\'inscription par email est désactivée';
-          break;
         default:
           errorMessage = error.message;
       }
@@ -225,24 +292,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Google Sign In
+  // Google Sign In with database sync
   const signInWithGoogle = async () => {
     try {
       dispatch({ type: 'AUTH_START' });
       
       const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
+      const firebaseUser = result.user;
       
-      const userData = {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        emailVerified: user.emailVerified,
-      };
-      
-      const token = await user.getIdToken();
+      const token = await firebaseUser.getIdToken();
       localStorage.setItem('token', token);
+      
+      // Sync with database
+      const userData = await syncUserWithDatabase(firebaseUser);
       localStorage.setItem('user', JSON.stringify(userData));
       
       dispatch({
@@ -258,7 +320,7 @@ export const AuthProvider = ({ children }) => {
       if (error.code === 'auth/popup-closed-by-user') {
         errorMessage = 'Connexion annulée';
       } else if (error.code === 'auth/popup-blocked') {
-        errorMessage = 'Popup bloqué. Veuillez autoriser les popups pour ce site';
+        errorMessage = 'Popup bloqué par le navigateur';
       } else {
         errorMessage = error.message;
       }
@@ -269,24 +331,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Facebook Sign In
+  // Facebook Sign In with database sync
   const signInWithFacebook = async () => {
     try {
       dispatch({ type: 'AUTH_START' });
       
       const result = await signInWithPopup(auth, facebookProvider);
-      const user = result.user;
+      const firebaseUser = result.user;
       
-      const userData = {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        emailVerified: user.emailVerified,
-      };
-      
-      const token = await user.getIdToken();
+      const token = await firebaseUser.getIdToken();
       localStorage.setItem('token', token);
+      
+      // Sync with database
+      const userData = await syncUserWithDatabase(firebaseUser);
       localStorage.setItem('user', JSON.stringify(userData));
       
       dispatch({
@@ -302,9 +359,7 @@ export const AuthProvider = ({ children }) => {
       if (error.code === 'auth/popup-closed-by-user') {
         errorMessage = 'Connexion annulée';
       } else if (error.code === 'auth/popup-blocked') {
-        errorMessage = 'Popup bloqué. Veuillez autoriser les popups pour ce site';
-      } else if (error.code === 'auth/account-exists-with-different-credential') {
-        errorMessage = 'Un compte existe déjà avec cette adresse email';
+        errorMessage = 'Popup bloqué par le navigateur';
       } else {
         errorMessage = error.message;
       }
@@ -315,102 +370,101 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout function with Firebase
+  // Logout function
   const logout = async () => {
     try {
       await signOut(auth);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       dispatch({ type: 'LOGOUT' });
-      toast.success('Déconnexion réussie');
+      toast.success('Déconnexion réussie !');
+      return { success: true };
     } catch (error) {
       console.error('Logout error:', error);
       toast.error('Erreur lors de la déconnexion');
+      return { success: false, error: error.message };
     }
   };
 
-  // Update user profile
+  // Update profile function
   const updateProfile = async (userData) => {
     try {
-      const user = auth.currentUser;
-      if (!user) {
-        throw new Error('Aucun utilisateur connecté');
+      const response = await apiCall('/users/profile', {
+        method: 'PUT',
+        body: JSON.stringify(userData)
+      });
+      
+      if (response.success) {
+        const updatedUser = { ...state.user, ...response.user };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        dispatch({ type: 'UPDATE_USER', payload: updatedUser });
+        return { success: true };
+      } else {
+        return { success: false, error: response.message };
       }
-      
-      await updateFirebaseProfile(user, userData);
-      
-      const updatedUserData = {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        emailVerified: user.emailVerified,
-      };
-      
-      localStorage.setItem('user', JSON.stringify(updatedUserData));
-      dispatch({ type: 'UPDATE_USER', payload: updatedUserData });
-      
-      toast.success('Profil mis à jour avec succès !');
-      return { success: true };
     } catch (error) {
-      const errorMessage = error.message || 'Erreur lors de la mise à jour';
-      toast.error(errorMessage);
-      return { success: false, error: errorMessage };
+      return { success: false, error: error.message };
     }
   };
 
-  // Change password
+  // Change password function
   const changePassword = async (currentPassword, newPassword) => {
     try {
-      // Firebase doesn't have a direct changePassword method
-      // You would need to re-authenticate the user first
-      toast.success('Mot de passe modifié avec succès !');
-      return { success: true };
+      const response = await apiCall('/auth/change-password', {
+        method: 'POST',
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+      
+      return response;
     } catch (error) {
-      const errorMessage = error.message || 'Erreur lors du changement de mot de passe';
-      toast.error(errorMessage);
-      return { success: false, error: errorMessage };
+      return { success: false, error: error.message };
     }
   };
 
-  // Forgot password
+  // Forgot password function
   const forgotPassword = async (email) => {
     try {
-      // Firebase password reset would go here
-      toast.success('Email de réinitialisation envoyé !');
-      return { success: true };
+      const response = await apiCall('/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email })
+      });
+      
+      return response;
     } catch (error) {
-      const errorMessage = error.message || 'Erreur lors de l\'envoi de l\'email';
-      toast.error(errorMessage);
-      return { success: false, error: errorMessage };
+      return { success: false, error: error.message };
     }
   };
 
-  // Reset password
+  // Reset password function
   const resetPassword = async (token, newPassword) => {
     try {
-      // Firebase password reset would go here
-      toast.success('Mot de passe réinitialisé avec succès !');
-      return { success: true };
+      const response = await apiCall('/auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify({ token, newPassword })
+      });
+      
+      return response;
     } catch (error) {
-      const errorMessage = error.message || 'Erreur lors de la réinitialisation';
-      toast.error(errorMessage);
-      return { success: false, error: errorMessage };
+      return { success: false, error: error.message };
     }
   };
 
-  // Clear error
+  // Clear error function
   const clearError = () => {
     dispatch({ type: 'CLEAR_ERROR' });
   };
 
   const value = {
-    ...state,
+    user: state.user,
+    token: state.token,
+    isAuthenticated: state.isAuthenticated,
+    isLoading: state.isLoading,
+    error: state.error,
     login,
     register,
-    logout,
     signInWithGoogle,
     signInWithFacebook,
+    logout,
     updateProfile,
     changePassword,
     forgotPassword,

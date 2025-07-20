@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-// Icons temporarily removed due to React 19 compatibility
 import { AuthContext } from '../../contexts/AuthContext';
 import { CartContext } from '../../contexts/CartContext';
 
@@ -11,129 +10,143 @@ const Header = () => {
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
+    <header className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-200/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">U</span>
+        <div className="flex justify-between items-center h-24">
+          {/* Logo - moved to far left */}
+          <Link to="/" className="flex items-center group">
+            <div className="relative">
+              <img 
+                src="/LOGO.png" 
+                alt="UMOD Logo" 
+                className="h-16 w-auto transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
-            <span className="text-xl font-bold text-gray-900">UMOD</span>
           </Link>
 
-          {/* Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            <Link 
-              to="/" 
-              className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              Accueil
-            </Link>
-            <Link 
-              to="/products" 
-              className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              Produits
-            </Link>
-            <Link 
-              to="/categories" 
-              className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              Catégories
-            </Link>
-            <Link 
-              to="/about" 
-              className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              À propos
-            </Link>
-            <Link 
-              to="/contact" 
-              className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              Contact
-            </Link>
+          {/* Navigation - centered */}
+          <nav className="hidden lg:flex space-x-1">
+            {[
+              { to: "/", label: "Accueil" },
+              { to: "/products", label: "Produits" },
+              { to: "/categories", label: "Catégories" },
+              { to: "/about", label: "À propos" },
+              { to: "/contact", label: "Contact" }
+            ].map((item) => (
+              <Link 
+                key={item.to}
+                to={item.to} 
+                className="relative px-4 py-2 text-gray-700 hover:text-blue-600 font-medium transition-all duration-300 group"
+              >
+                {item.label}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            ))}
           </nav>
 
           {/* Search Bar */}
           <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
+            <div className="relative w-full group">
+              <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors duration-300">🔍</span>
               <input
                 type="text"
                 placeholder="Rechercher des produits..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-12 pr-4 py-3 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300"
               />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
           </div>
 
           {/* Right side actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             {/* Cart */}
             <Link 
               to="/cart" 
-              className="relative p-2 text-gray-700 hover:text-blue-600 transition-colors"
+              className="relative p-3 text-gray-700 hover:text-blue-600 transition-all duration-300 group"
             >
-              🛒
-              {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              )}
+              <div className="relative">
+                <span className="text-xl group-hover:scale-110 transition-transform duration-300">🛒</span>
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-lg">
+                    {cartItemCount}
+                  </span>
+                )}
+              </div>
             </Link>
 
             {/* User menu */}
             {user ? (
               <div className="relative group">
-                <button className="flex items-center space-x-2 p-2 text-gray-700 hover:text-blue-600 transition-colors">
-                  👤
+                <button className="flex items-center space-x-3 p-2 text-gray-700 hover:text-blue-600 transition-all duration-300 rounded-xl hover:bg-gray-50">
+                  {user.photoURL ? (
+                    <div className="relative">
+                      <img 
+                        src={user.photoURL} 
+                        alt="Profile" 
+                        className="w-8 h-8 rounded-full object-cover ring-2 ring-gray-200 group-hover:ring-blue-500/50 transition-all duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                  ) : (
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm ring-2 ring-gray-200 group-hover:ring-blue-500/50 transition-all duration-300">
+                      {user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
+                    </div>
+                  )}
                   <span className="hidden sm:block text-sm font-medium">
-                    {user.firstName}
+                    {user.displayName || user.email}
                   </span>
+                  <span className="text-xs opacity-60 group-hover:opacity-100 transition-opacity duration-300">▼</span>
                 </button>
                 
                 {/* Dropdown menu */}
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <Link 
-                    to="/profile" 
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Mon profil
-                  </Link>
-                  <Link 
-                    to="/orders" 
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Mes commandes
-                  </Link>
-                  {user.role === 'admin' && (
+                <div className="absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-md rounded-xl shadow-xl border border-gray-200/50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                  <div className="p-2">
                     <Link 
-                      to="/admin" 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      to="/profile" 
+                      className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 rounded-lg transition-all duration-200"
                     >
-                      Administration
+                      <span className="text-lg">👤</span>
+                      <span>Mon profil</span>
                     </Link>
-                  )}
-                  <button 
-                    onClick={logout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Se déconnecter
-                  </button>
+                    <Link 
+                      to="/orders" 
+                      className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 rounded-lg transition-all duration-200"
+                    >
+                      <span className="text-lg">📦</span>
+                      <span>Mes commandes</span>
+                    </Link>
+                    {user.role === 'admin' && (
+                      <Link 
+                        to="/admin" 
+                        className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 rounded-lg transition-all duration-200"
+                      >
+                        <span className="text-lg">⚙️</span>
+                        <span>Administration</span>
+                      </Link>
+                    )}
+                    <div className="border-t border-gray-200 my-2"></div>
+                    <button 
+                      onClick={logout}
+                      className="flex items-center space-x-3 w-full px-4 py-3 text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 rounded-lg transition-all duration-200"
+                    >
+                      <span className="text-lg">🚪</span>
+                      <span>Se déconnecter</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3">
                 <Link 
                   to="/login" 
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  className="px-4 py-2 text-gray-700 hover:text-blue-600 font-medium transition-all duration-300 hover:bg-gray-50 rounded-lg"
                 >
                   Connexion
                 </Link>
                 <Link 
                   to="/register" 
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
                   Inscription
                 </Link>
@@ -141,8 +154,8 @@ const Header = () => {
             )}
 
             {/* Mobile menu button */}
-            <button className="md:hidden p-2 text-gray-700 hover:text-blue-600 transition-colors">
-              ☰
+            <button className="lg:hidden p-3 text-gray-700 hover:text-blue-600 transition-all duration-300 rounded-xl hover:bg-gray-50">
+              <span className="text-xl">☰</span>
             </button>
           </div>
         </div>

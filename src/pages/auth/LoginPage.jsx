@@ -3,31 +3,96 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 
 const LoginPage = () => {
-  console.log('LoginPage component rendering...'); // Debug log
-  
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+  
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const { login, signInWithGoogle, signInWithFacebook } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  // Real-time validation
+  const validateField = (name, value) => {
+    switch (name) {
+      case 'email':
+        if (!value.trim()) return 'L\'adresse email est requise';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return 'L\'adresse email n\'est pas valide';
+        return '';
+      
+      case 'password':
+        if (!value) return 'Le mot de passe est requis';
+        if (value.length < 6) return 'Le mot de passe doit contenir au moins 6 caractères';
+        return '';
+      
+      default:
+        return '';
+    }
+  };
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+
+    // Real-time validation
+    if (touched[name]) {
+      const fieldError = validateField(name, value);
+      setErrors({
+        ...errors,
+        [name]: fieldError
+      });
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched({
+      ...touched,
+      [name]: true
+    });
+    
+    const fieldError = validateField(name, value);
+    setErrors({
+      ...errors,
+      [name]: fieldError
+    });
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
+
+    Object.keys(formData).forEach(field => {
+      const fieldError = validateField(field, formData[field]);
+      if (fieldError) {
+        newErrors[field] = fieldError;
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
 
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+
     try {
-      const result = await login(formData.email, formData.password);
+      const result = await login(formData.email.trim(), formData.password);
       if (result.success) {
         navigate('/');
       } else {
@@ -77,10 +142,10 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+          <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
             <span className="text-white font-bold text-xl">U</span>
           </div>
         </div>
@@ -99,8 +164,8 @@ const LoginPage = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+        <div className="bg-white/80 backdrop-blur-sm py-8 px-4 shadow-xl rounded-2xl sm:px-10 border border-gray-200/50">
+          <form className="space-y-6" onSubmit={handleSubmit} noValidate>
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -112,12 +177,19 @@ const LoginPage = () => {
                   name="email"
                   type="email"
                   autoComplete="email"
-                  required
                   value={formData.email}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  onBlur={handleBlur}
+                  className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                    errors.email && touched.email 
+                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                      : 'border-gray-300'
+                  }`}
                   placeholder="votre@email.com"
                 />
+                {errors.email && touched.email && (
+                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                )}
               </div>
             </div>
 
@@ -132,12 +204,19 @@ const LoginPage = () => {
                   name="password"
                   type="password"
                   autoComplete="current-password"
-                  required
                   value={formData.password}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  onBlur={handleBlur}
+                  className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                    errors.password && touched.password 
+                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                      : 'border-gray-300'
+                  }`}
                   placeholder="Votre mot de passe"
                 />
+                {errors.password && touched.password && (
+                  <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                )}
               </div>
             </div>
 
@@ -167,7 +246,7 @@ const LoginPage = () => {
 
             {/* Error Message */}
             {error && (
-              <div className="rounded-md bg-red-50 p-4">
+              <div className="rounded-xl bg-red-50 p-4 border border-red-200">
                 <div className="flex">
                   <div className="ml-3">
                     <h3 className="text-sm font-medium text-red-800">
@@ -183,7 +262,7 @@ const LoginPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 {isLoading ? (
                   <div className="flex items-center">
@@ -213,7 +292,7 @@ const LoginPage = () => {
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
               >
                 <span className="sr-only">Se connecter avec Google</span>
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -240,7 +319,7 @@ const LoginPage = () => {
                 type="button"
                 onClick={handleFacebookSignIn}
                 disabled={isLoading}
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
               >
                 <span className="sr-only">Se connecter avec Facebook</span>
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -252,21 +331,6 @@ const LoginPage = () => {
                 </svg>
               </button>
             </div>
-          </div>
-
-          {/* Terms */}
-          <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500">
-              En vous connectant, vous acceptez nos{' '}
-              <Link to="/terms" className="text-blue-600 hover:text-blue-500">
-                conditions d'utilisation
-              </Link>{' '}
-              et notre{' '}
-              <Link to="/privacy" className="text-blue-600 hover:text-blue-500">
-                politique de confidentialité
-              </Link>
-              .
-            </p>
           </div>
         </div>
       </div>
