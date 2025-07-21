@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const AddAddressModal = ({ isOpen, onClose, onAdd }) => {
+const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) => {
   const [formData, setFormData] = useState({
     name: '',
     firstName: '',
@@ -14,6 +14,35 @@ const AddAddressModal = ({ isOpen, onClose, onAdd }) => {
   
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+
+  // Initialize form data when editing
+  React.useEffect(() => {
+    if (editingAddress) {
+      setFormData({
+        name: editingAddress.name || '',
+        firstName: editingAddress.firstName || '',
+        lastName: editingAddress.lastName || '',
+        address: editingAddress.address || '',
+        city: editingAddress.city || '',
+        postalCode: editingAddress.postalCode || '',
+        country: editingAddress.country || 'France',
+        phone: editingAddress.phone || ''
+      });
+    } else {
+      setFormData({
+        name: '',
+        firstName: '',
+        lastName: '',
+        address: '',
+        city: '',
+        postalCode: '',
+        country: 'France',
+        phone: ''
+      });
+    }
+    setErrors({});
+    setTouched({});
+  }, [editingAddress]);
 
   const validateField = (name, value) => {
     switch (name) {
@@ -104,7 +133,11 @@ const AddAddressModal = ({ isOpen, onClose, onAdd }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      onAdd(formData);
+      if (editingAddress) {
+        onUpdate(formData);
+      } else {
+        onAdd(formData);
+      }
       handleClose();
     }
   };
@@ -132,7 +165,9 @@ const AddAddressModal = ({ isOpen, onClose, onAdd }) => {
       <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Ajouter une adresse</h2>
+            <h2 className="text-xl font-bold text-gray-900">
+              {editingAddress ? 'Modifier l\'adresse' : 'Ajouter une adresse'}
+            </h2>
             <button
               onClick={handleClose}
               className="text-gray-400 hover:text-gray-600 transition-colors duration-300"
@@ -338,7 +373,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd }) => {
                 type="submit"
                 className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
-                Ajouter l'adresse
+                {editingAddress ? 'Modifier l\'adresse' : 'Ajouter l\'adresse'}
               </button>
             </div>
           </form>

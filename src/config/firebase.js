@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
 
 // Your Firebase configuration
 // Using environment variables from .env file
@@ -22,6 +23,10 @@ console.log('Firebase app initialized:', app);
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);
 console.log('Firebase auth initialized:', auth);
+
+// Initialize Firebase Storage
+export const storage = getStorage(app);
+console.log('Firebase storage initialized:', storage);
 
 // Initialize providers
 export const googleProvider = new GoogleAuthProvider();

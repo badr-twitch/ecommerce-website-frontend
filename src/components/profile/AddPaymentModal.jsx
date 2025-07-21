@@ -11,6 +11,20 @@ const AddPaymentModal = ({ isOpen, onClose, onAdd }) => {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
+  // Reset form data when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        cardNumber: '',
+        cardName: '',
+        expiryDate: '',
+        cvv: ''
+      });
+      setErrors({});
+      setTouched({});
+    }
+  }, [isOpen]);
+
   const validateField = (name, value) => {
     switch (name) {
       case 'cardNumber': {
@@ -112,11 +126,12 @@ const AddPaymentModal = ({ isOpen, onClose, onAdd }) => {
     if (validateForm()) {
       const cardNumber = formData.cardNumber.replace(/\s/g, '');
       const paymentData = {
-        type: 'visa', // You could detect this based on card number
-        last4: cardNumber.slice(-4),
+        cardNumber,
         expiry: formData.expiryDate,
-        cardholderName: formData.cardName
+        cardholderName: formData.cardName,
+        cvv: formData.cvv
       };
+      
       onAdd(paymentData);
       handleClose();
     }
@@ -141,7 +156,9 @@ const AddPaymentModal = ({ isOpen, onClose, onAdd }) => {
       <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Ajouter une carte</h2>
+            <h2 className="text-xl font-bold text-gray-900">
+              Ajouter une carte
+            </h2>
             <button
               onClick={handleClose}
               className="text-gray-400 hover:text-gray-600 transition-colors duration-300"

@@ -81,11 +81,24 @@ const apiCall = async (endpoint, options = {}) => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
       ...options.headers,
+      // Only add Authorization from localStorage if not provided in options
+      ...(token && !options.headers?.Authorization && { Authorization: `Bearer ${token}` }),
     },
     ...options,
   };
+
+  // Ensure Content-Type is always application/json for POST requests
+  if (config.method === 'POST' && config.body) {
+    config.headers['Content-Type'] = 'application/json';
+  }
+
+  console.log('🔍 Frontend - API Call config:', {
+    url: `${API_BASE_URL}${endpoint}`,
+    method: config.method,
+    headers: config.headers,
+    body: config.body
+  });
 
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
@@ -135,6 +148,8 @@ export const AuthProvider = ({ children }) => {
       }
 
       // If user doesn't exist in database, create them
+      console.log('🔍 Frontend - Sending userData to backend:', userData);
+      console.log('🔍 Frontend - userData JSON:', JSON.stringify(userData));
       const newUser = await apiCall('/auth/register-firebase', {
         method: 'POST',
         body: JSON.stringify(userData),
@@ -389,7 +404,7 @@ export const AuthProvider = ({ children }) => {
   // Update profile function
   const updateProfile = async (userData) => {
     try {
-      const response = await apiCall('/users/profile', {
+      const response = await apiCall('/auth/profile', {
         method: 'PUT',
         body: JSON.stringify(userData)
       });

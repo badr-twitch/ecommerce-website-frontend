@@ -1,8 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import AddPaymentModal from '../components/profile/AddPaymentModal';
 import AddAddressModal from '../components/profile/AddAddressModal';
+import ProfilePhotoUpload from '../components/profile/ProfilePhotoUpload';
+import { paymentService } from '../services/paymentService';
+import { shippingService } from '../services/shippingService';
 
 const ProfilePage = () => {
   const { user, updateProfile, changePassword, logout } = useContext(AuthContext);
@@ -36,35 +39,50 @@ const ProfilePage = () => {
   });
 
   // Payment methods state
-  const [paymentMethods, setPaymentMethods] = useState([
-    {
-      id: 1,
-      type: 'visa',
-      last4: '4242',
-      expiry: '12/25',
-      isDefault: true,
-      cardholderName: 'John Doe'
-    }
-  ]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(false);
 
   // Shipping addresses state
-  const [shippingAddresses, setShippingAddresses] = useState([
-    {
-      id: 1,
-      name: 'Domicile',
-      firstName: 'John',
-      lastName: 'Doe',
-      address: '123 Rue de la Paix',
-      city: 'Paris',
-      postalCode: '75001',
-      country: 'France',
-      phone: '06 12 34 56 78',
-      isDefault: true
-    }
-  ]);
+  const [shippingAddresses, setShippingAddresses] = useState([]);
+  const [loadingShippingAddresses, setLoadingShippingAddresses] = useState(false);
 
   const [showAddPayment, setShowAddPayment] = useState(false);
   const [showAddAddress, setShowAddAddress] = useState(false);
+  const [editingAddress, setEditingAddress] = useState(null);
+
+  // Load payment methods and shipping addresses on component mount
+  useEffect(() => {
+    if (user) {
+      loadPaymentMethods();
+      loadShippingAddresses();
+    }
+  }, [user]);
+
+  const loadPaymentMethods = async () => {
+    try {
+      setLoadingPaymentMethods(true);
+      const response = await paymentService.getPaymentMethods();
+      setPaymentMethods(response.paymentMethods);
+    } catch (error) {
+      console.error('Error loading payment methods:', error);
+      setError('Erreur lors du chargement des méthodes de paiement');
+    } finally {
+      setLoadingPaymentMethods(false);
+    }
+  };
+
+  const loadShippingAddresses = async () => {
+    try {
+      setLoadingShippingAddresses(true);
+      const response = await shippingService.getShippingAddresses();
+      setShippingAddresses(response.shippingAddresses);
+    } catch (error) {
+      console.error('Error loading shipping addresses:', error);
+      setError('Erreur lors du chargement des adresses de livraison');
+    } finally {
+      setLoadingShippingAddresses(false);
+    }
+  };
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
@@ -143,56 +161,89 @@ const ProfilePage = () => {
     }
   };
 
-  const handleAddPaymentMethod = (paymentData) => {
-    const newPayment = {
-      id: Date.now(),
-      ...paymentData,
-      isDefault: paymentMethods.length === 0
-    };
-    setPaymentMethods([...paymentMethods, newPayment]);
-    setShowAddPayment(false);
-    setSuccess('Méthode de paiement ajoutée avec succès !');
+  const handleAddPaymentMethod = async (paymentData) => {
+    try {
+      await paymentService.addPaymentMethod(paymentData);
+      await loadPaymentMethods(); // Reload from database
+      setShowAddPayment(false);
+      setSuccess('Méthode de paiement ajoutée avec succès !');
+    } catch (error) {
+      setError('Erreur lors de l\'ajout de la méthode de paiement');
+    }
   };
 
-  const handleAddShippingAddress = (addressData) => {
-    const newAddress = {
-      id: Date.now(),
-      ...addressData,
-      isDefault: shippingAddresses.length === 0
-    };
-    setShippingAddresses([...shippingAddresses, newAddress]);
-    setShowAddAddress(false);
-    setSuccess('Adresse de livraison ajoutée avec succès !');
+  const handleAddShippingAddress = async (addressData) => {
+    try {
+      await shippingService.addShippingAddress(addressData);
+      await loadShippingAddresses(); // Reload from database
+      setShowAddAddress(false);
+      setSuccess('Adresse de livraison ajoutée avec succès !');
+    } catch (error) {
+      setError('Erreur lors de l\'ajout de l\'adresse de livraison');
+    }
   };
 
-  const handleDeletePaymentMethod = (id) => {
+  const handleDeletePaymentMethod = async (id) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette méthode de paiement ?')) {
-      setPaymentMethods(paymentMethods.filter(pm => pm.id !== id));
-      setSuccess('Méthode de paiement supprimée avec succès !');
+      try {
+        await paymentService.deletePaymentMethod(id);
+        await loadPaymentMethods(); // Reload from database
+        setSuccess('Méthode de paiement supprimée avec succès !');
+      } catch (error) {
+        setError('Erreur lors de la suppression de la méthode de paiement');
+      }
     }
   };
 
-  const handleDeleteShippingAddress = (id) => {
+  const handleDeleteShippingAddress = async (id) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette adresse de livraison ?')) {
-      setShippingAddresses(shippingAddresses.filter(addr => addr.id !== id));
-      setSuccess('Adresse de livraison supprimée avec succès !');
+      try {
+        await shippingService.deleteShippingAddress(id);
+        await loadShippingAddresses(); // Reload from database
+        setSuccess('Adresse de livraison supprimée avec succès !');
+      } catch (error) {
+        setError('Erreur lors de la suppression de l\'adresse de livraison');
+      }
     }
   };
 
-  const handleSetDefaultPayment = (id) => {
-    setPaymentMethods(paymentMethods.map(pm => ({
-      ...pm,
-      isDefault: pm.id === id
-    })));
-    setSuccess('Méthode de paiement par défaut mise à jour !');
+  const handleSetDefaultPayment = async (id) => {
+    try {
+      await paymentService.setDefaultPaymentMethod(id);
+      await loadPaymentMethods(); // Reload from database
+      setSuccess('Méthode de paiement par défaut mise à jour !');
+    } catch (error) {
+      setError('Erreur lors de la mise à jour de la méthode de paiement par défaut');
+    }
   };
 
-  const handleSetDefaultAddress = (id) => {
-    setShippingAddresses(shippingAddresses.map(addr => ({
-      ...addr,
-      isDefault: addr.id === id
-    })));
-    setSuccess('Adresse de livraison par défaut mise à jour !');
+  const handleSetDefaultAddress = async (id) => {
+    try {
+      await shippingService.setDefaultShippingAddress(id);
+      await loadShippingAddresses(); // Reload from database
+      setSuccess('Adresse de livraison par défaut mise à jour !');
+    } catch (error) {
+      setError('Erreur lors de la mise à jour de l\'adresse de livraison par défaut');
+    }
+  };
+
+  const handleEditShippingAddress = (address) => {
+    setEditingAddress(address);
+    setShowAddAddress(true);
+  };
+
+  const handleUpdateShippingAddress = async (addressData) => {
+    if (editingAddress) {
+      try {
+        await shippingService.updateShippingAddress(editingAddress.id, addressData);
+        await loadShippingAddresses(); // Reload from database
+        setEditingAddress(null);
+        setShowAddAddress(false);
+        setSuccess('Adresse de livraison mise à jour avec succès !');
+      } catch (error) {
+        setError('Erreur lors de la mise à jour de l\'adresse de livraison');
+      }
+    }
   };
 
   if (!user) {
@@ -342,15 +393,10 @@ const ProfilePage = () => {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        URL de la photo de profil
-                      </label>
-                      <input
-                        type="url"
-                        value={profileData.photoURL}
-                        onChange={(e) => setProfileData({...profileData, photoURL: e.target.value})}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="https://example.com/photo.jpg"
+                      <ProfilePhotoUpload
+                        currentPhotoURL={profileData.photoURL}
+                        onPhotoChange={(url) => setProfileData({...profileData, photoURL: url})}
+                        isLoading={isLoading}
                       />
                     </div>
                     <button
@@ -432,46 +478,9 @@ const ProfilePage = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  {paymentMethods.map((payment) => (
-                    <div key={payment.id} className="border border-gray-200 rounded-xl p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className="text-2xl">💳</div>
-                          <div>
-                            <h3 className="font-medium text-gray-900">
-                              {payment.cardholderName}
-                            </h3>
-                            <p className="text-sm text-gray-600">
-                              •••• •••• •••• {payment.last4} - Expire {payment.expiry}
-                            </p>
-                            {payment.isDefault && (
-                              <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mt-1">
-                                Par défaut
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          {!payment.isDefault && (
-                            <button
-                              onClick={() => handleSetDefaultPayment(payment.id)}
-                              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                            >
-                              Définir par défaut
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleDeletePaymentMethod(payment.id)}
-                            className="text-red-600 hover:text-red-700 text-sm font-medium"
-                          >
-                            Supprimer
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {paymentMethods.length === 0 && (
+                  {loadingPaymentMethods ? (
+                    <div className="text-center py-8">Chargement des méthodes de paiement...</div>
+                  ) : paymentMethods.length === 0 ? (
                     <div className="text-center py-8">
                       <div className="text-4xl mb-4">💳</div>
                       <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune méthode de paiement</h3>
@@ -483,6 +492,45 @@ const ProfilePage = () => {
                         Ajouter une carte
                       </button>
                     </div>
+                  ) : (
+                    paymentMethods.map((payment) => (
+                      <div key={payment.id} className="border border-gray-200 rounded-xl p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <div className="text-2xl">💳</div>
+                            <div>
+                              <h3 className="font-medium text-gray-900">
+                                {payment.cardholderName}
+                              </h3>
+                              <p className="text-sm text-gray-600">
+                                •••• •••• •••• {payment.last4} - Expire {payment.expiry}
+                              </p>
+                              {payment.isDefault && (
+                                <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mt-1">
+                                  Par défaut
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            {!payment.isDefault && (
+                              <button
+                                onClick={() => handleSetDefaultPayment(payment.id)}
+                                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                              >
+                                Définir par défaut
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDeletePaymentMethod(payment.id)}
+                              className="text-red-600 hover:text-red-700 text-sm font-medium"
+                            >
+                              Supprimer
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
                   )}
                 </div>
               </div>
@@ -502,55 +550,9 @@ const ProfilePage = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {shippingAddresses.map((address) => (
-                    <div key={address.id} className="border border-gray-200 rounded-xl p-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <h3 className="font-medium text-gray-900">{address.name}</h3>
-                            {address.isDefault && (
-                              <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                Par défaut
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-600">
-                            {address.firstName} {address.lastName}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {address.address}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {address.postalCode} {address.city}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {address.country}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {address.phone}
-                          </p>
-                        </div>
-                        <div className="flex flex-col space-y-2">
-                          {!address.isDefault && (
-                            <button
-                              onClick={() => handleSetDefaultAddress(address.id)}
-                              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                            >
-                              Définir par défaut
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleDeleteShippingAddress(address.id)}
-                            className="text-red-600 hover:text-red-700 text-sm font-medium"
-                          >
-                            Supprimer
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {shippingAddresses.length === 0 && (
+                  {loadingShippingAddresses ? (
+                    <div className="text-center py-8">Chargement des adresses de livraison...</div>
+                  ) : shippingAddresses.length === 0 ? (
                     <div className="col-span-full text-center py-8">
                       <div className="text-4xl mb-4">🏠</div>
                       <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune adresse de livraison</h3>
@@ -562,6 +564,60 @@ const ProfilePage = () => {
                         Ajouter une adresse
                       </button>
                     </div>
+                  ) : (
+                    shippingAddresses.map((address) => (
+                      <div key={address.id} className="border border-gray-200 rounded-xl p-4">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <h3 className="font-medium text-gray-900">{address.name}</h3>
+                              {address.isDefault && (
+                                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                                  Par défaut
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600">
+                              {address.firstName} {address.lastName}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {address.address}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {address.postalCode} {address.city}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {address.country}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {address.phone}
+                            </p>
+                          </div>
+                          <div className="flex flex-col space-y-2">
+                            {!address.isDefault && (
+                              <button
+                                onClick={() => handleSetDefaultAddress(address.id)}
+                                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                              >
+                                Définir par défaut
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDeleteShippingAddress(address.id)}
+                              className="text-red-600 hover:text-red-700 text-sm font-medium"
+                            >
+                              Supprimer
+                            </button>
+                            <button
+                              onClick={() => handleEditShippingAddress(address)}
+                              className="text-gray-600 hover:text-gray-700 text-sm font-medium"
+                            >
+                              Modifier
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
                   )}
                 </div>
               </div>
@@ -650,16 +706,21 @@ const ProfilePage = () => {
       </div>
 
       {/* Modals */}
-      <AddPaymentModal
-        isOpen={showAddPayment}
-        onClose={() => setShowAddPayment(false)}
-        onAdd={handleAddPaymentMethod}
-      />
+                      <AddPaymentModal
+                  isOpen={showAddPayment}
+                  onClose={() => setShowAddPayment(false)}
+                  onAdd={handleAddPaymentMethod}
+                />
       
       <AddAddressModal
         isOpen={showAddAddress}
-        onClose={() => setShowAddAddress(false)}
+        onClose={() => {
+          setShowAddAddress(false);
+          setEditingAddress(null);
+        }}
         onAdd={handleAddShippingAddress}
+        editingAddress={editingAddress}
+        onUpdate={handleUpdateShippingAddress}
       />
     </div>
   );
