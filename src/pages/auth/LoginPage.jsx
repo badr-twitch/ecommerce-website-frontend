@@ -176,7 +176,7 @@ const LoginPage = () => {
                   id="email"
                   name="email"
                   type="email"
-                  autoComplete="email"
+                  autoComplete="off"
                   value={formData.email}
                   onChange={handleChange}
                   onBlur={handleBlur}

@@ -122,7 +122,7 @@ const ProfilePage = () => {
         setError(result.error || 'Erreur lors de la mise à jour du profil');
       }
     } catch (error) {
-      setError('Erreur lors de la mise à jour du profil');
+      setError('Erreur lors de la mise à jour du profil: ' + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -135,20 +135,17 @@ const ProfilePage = () => {
     setSuccess('');
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError('Les nouveaux mots de passe ne correspondent pas');
-      setIsLoading(false);
-      return;
-    }
-
-    if (passwordData.newPassword.length < 6) {
-      setError('Le nouveau mot de passe doit contenir au moins 6 caractères');
+      setError('Les mots de passe ne correspondent pas');
       setIsLoading(false);
       return;
     }
 
     try {
-      const result = await changePassword(passwordData.currentPassword, passwordData.newPassword);
-      
+      const result = await changePassword(
+        passwordData.currentPassword,
+        passwordData.newPassword
+      );
+
       if (result.success) {
         setSuccess('Mot de passe modifié avec succès !');
         setPasswordData({
@@ -157,10 +154,10 @@ const ProfilePage = () => {
           confirmPassword: ''
         });
       } else {
-        setError(result.error || 'Erreur lors du changement de mot de passe');
+        setError(result.error || 'Erreur lors de la modification du mot de passe');
       }
     } catch (error) {
-      setError('Erreur lors du changement de mot de passe');
+      setError('Erreur lors de la modification du mot de passe: ' + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -171,7 +168,7 @@ const ProfilePage = () => {
       await logout();
       navigate('/');
     } catch (error) {
-      setError('Erreur lors de la déconnexion');
+      setError('Erreur lors de la déconnexion: ' + error.message);
     }
   };
 
@@ -200,7 +197,6 @@ const ProfilePage = () => {
       }
     } catch (error) {
       setError('Erreur lors de la suppression du compte: ' + error.message);
-      console.error('Error deleting user account:', error);
     } finally {
       setIsLoading(false);
       setShowDeleteConfirm(false);
@@ -300,29 +296,21 @@ const ProfilePage = () => {
   };
 
   const handleSaveName = async () => {
-    if (tempDisplayName.trim() === '') {
-      setError('Le nom ne peut pas être vide');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
-    setSuccess('');
-
     try {
+      setIsLoading(true);
       const result = await updateProfile({
-        displayName: tempDisplayName.trim()
+        displayName: tempDisplayName
       });
 
       if (result.success) {
-        setProfileData({ ...profileData, displayName: tempDisplayName.trim() });
+        setProfileData(prev => ({ ...prev, displayName: tempDisplayName }));
         setIsEditingName(false);
         setSuccess('Nom mis à jour avec succès !');
       } else {
         setError(result.error || 'Erreur lors de la mise à jour du nom');
       }
     } catch (error) {
-      setError('Erreur lors de la mise à jour du nom');
+      setError('Erreur lors de la mise à jour du nom: ' + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -330,73 +318,42 @@ const ProfilePage = () => {
 
   const handleCancelEditName = () => {
     setIsEditingName(false);
-    setTempDisplayName('');
+    setTempDisplayName(profileData.displayName);
   };
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Accès refusé
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Vous devez être connecté pour accéder à cette page.
-              </p>
-              <Link
-                to="/login"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-              >
-                Se connecter
-              </Link>
-            </div>
-          </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Connexion requise</h2>
+          <p className="text-gray-600 mb-6">Veuillez vous connecter pour accéder à votre profil.</p>
+          <Link
+            to="/login"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+          >
+            Se connecter
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Mon Compte</h1>
-          <p className="mt-2 text-gray-600">
-            Gérez vos informations personnelles, paiements et adresses de livraison
-          </p>
-        </div>
-
-        {/* Error/Success Messages */}
-        {error && (
-          <div className="mb-6 rounded-xl bg-red-50 p-4 border border-red-200">
-            <div className="flex">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">{error}</h3>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-xl shadow-sm">
+          {/* Header */}
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h1 className="text-2xl font-semibold text-gray-900">Mon Profil</h1>
+            <p className="text-gray-600">Gérez vos informations personnelles et paramètres</p>
           </div>
-        )}
 
-        {success && (
-          <div className="mb-6 rounded-xl bg-green-50 p-4 border border-green-200">
-            <div className="flex">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-green-800">{success}</h3>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-gray-200/50">
           {/* Navigation Tabs */}
           <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8 px-6 overflow-x-auto">
+            <nav className="flex space-x-8 px-6">
               <button
                 onClick={() => setActiveTab('profile')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'profile'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -406,7 +363,7 @@ const ProfilePage = () => {
               </button>
               <button
                 onClick={() => setActiveTab('security')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'security'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -415,28 +372,28 @@ const ProfilePage = () => {
                 Sécurité
               </button>
               <button
-                onClick={() => setActiveTab('payments')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-                  activeTab === 'payments'
+                onClick={() => setActiveTab('payment')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'payment'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Paiements
+                Paiement
               </button>
               <button
-                onClick={() => setActiveTab('addresses')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-                  activeTab === 'addresses'
+                onClick={() => setActiveTab('shipping')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'shipping'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Adresses
+                Livraison
               </button>
               <button
                 onClick={() => setActiveTab('settings')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'settings'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -447,111 +404,103 @@ const ProfilePage = () => {
             </nav>
           </div>
 
-          {/* Tab Content */}
+          {/* Content */}
           <div className="p-6">
+            {/* Error and Success Messages */}
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-800">{error}</p>
+              </div>
+            )}
+            {success && (
+              <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-green-800">{success}</p>
+              </div>
+            )}
+
             {/* Profile Tab */}
             {activeTab === 'profile' && (
               <div className="space-y-6">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Informations personnelles</h2>
-                  <form onSubmit={handleProfileSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-start space-x-6">
+                  <ProfilePhotoUpload
+                    currentPhotoURL={profileData.photoURL}
+                    onPhotoUpdate={(newPhotoURL) => {
+                      setProfileData(prev => ({ ...prev, photoURL: newPhotoURL }));
+                    }}
+                  />
+                  
+                  <div className="flex-1">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Informations personnelles</h2>
+                    
+                    <form onSubmit={handleProfileSubmit} className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Nom complet
+                        <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">
+                          Nom d'affichage
                         </label>
-                        <div className="flex items-center space-x-2">
-                          {isEditingName ? (
-                            <>
-                              <input
-                                type="text"
-                                value={tempDisplayName}
-                                onChange={(e) => setTempDisplayName(e.target.value)}
-                                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Entrez votre nom complet"
-                              />
-                              <button
-                                type="button"
-                                onClick={handleSaveName}
-                                disabled={isLoading}
-                                className="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 disabled:opacity-50"
-                              >
-                                ✓
-                              </button>
-                              <button
-                                type="button"
-                                onClick={handleCancelEditName}
-                                disabled={isLoading}
-                                className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 disabled:opacity-50"
-                              >
-                                ✕
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <input
-                                type="text"
-                                value={profileData.displayName}
-                                disabled
-                                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700"
-                                placeholder="Aucun nom défini"
-                              />
-                              <button
-                                type="button"
-                                onClick={handleEditName}
-                                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300"
-                              >
-                                ✏️
-                              </button>
-                            </>
-                          )}
-                        </div>
+                        {isEditingName ? (
+                          <div className="flex space-x-2">
+                            <input
+                              type="text"
+                              id="displayName"
+                              value={tempDisplayName}
+                              onChange={(e) => setTempDisplayName(e.target.value)}
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                            <button
+                              type="button"
+                              onClick={handleSaveName}
+                              disabled={isLoading}
+                              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                            >
+                              Sauvegarder
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleCancelEditName}
+                              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                            >
+                              Annuler
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-2">
+                            <span className="px-3 py-2 bg-gray-100 rounded-lg text-gray-900">
+                              {profileData.displayName || 'Non défini'}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={handleEditName}
+                              className="text-blue-600 hover:text-blue-700 text-sm"
+                            >
+                              Modifier
+                            </button>
+                          </div>
+                        )}
                       </div>
+
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                           Email
                         </label>
                         <input
                           type="email"
+                          id="email"
                           value={profileData.email}
                           disabled
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
                         />
+                        <p className="text-xs text-gray-500 mt-1">L'email ne peut pas être modifié</p>
                       </div>
-                    </div>
-                    <div>
-                      <ProfilePhotoUpload
-                        currentPhotoURL={profileData.photoURL}
-                        onPhotoChange={(url) => setProfileData({...profileData, photoURL: url})}
-                        isLoading={isLoading}
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50"
-                    >
-                      {isLoading ? 'Mise à jour...' : 'Mettre à jour le profil'}
-                    </button>
-                    {isEditingName && (
-                      <div className="mt-4 flex space-x-2">
-                        <button
-                          onClick={handleSaveName}
-                          disabled={isLoading}
-                          className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white font-medium py-2 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50"
-                        >
-                          {isLoading ? 'Sauvegarde...' : 'Enregistrer'}
-                        </button>
-                        <button
-                          onClick={handleCancelEditName}
-                          disabled={isLoading}
-                          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-xl transition-all duration-300"
-                        >
-                          Annuler
-                        </button>
-                      </div>
-                    )}
-                  </form>
+
+                      <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                      >
+                        {isLoading ? 'Mise à jour...' : 'Mettre à jour le profil'}
+                      </button>
+                    </form>
+                  </div>
                 </div>
               </div>
             )}
@@ -559,269 +508,281 @@ const ProfilePage = () => {
             {/* Security Tab */}
             {activeTab === 'security' && (
               <div className="space-y-6">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Changer le mot de passe</h2>
-                  <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Mot de passe actuel
-                      </label>
-                      <input
-                        type="password"
-                        value={passwordData.currentPassword}
-                        onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Nouveau mot de passe
-                        </label>
-                        <input
-                          type="password"
-                          value={passwordData.newPassword}
-                          onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Confirmer le nouveau mot de passe
-                        </label>
-                        <input
-                          type="password"
-                          value={passwordData.confirmPassword}
-                          onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50"
-                    >
-                      {isLoading ? 'Changement...' : 'Changer le mot de passe'}
-                    </button>
-                  </form>
-                </div>
+                <h2 className="text-xl font-semibold text-gray-900">Sécurité</h2>
+                
+                <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-md">
+                  <div>
+                    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                      Mot de passe actuel
+                    </label>
+                    <input
+                      type="password"
+                      id="currentPassword"
+                      value={passwordData.currentPassword}
+                      onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                      Nouveau mot de passe
+                    </label>
+                    <input
+                      type="password"
+                      id="newPassword"
+                      value={passwordData.newPassword}
+                      onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                      required
+                      minLength="6"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                      Confirmer le nouveau mot de passe
+                    </label>
+                    <input
+                      type="password"
+                      id="confirmPassword"
+                      value={passwordData.confirmPassword}
+                      onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                      required
+                      minLength="6"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {isLoading ? 'Modification...' : 'Modifier le mot de passe'}
+                  </button>
+                </form>
               </div>
             )}
 
-            {/* Payments Tab */}
-            {activeTab === 'payments' && (
+            {/* Payment Tab */}
+            {activeTab === 'payment' && (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-semibold text-gray-900">Méthodes de paiement</h2>
                   <button
                     onClick={() => setShowAddPayment(true)}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-2 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    + Ajouter une carte
+                    Ajouter une méthode
                   </button>
                 </div>
-                
-                <div className="space-y-4">
-                  {loadingPaymentMethods ? (
-                    <div className="text-center py-8">Chargement des méthodes de paiement...</div>
-                  ) : paymentMethods.length === 0 ? (
-                    <div className="text-center py-8">
-                      <div className="text-4xl mb-4">💳</div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune méthode de paiement</h3>
-                      <p className="text-gray-600 mb-4">Ajoutez une carte pour des achats plus rapides</p>
-                      <button
-                        onClick={() => setShowAddPayment(true)}
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-2 px-4 rounded-xl transition-all duration-300"
-                      >
-                        Ajouter une carte
-                      </button>
-                    </div>
-                  ) : (
-                    paymentMethods.map((payment) => (
-                      <div key={payment.id} className="border border-gray-200 rounded-xl p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                            <div className="text-2xl">💳</div>
-                            <div>
-                              <h3 className="font-medium text-gray-900">
-                                {payment.cardholderName}
-                              </h3>
-                              <p className="text-sm text-gray-600">
-                                •••• •••• •••• {payment.last4} - Expire {payment.expiry}
-                              </p>
-                              {payment.isDefault && (
-                                <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mt-1">
-                                  Par défaut
-                                </span>
-                              )}
-                            </div>
+
+                {loadingPaymentMethods ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="text-gray-600 mt-2">Chargement des méthodes de paiement...</p>
+                  </div>
+                ) : paymentMethods.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600">Aucune méthode de paiement enregistrée</p>
+                    <button
+                      onClick={() => setShowAddPayment(true)}
+                      className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Ajouter votre première méthode
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {paymentMethods.map((method) => (
+                      <div key={method.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-6 bg-gray-200 rounded flex items-center justify-center">
+                            <span className="text-xs font-medium text-gray-600">
+                              {method.cardType || 'CARTE'}
+                            </span>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            {!payment.isDefault && (
-                              <button
-                                onClick={() => handleSetDefaultPayment(payment.id)}
-                                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                              >
-                                Définir par défaut
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleDeletePaymentMethod(payment.id)}
-                              className="text-red-600 hover:text-red-700 text-sm font-medium"
-                            >
-                              Supprimer
-                            </button>
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              •••• •••• •••• {method.last4}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Expire {method.expiryMonth}/{method.expiryYear}
+                            </p>
                           </div>
                         </div>
+                        <div className="flex items-center space-x-2">
+                          {method.isDefault && (
+                            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                              Par défaut
+                            </span>
+                          )}
+                          {!method.isDefault && (
+                            <button
+                              onClick={() => handleSetDefaultPayment(method.id)}
+                              className="text-blue-600 hover:text-blue-700 text-sm"
+                            >
+                              Définir par défaut
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDeletePaymentMethod(method.id)}
+                            className="text-red-600 hover:text-red-700 text-sm"
+                          >
+                            Supprimer
+                          </button>
+                        </div>
                       </div>
-                    ))
-                  )}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
-            {/* Addresses Tab */}
-            {activeTab === 'addresses' && (
+            {/* Shipping Tab */}
+            {activeTab === 'shipping' && (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-semibold text-gray-900">Adresses de livraison</h2>
                   <button
                     onClick={() => setShowAddAddress(true)}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-2 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    + Ajouter une adresse
+                    Ajouter une adresse
                   </button>
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {loadingShippingAddresses ? (
-                    <div className="text-center py-8">Chargement des adresses de livraison...</div>
-                  ) : shippingAddresses.length === 0 ? (
-                    <div className="col-span-full text-center py-8">
-                      <div className="text-4xl mb-4">🏠</div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune adresse de livraison</h3>
-                      <p className="text-gray-600 mb-4">Ajoutez une adresse pour des achats plus rapides</p>
-                      <button
-                        onClick={() => setShowAddAddress(true)}
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-2 px-4 rounded-xl transition-all duration-300"
-                      >
-                        Ajouter une adresse
-                      </button>
-                    </div>
-                  ) : (
-                    shippingAddresses.map((address) => (
-                      <div key={address.id} className="border border-gray-200 rounded-xl p-4">
+
+                {loadingShippingAddresses ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="text-gray-600 mt-2">Chargement des adresses...</p>
+                  </div>
+                ) : shippingAddresses.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600">Aucune adresse de livraison enregistrée</p>
+                    <button
+                      onClick={() => setShowAddAddress(true)}
+                      className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Ajouter votre première adresse
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {shippingAddresses.map((address) => (
+                      <div key={address.id} className="p-4 border border-gray-200 rounded-lg">
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
                             <div className="flex items-center space-x-2 mb-2">
-                              <h3 className="font-medium text-gray-900">{address.name}</h3>
+                              <h3 className="font-medium text-gray-900">
+                                {address.firstName} {address.lastName}
+                              </h3>
                               {address.isDefault && (
-                                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                                <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                                   Par défaut
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-600">
-                              {address.firstName} {address.lastName}
+                            <p className="text-gray-600">
+                              {address.streetAddress}
                             </p>
-                            <p className="text-sm text-gray-600">
-                              {address.address}
+                            <p className="text-gray-600">
+                              {address.city}, {address.state} {address.postalCode}
                             </p>
-                            <p className="text-sm text-gray-600">
-                              {address.postalCode} {address.city}
-                            </p>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-gray-600">
                               {address.country}
                             </p>
-                            <p className="text-sm text-gray-600">
-                              {address.phone}
-                            </p>
+                            {address.phone && (
+                              <p className="text-gray-600">
+                                Tél: {address.phone}
+                              </p>
+                            )}
                           </div>
-                          <div className="flex flex-col space-y-2">
+                          <div className="flex items-center space-x-2">
                             {!address.isDefault && (
                               <button
                                 onClick={() => handleSetDefaultAddress(address.id)}
-                                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                                className="text-blue-600 hover:text-blue-700 text-sm"
                               >
                                 Définir par défaut
                               </button>
                             )}
                             <button
-                              onClick={() => handleDeleteShippingAddress(address.id)}
-                              className="text-red-600 hover:text-red-700 text-sm font-medium"
-                            >
-                              Supprimer
-                            </button>
-                            <button
                               onClick={() => handleEditShippingAddress(address)}
-                              className="text-gray-600 hover:text-gray-700 text-sm font-medium"
+                              className="text-blue-600 hover:text-blue-700 text-sm"
                             >
                               Modifier
+                            </button>
+                            <button
+                              onClick={() => handleDeleteShippingAddress(address.id)}
+                              className="text-red-600 hover:text-red-700 text-sm"
+                            >
+                              Supprimer
                             </button>
                           </div>
                         </div>
                       </div>
-                    ))
-                  )}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
             {/* Settings Tab */}
             {activeTab === 'settings' && (
               <div className="space-y-6">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Paramètres du compte</h2>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium text-gray-900">Notifications par email</h3>
-                        <p className="text-sm text-gray-600">Recevoir les notifications importantes</p>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={accountSettings.emailNotifications}
-                        onChange={(e) => setAccountSettings({...accountSettings, emailNotifications: e.target.checked})}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
+                <h2 className="text-xl font-semibold text-gray-900">Paramètres du compte</h2>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-medium text-gray-900">Notifications par email</h3>
+                      <p className="text-sm text-gray-600">Recevoir les notifications importantes</p>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium text-gray-900">Emails marketing</h3>
-                        <p className="text-sm text-gray-600">Recevoir les offres et promotions</p>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={accountSettings.marketingEmails}
-                        onChange={(e) => setAccountSettings({...accountSettings, marketingEmails: e.target.checked})}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
+                    <input
+                      type="checkbox"
+                      checked={accountSettings.emailNotifications}
+                      onChange={(e) => setAccountSettings({...accountSettings, emailNotifications: e.target.checked})}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-medium text-gray-900">Emails marketing</h3>
+                      <p className="text-sm text-gray-600">Recevoir les offres et promotions</p>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium text-gray-900">Mises à jour de commande</h3>
-                        <p className="text-sm text-gray-600">Notifications sur le statut des commandes</p>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={accountSettings.orderUpdates}
-                        onChange={(e) => setAccountSettings({...accountSettings, orderUpdates: e.target.checked})}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
+                    <input
+                      type="checkbox"
+                      checked={accountSettings.marketingEmails}
+                      onChange={(e) => setAccountSettings({...accountSettings, marketingEmails: e.target.checked})}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-medium text-gray-900">Mises à jour de commande</h3>
+                      <p className="text-sm text-gray-600">Notifications sur le statut des commandes</p>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium text-gray-900">Newsletter</h3>
-                        <p className="text-sm text-gray-600">Recevoir notre newsletter mensuelle</p>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={accountSettings.newsletter}
-                        onChange={(e) => setAccountSettings({...accountSettings, newsletter: e.target.checked})}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
+                    <input
+                      type="checkbox"
+                      checked={accountSettings.orderUpdates}
+                      onChange={(e) => setAccountSettings({...accountSettings, orderUpdates: e.target.checked})}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-medium text-gray-900">Newsletter</h3>
+                      <p className="text-sm text-gray-600">Recevoir notre newsletter mensuelle</p>
                     </div>
+                    <input
+                      type="checkbox"
+                      checked={accountSettings.newsletter}
+                      onChange={(e) => setAccountSettings({...accountSettings, newsletter: e.target.checked})}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
                   </div>
                 </div>
 
@@ -851,11 +812,11 @@ const ProfilePage = () => {
       </div>
 
       {/* Modals */}
-                      <AddPaymentModal
-                  isOpen={showAddPayment}
-                  onClose={() => setShowAddPayment(false)}
-                  onAdd={handleAddPaymentMethod}
-                />
+      <AddPaymentModal
+        isOpen={showAddPayment}
+        onClose={() => setShowAddPayment(false)}
+        onAdd={handleAddPaymentMethod}
+      />
       
       <AddAddressModal
         isOpen={showAddAddress}
@@ -876,15 +837,25 @@ const ProfilePage = () => {
               Confirmer la suppression
             </h3>
             <p className="text-gray-600 mb-4">
-              Pour des raisons de sécurité, veuillez entrer votre mot de passe pour confirmer la suppression de votre compte.
+              Pour des raisons de sécurité, veuillez entrer votre mot de passe pour commencer le processus de suppression.
             </p>
+            
             <input
               type="password"
+              name="delete-account-password"
               value={deletePassword}
               onChange={(e) => setDeletePassword(e.target.value)}
               placeholder="Votre mot de passe"
+              autoComplete="new-password"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
+              data-form-type="other"
+              data-lpignore="true"
+              data-1p-ignore="true"
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-4"
             />
+            
             <div className="flex space-x-3">
               <button
                 onClick={() => {
