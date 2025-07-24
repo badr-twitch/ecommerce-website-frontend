@@ -6,6 +6,7 @@ import AddAddressModal from '../components/profile/AddAddressModal';
 import ProfilePhotoUpload from '../components/profile/ProfilePhotoUpload';
 import { paymentService } from '../services/paymentService';
 import { shippingService } from '../services/shippingService';
+import userService from '../services/userService';
 
 const ProfilePage = () => {
   const { user, updateProfile, changePassword, logout } = useContext(AuthContext);
@@ -18,10 +19,29 @@ const ProfilePage = () => {
 
   // Profile form state
   const [profileData, setProfileData] = useState({
-    displayName: user?.displayName || '',
-    email: user?.email || '',
-    photoURL: user?.photoURL || ''
+    displayName: '',
+    email: '',
+    photoURL: ''
   });
+
+  // Profile editing state
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempDisplayName, setTempDisplayName] = useState('');
+
+  // Delete account state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+
+  // Sync profile data when user changes
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        displayName: user.displayName || user.fullName || '',
+        email: user.email || '',
+        photoURL: user.photoURL || user.profilePhoto || ''
+      });
+    }
+  }, [user]);
 
   // Password form state
   const [passwordData, setPasswordData] = useState({
@@ -155,9 +175,36 @@ const ProfilePage = () => {
     }
   };
 
-  const handleDeleteAccount = () => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) {
-      setError('Fonctionnalité de suppression de compte à implémenter');
+  const handleDeleteAccount = async () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletePassword.trim()) {
+      setError('Mot de passe requis pour supprimer le compte');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError('');
+      
+      const result = await userService.deleteAccount(deletePassword);
+      
+      if (result.success) {
+        // Logout and redirect
+        await logout();
+        navigate('/');
+      } else {
+        setError(result.message || 'Erreur lors de la suppression du compte');
+      }
+    } catch (error) {
+      setError('Erreur lors de la suppression du compte: ' + error.message);
+      console.error('Error deleting user account:', error);
+    } finally {
+      setIsLoading(false);
+      setShowDeleteConfirm(false);
+      setDeletePassword('');
     }
   };
 
@@ -244,6 +291,46 @@ const ProfilePage = () => {
         setError('Erreur lors de la mise à jour de l\'adresse de livraison');
       }
     }
+  };
+
+  // Profile name editing functions
+  const handleEditName = () => {
+    setTempDisplayName(profileData.displayName);
+    setIsEditingName(true);
+  };
+
+  const handleSaveName = async () => {
+    if (tempDisplayName.trim() === '') {
+      setError('Le nom ne peut pas être vide');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const result = await updateProfile({
+        displayName: tempDisplayName.trim()
+      });
+
+      if (result.success) {
+        setProfileData({ ...profileData, displayName: tempDisplayName.trim() });
+        setIsEditingName(false);
+        setSuccess('Nom mis à jour avec succès !');
+      } else {
+        setError(result.error || 'Erreur lors de la mise à jour du nom');
+      }
+    } catch (error) {
+      setError('Erreur lors de la mise à jour du nom');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancelEditName = () => {
+    setIsEditingName(false);
+    setTempDisplayName('');
   };
 
   if (!user) {
@@ -373,12 +460,52 @@ const ProfilePage = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Nom complet
                         </label>
-                        <input
-                          type="text"
-                          value={profileData.displayName}
-                          onChange={(e) => setProfileData({...profileData, displayName: e.target.value})}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
+                        <div className="flex items-center space-x-2">
+                          {isEditingName ? (
+                            <>
+                              <input
+                                type="text"
+                                value={tempDisplayName}
+                                onChange={(e) => setTempDisplayName(e.target.value)}
+                                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Entrez votre nom complet"
+                              />
+                              <button
+                                type="button"
+                                onClick={handleSaveName}
+                                disabled={isLoading}
+                                className="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 disabled:opacity-50"
+                              >
+                                ✓
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleCancelEditName}
+                                disabled={isLoading}
+                                className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 disabled:opacity-50"
+                              >
+                                ✕
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <input
+                                type="text"
+                                value={profileData.displayName}
+                                disabled
+                                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700"
+                                placeholder="Aucun nom défini"
+                              />
+                              <button
+                                type="button"
+                                onClick={handleEditName}
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300"
+                              >
+                                ✏️
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -406,6 +533,24 @@ const ProfilePage = () => {
                     >
                       {isLoading ? 'Mise à jour...' : 'Mettre à jour le profil'}
                     </button>
+                    {isEditingName && (
+                      <div className="mt-4 flex space-x-2">
+                        <button
+                          onClick={handleSaveName}
+                          disabled={isLoading}
+                          className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white font-medium py-2 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50"
+                        >
+                          {isLoading ? 'Sauvegarde...' : 'Enregistrer'}
+                        </button>
+                        <button
+                          onClick={handleCancelEditName}
+                          disabled={isLoading}
+                          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-xl transition-all duration-300"
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                    )}
                   </form>
                 </div>
               </div>
@@ -722,6 +867,46 @@ const ProfilePage = () => {
         editingAddress={editingAddress}
         onUpdate={handleUpdateShippingAddress}
       />
+
+      {/* Delete Account Password Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Confirmer la suppression
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Pour des raisons de sécurité, veuillez entrer votre mot de passe pour confirmer la suppression de votre compte.
+            </p>
+            <input
+              type="password"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+              placeholder="Votre mot de passe"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-4"
+            />
+            <div className="flex space-x-3">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setDeletePassword('');
+                  setError('');
+                }}
+                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-4 rounded-xl transition-all duration-300"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                disabled={isLoading}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 disabled:opacity-50"
+              >
+                {isLoading ? 'Suppression...' : 'Supprimer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
