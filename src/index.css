@@ -187,3 +187,25 @@
     font-size: clamp(1.125rem, 1.5vw, 1.5rem);
   }
 }
+
+/* Phone Input Styles */
+.PhoneInput {
+  @apply w-full;
+}
+
+.PhoneInputInput {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  @apply bg-white text-gray-900;
+}
+
+.PhoneInputCountry {
+  @apply mr-2;
+}
+
+.PhoneInputCountrySelect {
+  @apply bg-white border border-gray-300 rounded-lg px-2 py-1 text-sm;
+}
+
+.PhoneInputCountryIcon {
+  @apply w-5 h-5;
+}

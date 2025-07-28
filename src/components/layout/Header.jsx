@@ -2,12 +2,15 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { CartContext } from '../../contexts/CartContext';
+import { WishlistContext } from '../../contexts/WishlistContext';
 
 const Header = () => {
   const { user, logout } = useContext(AuthContext);
   const { cartItems } = useContext(CartContext);
+  const { getWishlistCount } = useContext(WishlistContext);
 
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const wishlistCount = getWishlistCount();
 
   return (
     <header className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-200/50">
@@ -68,6 +71,21 @@ const Header = () => {
 
           {/* Right side actions */}
           <div className="flex items-center space-x-3">
+            {/* Wishlist */}
+            <Link 
+              to="/wishlist" 
+              className="relative p-3 text-gray-700 hover:text-blue-600 transition-all duration-300 group"
+            >
+              <div className="relative">
+                <span className="text-xl group-hover:scale-110 transition-transform duration-300">💝</span>
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-lg">
+                    {wishlistCount}
+                  </span>
+                )}
+              </div>
+            </Link>
+
             {/* Cart */}
             <Link 
               to="/cart" 

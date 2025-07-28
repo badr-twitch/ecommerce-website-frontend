@@ -1,12 +1,16 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
+import { auth } from '../config/firebase';
 import AddPaymentModal from '../components/profile/AddPaymentModal';
 import AddAddressModal from '../components/profile/AddAddressModal';
 import ProfilePhotoUpload from '../components/profile/ProfilePhotoUpload';
 import { paymentService } from '../services/paymentService';
 import { shippingService } from '../services/shippingService';
 import userService from '../services/userService';
+import toast from 'react-hot-toast';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 
 const ProfilePage = () => {
   const { user, updateProfile, changePassword, logout } = useContext(AuthContext);
@@ -21,7 +25,8 @@ const ProfilePage = () => {
   const [profileData, setProfileData] = useState({
     displayName: '',
     email: '',
-    photoURL: ''
+    photoURL: '',
+    phone: ''
   });
 
   // Profile editing state
@@ -38,7 +43,8 @@ const ProfilePage = () => {
       setProfileData({
         displayName: user.displayName || user.fullName || '',
         email: user.email || '',
-        photoURL: user.photoURL || user.profilePhoto || ''
+        photoURL: user.photoURL || user.profilePhoto || '',
+        phone: user.phone || ''
       });
     }
   }, [user]);
@@ -70,6 +76,15 @@ const ProfilePage = () => {
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
 
+  // Phone verification states
+  const [showPhoneVerification, setShowPhoneVerification] = useState(false);
+  const [newPhoneNumber, setNewPhoneNumber] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [isSendingVerification, setIsSendingVerification] = useState(false);
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+  const [isSettingNewPhone, setIsSettingNewPhone] = useState(false);
+  const [currentPhoneVerified, setCurrentPhoneVerified] = useState(false);
+
   // Load payment methods and shipping addresses on component mount
   useEffect(() => {
     if (user) {
@@ -85,7 +100,7 @@ const ProfilePage = () => {
       setPaymentMethods(response.paymentMethods);
     } catch (error) {
       console.error('Error loading payment methods:', error);
-      setError('Erreur lors du chargement des méthodes de paiement');
+      toast.error('Erreur lors du chargement des méthodes de paiement');
     } finally {
       setLoadingPaymentMethods(false);
     }
@@ -98,7 +113,7 @@ const ProfilePage = () => {
       setShippingAddresses(response.shippingAddresses);
     } catch (error) {
       console.error('Error loading shipping addresses:', error);
-      setError('Erreur lors du chargement des adresses de livraison');
+      toast.error('Erreur lors du chargement des adresses de livraison');
     } finally {
       setLoadingShippingAddresses(false);
     }
@@ -107,22 +122,30 @@ const ProfilePage = () => {
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
-    setSuccess('');
+
+    // Validate phone number if provided
+    if (profileData.phone && profileData.phone.length < 10) {
+      toast.error('Le numéro de téléphone doit contenir au moins 10 chiffres');
+      setIsLoading(false);
+      return;
+    }
+
+    console.log('📱 Updating profile with phone number:', profileData.phone);
 
     try {
       const result = await updateProfile({
         displayName: profileData.displayName,
-        photoURL: profileData.photoURL
+        photoURL: profileData.photoURL,
+        phone: profileData.phone
       });
 
       if (result.success) {
-        setSuccess('Profil mis à jour avec succès !');
+        toast.success('Profil mis à jour avec succès !');
       } else {
-        setError(result.error || 'Erreur lors de la mise à jour du profil');
+        toast.error(result.error || 'Erreur lors de la mise à jour du profil');
       }
     } catch (error) {
-      setError('Erreur lors de la mise à jour du profil: ' + error.message);
+      toast.error('Erreur lors de la mise à jour du profil: ' + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -131,11 +154,9 @@ const ProfilePage = () => {
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
-    setSuccess('');
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError('Les mots de passe ne correspondent pas');
+      toast.error('Les mots de passe ne correspondent pas');
       setIsLoading(false);
       return;
     }
@@ -147,17 +168,17 @@ const ProfilePage = () => {
       );
 
       if (result.success) {
-        setSuccess('Mot de passe modifié avec succès !');
+        toast.success('Mot de passe modifié avec succès !');
         setPasswordData({
           currentPassword: '',
           newPassword: '',
           confirmPassword: ''
         });
       } else {
-        setError(result.error || 'Erreur lors de la modification du mot de passe');
+        toast.error(result.error || 'Erreur lors de la modification du mot de passe');
       }
     } catch (error) {
-      setError('Erreur lors de la modification du mot de passe: ' + error.message);
+      toast.error('Erreur lors de la modification du mot de passe: ' + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -168,7 +189,7 @@ const ProfilePage = () => {
       await logout();
       navigate('/');
     } catch (error) {
-      setError('Erreur lors de la déconnexion: ' + error.message);
+      toast.error('Erreur lors de la déconnexion: ' + error.message);
     }
   };
 
@@ -178,13 +199,12 @@ const ProfilePage = () => {
 
   const handleConfirmDelete = async () => {
     if (!deletePassword.trim()) {
-      setError('Mot de passe requis pour supprimer le compte');
+      toast.error('Mot de passe requis pour supprimer le compte');
       return;
     }
 
     try {
       setIsLoading(true);
-      setError('');
       
       const result = await userService.deleteAccount(deletePassword);
       
@@ -193,10 +213,10 @@ const ProfilePage = () => {
         await logout();
         navigate('/');
       } else {
-        setError(result.message || 'Erreur lors de la suppression du compte');
+        toast.error(result.message || 'Erreur lors de la suppression du compte');
       }
     } catch (error) {
-      setError('Erreur lors de la suppression du compte: ' + error.message);
+      toast.error('Erreur lors de la suppression du compte: ' + error.message);
     } finally {
       setIsLoading(false);
       setShowDeleteConfirm(false);
@@ -209,9 +229,9 @@ const ProfilePage = () => {
       await paymentService.addPaymentMethod(paymentData);
       await loadPaymentMethods(); // Reload from database
       setShowAddPayment(false);
-      setSuccess('Méthode de paiement ajoutée avec succès !');
+      toast.success('Méthode de paiement ajoutée avec succès !');
     } catch (error) {
-      setError('Erreur lors de l\'ajout de la méthode de paiement');
+      toast.error('Erreur lors de l\'ajout de la méthode de paiement');
     }
   };
 
@@ -220,32 +240,96 @@ const ProfilePage = () => {
       await shippingService.addShippingAddress(addressData);
       await loadShippingAddresses(); // Reload from database
       setShowAddAddress(false);
-      setSuccess('Adresse de livraison ajoutée avec succès !');
+      toast.success('Adresse de livraison ajoutée avec succès !');
     } catch (error) {
-      setError('Erreur lors de l\'ajout de l\'adresse de livraison');
+      toast.error('Erreur lors de l\'ajout de l\'adresse de livraison');
     }
   };
 
   const handleDeletePaymentMethod = async (id) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette méthode de paiement ?')) {
+    const confirmed = await new Promise((resolve) => {
+      toast((t) => (
+        <div className="flex flex-col gap-3">
+          <div className="font-semibold text-gray-800">Confirmer la suppression</div>
+          <div className="text-gray-600">Êtes-vous sûr de vouloir supprimer cette méthode de paiement ?</div>
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={() => {
+                toast.dismiss(t.id);
+                resolve(true);
+              }}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+            >
+              Supprimer
+            </button>
+            <button
+              onClick={() => {
+                toast.dismiss(t.id);
+                resolve(false);
+              }}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      ), {
+        duration: Infinity,
+        position: 'top-center',
+      });
+    });
+
+    if (confirmed) {
       try {
         await paymentService.deletePaymentMethod(id);
         await loadPaymentMethods(); // Reload from database
-        setSuccess('Méthode de paiement supprimée avec succès !');
+        toast.success('Méthode de paiement supprimée avec succès !');
       } catch (error) {
-        setError('Erreur lors de la suppression de la méthode de paiement');
+        toast.error('Erreur lors de la suppression de la méthode de paiement');
       }
     }
   };
 
   const handleDeleteShippingAddress = async (id) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette adresse de livraison ?')) {
+    const confirmed = await new Promise((resolve) => {
+      toast((t) => (
+        <div className="flex flex-col gap-3">
+          <div className="font-semibold text-gray-800">Confirmer la suppression</div>
+          <div className="text-gray-600">Êtes-vous sûr de vouloir supprimer cette adresse de livraison ?</div>
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={() => {
+                toast.dismiss(t.id);
+                resolve(true);
+              }}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+            >
+              Supprimer
+            </button>
+            <button
+              onClick={() => {
+                toast.dismiss(t.id);
+                resolve(false);
+              }}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      ), {
+        duration: Infinity,
+        position: 'top-center',
+      });
+    });
+
+    if (confirmed) {
       try {
         await shippingService.deleteShippingAddress(id);
         await loadShippingAddresses(); // Reload from database
-        setSuccess('Adresse de livraison supprimée avec succès !');
+        toast.success('Adresse de livraison supprimée avec succès !');
       } catch (error) {
-        setError('Erreur lors de la suppression de l\'adresse de livraison');
+        toast.error('Erreur lors de la suppression de l\'adresse de livraison');
       }
     }
   };
@@ -254,9 +338,9 @@ const ProfilePage = () => {
     try {
       await paymentService.setDefaultPaymentMethod(id);
       await loadPaymentMethods(); // Reload from database
-      setSuccess('Méthode de paiement par défaut mise à jour !');
+      toast.success('Méthode de paiement par défaut mise à jour !');
     } catch (error) {
-      setError('Erreur lors de la mise à jour de la méthode de paiement par défaut');
+      toast.error('Erreur lors de la mise à jour de la méthode de paiement par défaut');
     }
   };
 
@@ -264,9 +348,9 @@ const ProfilePage = () => {
     try {
       await shippingService.setDefaultShippingAddress(id);
       await loadShippingAddresses(); // Reload from database
-      setSuccess('Adresse de livraison par défaut mise à jour !');
+      toast.success('Adresse de livraison par défaut mise à jour !');
     } catch (error) {
-      setError('Erreur lors de la mise à jour de l\'adresse de livraison par défaut');
+      toast.error('Erreur lors de la mise à jour de l\'adresse de livraison par défaut');
     }
   };
 
@@ -282,9 +366,9 @@ const ProfilePage = () => {
         await loadShippingAddresses(); // Reload from database
         setEditingAddress(null);
         setShowAddAddress(false);
-        setSuccess('Adresse de livraison mise à jour avec succès !');
+        toast.success('Adresse de livraison mise à jour avec succès !');
       } catch (error) {
-        setError('Erreur lors de la mise à jour de l\'adresse de livraison');
+        toast.error('Erreur lors de la mise à jour de l\'adresse de livraison');
       }
     }
   };
@@ -305,12 +389,12 @@ const ProfilePage = () => {
       if (result.success) {
         setProfileData(prev => ({ ...prev, displayName: tempDisplayName }));
         setIsEditingName(false);
-        setSuccess('Nom mis à jour avec succès !');
+        toast.success('Nom mis à jour avec succès !');
       } else {
-        setError(result.error || 'Erreur lors de la mise à jour du nom');
+        toast.error(result.error || 'Erreur lors de la mise à jour du nom');
       }
     } catch (error) {
-      setError('Erreur lors de la mise à jour du nom: ' + error.message);
+      toast.error('Erreur lors de la mise à jour du nom: ' + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -320,6 +404,222 @@ const ProfilePage = () => {
     setIsEditingName(false);
     setTempDisplayName(profileData.displayName);
   };
+
+  // Phone verification functions
+  const handleSendPhoneVerification = async () => {
+    try {
+      console.log('🔍 Starting phone verification process...');
+      setIsSendingVerification(true);
+      
+      const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/send-phone-verification`;
+      console.log('🔍 API URL:', apiUrl);
+      
+      const token = localStorage.getItem('token');
+      console.log('🔍 Token exists:', !!token);
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('🔍 Response status:', response.status);
+      const result = await response.json();
+      console.log('🔍 Response result:', result);
+      
+      if (result.success) {
+        toast.success('SMS de vérification envoyé ! Vérifiez votre téléphone.');
+        setShowPhoneVerification(true);
+        
+        // Temporary: Show verification code in console for testing
+        console.log('🔐 TEMPORARY: Check backend console for verification code');
+      } else {
+        toast.error(result.error || 'Erreur lors de l\'envoi du SMS de vérification');
+      }
+    } catch (error) {
+      console.error('❌ Error sending phone verification:', error);
+      toast.error('Erreur lors de l\'envoi du SMS de vérification');
+    } finally {
+      setIsSendingVerification(false);
+    }
+  };
+
+  const handleVerifyCurrentPhone = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      toast.error('Veuillez entrer un code de vérification valide (6 chiffres)');
+      return;
+    }
+
+    try {
+      setIsVerifyingCode(true);
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/verify-current-phone`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ verificationCode })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast.success('Numéro de téléphone actuel vérifié avec succès !');
+        setCurrentPhoneVerified(true);
+        setVerificationCode('');
+      } else {
+        toast.error(result.error || 'Erreur lors de la vérification du code');
+      }
+    } catch (error) {
+      console.error('❌ Error verifying current phone:', error);
+      toast.error('Erreur lors de la vérification du code');
+    } finally {
+      setIsVerifyingCode(false);
+    }
+  };
+
+  const handleSetNewPhone = async () => {
+    if (!newPhoneNumber || newPhoneNumber.length < 10) {
+      toast.error('Veuillez entrer un numéro de téléphone valide');
+      return;
+    }
+
+    try {
+      setIsSettingNewPhone(true);
+      
+      console.log('🔍 Setting new phone number:', newPhoneNumber);
+      console.log('🔍 Request body:', { newPhoneNumber });
+      
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/set-new-phone`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ newPhoneNumber })
+      });
+
+      console.log('🔍 Response status:', response.status);
+      const result = await response.json();
+      console.log('🔍 Response result:', result);
+      
+      if (result.success) {
+        toast.success('Numéro de téléphone mis à jour avec succès !');
+        setProfileData({ ...profileData, phone: result.phone });
+        setShowPhoneVerification(false);
+        setNewPhoneNumber('');
+        setCurrentPhoneVerified(false);
+        
+        // Force refresh Firebase token to get updated custom claims
+        if (auth.currentUser) {
+          try {
+            console.log('🔄 Refreshing Firebase token...');
+            await auth.currentUser.getIdToken(true);
+            console.log('✅ Firebase token refreshed after phone update');
+            
+            // Verify the custom claims were updated
+            const tokenResult = await auth.currentUser.getIdTokenResult();
+            console.log('🔍 Updated custom claims after phone update:', tokenResult.claims);
+            console.log('📱 Phone number in custom claims:', tokenResult.claims.phone);
+            
+            // Also check the user object
+            console.log('🔍 Current auth user:', auth.currentUser);
+            
+          } catch (error) {
+            console.error('❌ Error refreshing Firebase token:', error);
+          }
+        }
+        
+        // Refresh user data
+        window.location.reload();
+      } else {
+        toast.error(result.error || 'Erreur lors de la mise à jour du numéro');
+      }
+    } catch (error) {
+      console.error('❌ Error setting new phone:', error);
+      toast.error('Erreur lors de la mise à jour du numéro');
+    } finally {
+      setIsSettingNewPhone(false);
+    }
+  };
+
+  const handleRemovePhone = async () => {
+    // First, send verification code for current phone
+    try {
+      setIsSendingVerification(true);
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/send-phone-verification`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast.success('Email de vérification envoyé ! Vérifiez votre boîte mail.');
+        setShowPhoneVerification(true);
+        // Set a flag to indicate this is for removal
+        setNewPhoneNumber('REMOVE');
+      } else {
+        toast.error(result.error || 'Erreur lors de l\'envoi du SMS de vérification');
+      }
+    } catch (error) {
+      console.error('❌ Error sending phone verification for removal:', error);
+              toast.error('Erreur lors de l\'envoi du SMS de vérification');
+    } finally {
+      setIsSendingVerification(false);
+    }
+  };
+
+  const handleConfirmRemovePhone = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/remove-phone`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast.success('Numéro de téléphone supprimé avec succès !');
+        setProfileData({ ...profileData, phone: '' });
+        setShowPhoneVerification(false);
+        setCurrentPhoneVerified(false);
+        setNewPhoneNumber('');
+        
+        // Force refresh Firebase token to get updated custom claims
+        if (auth.currentUser) {
+          try {
+            await auth.currentUser.getIdToken(true);
+            console.log('✅ Firebase token refreshed after phone removal');
+            
+            // Verify the custom claims were updated
+            const tokenResult = await auth.currentUser.getIdTokenResult();
+            console.log('🔍 Updated custom claims after phone removal:', tokenResult.claims);
+          } catch (error) {
+            console.error('❌ Error refreshing Firebase token:', error);
+          }
+        }
+        
+        // Refresh user data
+        window.location.reload();
+      } else {
+        toast.error(result.error || 'Erreur lors de la suppression du numéro de téléphone');
+      }
+    } catch (error) {
+      console.error('❌ Error removing phone:', error);
+      toast.error('Erreur lors de la suppression du numéro de téléphone');
+    }
+  };
+
+
 
   if (!user) {
     return (
@@ -424,7 +724,7 @@ const ProfilePage = () => {
                 <div className="flex items-start space-x-6">
                   <ProfilePhotoUpload
                     currentPhotoURL={profileData.photoURL}
-                    onPhotoUpdate={(newPhotoURL) => {
+                    onPhotoChange={(newPhotoURL) => {
                       setProfileData(prev => ({ ...prev, photoURL: newPhotoURL }));
                     }}
                   />
@@ -492,6 +792,206 @@ const ProfilePage = () => {
                         <p className="text-xs text-gray-500 mt-1">L'email ne peut pas être modifié</p>
                       </div>
 
+                      <div>
+                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                          Numéro de téléphone
+                          {profileData.phone && (
+                            <span className="ml-2 text-xs text-green-600">✓ Configuré</span>
+                          )}
+                        </label>
+                        
+                        {profileData.phone ? (
+                          // Show current phone number with change/remove options
+                          <div className="space-y-3">
+                            <div className="px-3 py-2 bg-gray-100 rounded-lg text-gray-900">
+                              {profileData.phone}
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={handleSendPhoneVerification}
+                                className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                              >
+                                Changer
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleRemovePhone}
+                                className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm"
+                              >
+                                Supprimer
+                              </button>
+                            </div>
+                            <p className="text-xs text-gray-500">
+                              La modification et suppression nécessitent une vérification de votre numéro actuel par SMS
+                            </p>
+                          </div>
+                        ) : (
+                          // Show phone input for first time setup
+                          <div className="space-y-3">
+                            <PhoneInput
+                              international
+                              defaultCountry="FR"
+                              value={profileData.phone}
+                              onChange={(value) => setProfileData({...profileData, phone: value})}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Entrez votre numéro de téléphone"
+                            />
+                            <p className="text-xs text-gray-500">
+                              Format international recommandé (ex: +33 6 12 34 56 78)
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Phone Verification Modal */}
+                      {showPhoneVerification && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                              {newPhoneNumber === 'REMOVE' ? 'Supprimer le numéro de téléphone' : 'Modifier le numéro de téléphone'}
+                            </h3>
+                            
+                            {!currentPhoneVerified ? (
+                              // Step 1: Verify current phone number
+                              <div className="space-y-4">
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                  <p className="text-sm text-blue-800">
+                                    <strong>Étape 1 :</strong> Vérification de votre numéro de téléphone actuel
+                                  </p>
+                                  <p className="text-sm text-blue-700 mt-1">
+                                    Un code de vérification a été envoyé par SMS à votre numéro <strong>{profileData.phone}</strong> pour confirmer que vous êtes bien le propriétaire
+                                  </p>
+                                </div>
+                                
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Code de vérification (6 chiffres)
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={verificationCode}
+                                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center text-lg font-mono"
+                                    placeholder="000000"
+                                    maxLength={6}
+                                  />
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    Code envoyé par SMS
+                                  </p>
+                                </div>
+                                
+                                <div className="flex gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={handleVerifyCurrentPhone}
+                                    disabled={isVerifyingCode || verificationCode.length !== 6}
+                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                                  >
+                                    {isVerifyingCode ? 'Vérification...' : 'Vérifier le numéro actuel'}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setShowPhoneVerification(false);
+                                      setVerificationCode('');
+                                      setNewPhoneNumber('');
+                                      setCurrentPhoneVerified(false);
+                                    }}
+                                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                                  >
+                                    Annuler
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              // Step 2: After verification, show options
+                              <div className="space-y-4">
+                                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                                  <p className="text-sm text-green-800">
+                                    <strong>✓ Vérification réussie !</strong>
+                                  </p>
+                                  <p className="text-sm text-green-700 mt-1">
+                                    Votre numéro de téléphone actuel a été vérifié. Vous pouvez maintenant le modifier ou le supprimer.
+                                  </p>
+                                </div>
+                                
+                                {newPhoneNumber === 'REMOVE' ? (
+                                  // Remove phone option
+                                  <div className="space-y-4">
+                                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                      <p className="text-sm text-red-800">
+                                        <strong>Attention :</strong> Cette action supprimera définitivement votre numéro de téléphone.
+                                      </p>
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={handleConfirmRemovePhone}
+                                        className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                      >
+                                        Confirmer la suppression
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setShowPhoneVerification(false);
+                                          setVerificationCode('');
+                                          setNewPhoneNumber('');
+                                          setCurrentPhoneVerified(false);
+                                        }}
+                                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                                      >
+                                        Annuler
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  // Change phone option
+                                  <div className="space-y-4">
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Nouveau numéro de téléphone
+                                      </label>
+                                      <PhoneInput
+                                        international
+                                        defaultCountry="FR"
+                                        value={newPhoneNumber}
+                                        onChange={setNewPhoneNumber}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Entrez le nouveau numéro"
+                                      />
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={handleSetNewPhone}
+                                        disabled={isSettingNewPhone || !newPhoneNumber || newPhoneNumber.length < 10}
+                                        className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                                      >
+                                        {isSettingNewPhone ? 'Mise à jour...' : 'Mettre à jour'}
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setShowPhoneVerification(false);
+                                          setVerificationCode('');
+                                          setNewPhoneNumber('');
+                                          setCurrentPhoneVerified(false);
+                                        }}
+                                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                                      >
+                                        Annuler
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                       <button
                         type="submit"
                         disabled={isLoading}
@@ -499,6 +999,8 @@ const ProfilePage = () => {
                       >
                         {isLoading ? 'Mise à jour...' : 'Mettre à jour le profil'}
                       </button>
+
+
                     </form>
                   </div>
                 </div>

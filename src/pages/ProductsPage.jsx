@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { productsAPI, categoriesAPI, formatPrice } from '../services/api';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 import { Star, Search, Filter, Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -158,6 +159,7 @@ const ProductsPage = () => {
   const [pagination, setPagination] = useState({});
   const [searchParams, setSearchParams] = useSearchParams();
   const { addItem } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   // Filter states
   const [filters, setFilters] = useState({
@@ -301,6 +303,15 @@ const ProductsPage = () => {
     addItem(product, 1);
   }, [addItem]);
 
+  const handleToggleWishlist = useCallback(async (product) => {
+    const isWishlisted = isInWishlist(product.id);
+    if (isWishlisted) {
+      await removeFromWishlist(product.id);
+    } else {
+      await addToWishlist(product);
+    }
+  }, [addToWishlist, removeFromWishlist, isInWishlist]);
+
   const renderStars = useCallback((rating) => {
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -347,8 +358,21 @@ const ProductsPage = () => {
           )}
         </div>
 
-        {/* Quick add to cart button */}
-        <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {/* Quick action buttons */}
+        <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          {/* Wishlist button */}
+          <button
+            onClick={() => handleToggleWishlist(product)}
+            className={`p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 ${
+              isInWishlist(product.id)
+                ? 'bg-red-500 hover:bg-red-600 text-white'
+                : 'bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-600 hover:text-red-500 hover:border-red-300'
+            }`}
+          >
+            {isInWishlist(product.id) ? '💝' : '🤍'}
+          </button>
+          
+          {/* Quick add to cart button */}
           <button
             onClick={() => handleAddToCart(product)}
             disabled={!product.inStock}
@@ -408,12 +432,16 @@ const ProductsPage = () => {
           >
             🛒 Ajouter
           </button>
-          <Link
-            to={`/products/${product.id}`}
-            className="px-4 py-3 bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 hover:text-blue-600 font-semibold rounded-xl transition-all duration-300 hover:bg-white hover:shadow-lg"
+          <button
+            onClick={() => handleToggleWishlist(product)}
+            className={`px-4 py-3 rounded-xl transition-all duration-300 hover:shadow-lg ${
+              isInWishlist(product.id)
+                ? 'bg-red-500 hover:bg-red-600 text-white'
+                : 'bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 hover:text-red-500 hover:border-red-300'
+            }`}
           >
-            👁️
-          </Link>
+            {isInWishlist(product.id) ? '💝' : '🤍'}
+          </button>
         </div>
       </div>
     </div>

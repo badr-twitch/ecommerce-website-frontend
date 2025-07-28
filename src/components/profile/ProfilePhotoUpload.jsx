@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import storageService from '../../services/storageService';
+import toast from 'react-hot-toast';
 
 const ProfilePhotoUpload = ({ currentPhotoURL, onPhotoChange, isLoading }) => {
   const { user } = useAuth();
@@ -51,13 +52,13 @@ const ProfilePhotoUpload = ({ currentPhotoURL, onPhotoChange, isLoading }) => {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Veuillez sélectionner une image valide (JPG, PNG, GIF)');
+      toast.error('Veuillez sélectionner une image valide (JPG, PNG, GIF)');
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('L\'image doit faire moins de 5MB');
+      toast.error('L\'image doit faire moins de 5MB');
       return;
     }
 
@@ -87,7 +88,7 @@ const ProfilePhotoUpload = ({ currentPhotoURL, onPhotoChange, isLoading }) => {
       setIsUploading(false);
       setUploadProgress(0);
       console.error('Upload error:', error);
-      alert('Erreur lors du téléchargement de l\'image');
+      toast.error('Erreur lors du téléchargement de l\'image');
     }
   };
 

@@ -121,6 +121,11 @@ export const AuthProvider = ({ children }) => {
   // Sync user with database
   const syncUserWithDatabase = async (firebaseUser) => {
     try {
+      // Get custom claims (including phone number)
+      const tokenResult = await firebaseUser.getIdTokenResult();
+      const customClaims = tokenResult.claims || {};
+      console.log('🔍 Firebase custom claims retrieved:', customClaims);
+      
       const userData = {
         firebaseUid: firebaseUser.uid,
         email: firebaseUser.email,
@@ -128,7 +133,10 @@ export const AuthProvider = ({ children }) => {
         lastName: firebaseUser.displayName?.split(' ').slice(1).join(' ') || '',
         emailVerified: firebaseUser.emailVerified,
         photoURL: firebaseUser.photoURL,
+        phone: customClaims.phone || '', // Get phone from custom claims
       };
+      
+      console.log('📱 User data with phone from custom claims:', userData);
 
       // Try to get existing user from database
       try {
@@ -162,12 +170,16 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Error syncing user with database:', error);
       // Return basic user data if database sync fails
+      const tokenResult = await firebaseUser.getIdTokenResult();
+      const customClaims = tokenResult.claims || {};
+      
       return {
         firebaseUid: firebaseUser.uid,
         email: firebaseUser.email,
         displayName: firebaseUser.displayName,
         photoURL: firebaseUser.photoURL,
         emailVerified: firebaseUser.emailVerified,
+        phone: customClaims.phone || '',
       };
     }
   };
@@ -404,6 +416,25 @@ export const AuthProvider = ({ children }) => {
   // Update profile function
   const updateProfile = async (userData) => {
     try {
+      // First, update Firebase profile
+      if (auth.currentUser) {
+        const firebaseUpdateData = {};
+        
+        // Only update Firebase fields that are supported
+        if (userData.displayName !== undefined) {
+          firebaseUpdateData.displayName = userData.displayName;
+        }
+        if (userData.photoURL !== undefined) {
+          firebaseUpdateData.photoURL = userData.photoURL;
+        }
+        
+        // Update Firebase profile
+        await updateFirebaseProfile(auth.currentUser, firebaseUpdateData);
+        console.log('✅ Firebase profile updated successfully');
+      }
+
+      // Then, update backend database
+      console.log('📱 Sending profile update to backend:', userData);
       const response = await apiCall('/auth/profile', {
         method: 'PUT',
         body: JSON.stringify(userData)
@@ -413,11 +444,23 @@ export const AuthProvider = ({ children }) => {
         const updatedUser = { ...state.user, ...response.user };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         dispatch({ type: 'UPDATE_USER', payload: updatedUser });
+        
+        // Force refresh Firebase token to get updated custom claims
+        if (auth.currentUser) {
+          await auth.currentUser.getIdToken(true);
+          console.log('✅ Firebase token refreshed with updated custom claims');
+          
+          // Verify the custom claims were updated
+          const tokenResult = await auth.currentUser.getIdTokenResult();
+          console.log('🔍 Updated custom claims after profile update:', tokenResult.claims);
+        }
+        
         return { success: true };
       } else {
         return { success: false, error: response.message };
       }
     } catch (error) {
+      console.error('❌ Error updating profile:', error);
       return { success: false, error: error.message };
     }
   };

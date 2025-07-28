@@ -1,7 +1,25 @@
-import React from 'react';
+import React, { useContext, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { CartContext } from '../contexts/CartContext';
+import { WishlistContext } from '../contexts/WishlistContext';
 
 const HomePage = () => {
+  const { addItem } = useContext(CartContext);
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useContext(WishlistContext);
+
+  const handleAddToCart = useCallback((product) => {
+    addItem(product, 1);
+  }, [addItem]);
+
+  const handleToggleWishlist = useCallback(async (product) => {
+    const isWishlisted = isInWishlist(product.id);
+    if (isWishlisted) {
+      await removeFromWishlist(product.id);
+    } else {
+      await addToWishlist(product);
+    }
+  }, [addToWishlist, removeFromWishlist, isInWishlist]);
+
   const featuredProducts = [
     {
       id: 1,
@@ -156,11 +174,28 @@ const HomePage = () => {
                       {product.category}
                     </span>
                   </div>
+
+                  {/* Wishlist button */}
+                  <div className="absolute top-4 right-4">
+                    <button
+                      onClick={() => handleToggleWishlist(product)}
+                      className={`p-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 ${
+                        isInWishlist(product.id)
+                          ? 'bg-red-500 hover:bg-red-600 text-white'
+                          : 'bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-600 hover:text-red-500 hover:border-red-300'
+                      }`}
+                    >
+                      {isInWishlist(product.id) ? '💝' : '🤍'}
+                    </button>
+                  </div>
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-800 mb-2">{product.name}</h3>
                   <p className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">{product.price}</p>
-                  <button className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                  <button 
+                    onClick={() => handleAddToCart(product)}
+                    className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  >
                     🛒 Ajouter au panier
                   </button>
                 </div>

@@ -82,6 +82,11 @@ export const usersAPI = {
   delete: (id) => api.delete(`/users/${id}`),
   getOrders: (id, params = {}) => api.get(`/users/${id}/orders`, { params }),
   verifyEmail: (id, data) => api.post(`/users/${id}/verify-email`, data),
+  // Wishlist API
+  getWishlist: (id) => api.get(`/users/${id}/wishlist`),
+  addToWishlist: (id, data) => api.post(`/users/${id}/wishlist`, data),
+  removeFromWishlist: (id, productId) => api.delete(`/users/${id}/wishlist/${productId}`),
+  clearWishlist: (id) => api.delete(`/users/${id}/wishlist`),
 };
 
 // Cart API (if you want to persist cart on server)
