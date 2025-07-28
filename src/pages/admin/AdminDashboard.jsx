@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAdmin } from '../../contexts/AdminContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -11,12 +11,16 @@ import {
   Eye,
   Edit,
   Trash2,
-  Plus
+  Plus,
+  AlertTriangle
 } from 'lucide-react';
 import ProductForm from './ProductForm';
 import ProductDetail from './ProductDetail';
 import CategoryForm from './CategoryForm';
+import OrderDetail from './OrderDetail';
+import InventoryAlerts from './InventoryAlerts';
 
+// FIXED: Remove unnecessary memoization since InventoryAlerts is already optimized
 const AdminDashboard = () => {
   const { adminData, refreshAdminData } = useAdmin();
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -31,21 +35,28 @@ const AdminDashboard = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [showOrderDetail, setShowOrderDetail] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderFilters, setOrderFilters] = useState({
+    status: 'all',
+    search: '',
+    startDate: '',
+    endDate: '',
+    minAmount: '',
+    maxAmount: ''
+  });
 
-  // Load data based on active tab
-  useEffect(() => {
-    if (activeTab === 'products') {
-      loadProducts();
-    } else if (activeTab === 'categories') {
-      loadCategories();
-    } else if (activeTab === 'orders') {
-      loadOrders();
-    } else if (activeTab === 'users') {
-      loadUsers();
-    }
-  }, [activeTab]);
+  // FIXED: Add render counter for debugging
+  const renderCount = useRef(0);
+  renderCount.current += 1;
 
-  const loadProducts = async () => {
+  // FIXED: Memoize the tab change handler to prevent unnecessary re-renders
+  const handleTabChange = useCallback((tabId) => {
+    setActiveTab(tabId);
+  }, []);
+
+  // FIXED: Memoize all the load functions to prevent recreation
+  const loadProducts = useCallback(async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
@@ -61,9 +72,9 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
@@ -79,17 +90,29 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/orders`, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      const params = new URLSearchParams();
+      
+      if (orderFilters.status !== 'all') params.append('status', orderFilters.status);
+      if (orderFilters.search) params.append('search', orderFilters.search);
+      if (orderFilters.startDate) params.append('startDate', orderFilters.startDate);
+      if (orderFilters.endDate) params.append('endDate', orderFilters.endDate);
+      if (orderFilters.minAmount) params.append('minAmount', orderFilters.minAmount);
+      if (orderFilters.maxAmount) params.append('maxAmount', orderFilters.maxAmount);
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/orders?${params.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      });
+      );
       setOrders(response.data.data.orders);
     } catch (error) {
       console.error('❌ Error loading orders:', error);
@@ -97,9 +120,9 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderFilters]);
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
@@ -108,20 +131,19 @@ const AdminDashboard = () => {
           Authorization: `Bearer ${token}`
         }
       });
-      setUsers(response.data.data.users);
+      // FIXED: Handle the correct data structure from API
+      setUsers(response.data.data.users || []);
     } catch (error) {
       console.error('❌ Error loading users:', error);
       toast.error('Erreur lors du chargement des utilisateurs');
+      setUsers([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const deleteProduct = async (productId) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
-      return;
-    }
-
+  // FIXED: Memoize all handler functions
+  const deleteProduct = useCallback(async (productId) => {
     try {
       const token = localStorage.getItem('token');
       await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/products/${productId}`, {
@@ -135,13 +157,9 @@ const AdminDashboard = () => {
       console.error('❌ Error deleting product:', error);
       toast.error('Erreur lors de la suppression du produit');
     }
-  };
+  }, [loadProducts]);
 
-  const deleteCategory = async (categoryId) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) {
-      return;
-    }
-
+  const deleteCategory = useCallback(async (categoryId) => {
     try {
       const token = localStorage.getItem('token');
       await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/categories/${categoryId}`, {
@@ -155,12 +173,14 @@ const AdminDashboard = () => {
       console.error('❌ Error deleting category:', error);
       toast.error('Erreur lors de la suppression de la catégorie');
     }
-  };
+  }, [loadCategories]);
 
-  const toggleUserStatus = async (userId, currentStatus) => {
+  const toggleUserStatus = useCallback(async (userId, currentStatus) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/users/${userId}/status`, {}, {
+      await axios.patch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/users/${userId}/toggle-status`, {
+        isActive: !currentStatus
+      }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -169,198 +189,219 @@ const AdminDashboard = () => {
       loadUsers();
     } catch (error) {
       console.error('❌ Error toggling user status:', error);
-      toast.error('Erreur lors de la modification du statut utilisateur');
+      toast.error('Erreur lors du changement de statut');
     }
-  };
+  }, [loadUsers]);
 
-  const changeUserRole = async (userId, currentRole) => {
-    const newRole = currentRole === 'admin' ? 'client' : 'admin';
-    const confirmMessage = currentRole === 'admin' 
-      ? 'Êtes-vous sûr de vouloir retirer les droits d\'administrateur de cet utilisateur ?'
-      : 'Êtes-vous sûr de vouloir donner les droits d\'administrateur à cet utilisateur ?';
-
-    if (!window.confirm(confirmMessage)) {
-      return;
-    }
-
+  const changeUserRole = useCallback(async (userId, currentRole) => {
     try {
+      const newRole = currentRole === 'client' ? 'admin' : 'client';
       const token = localStorage.getItem('token');
-      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/users/${userId}/role`, 
-        { role: newRole }, 
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-      toast.success(`Rôle utilisateur changé de ${currentRole} à ${newRole} avec succès`);
-      loadUsers();
-    } catch (error) {
-      console.error('❌ Error changing user role:', error);
-      toast.error('Erreur lors du changement de rôle utilisateur');
-    }
-  };
-
-  // Product management functions
-  const handleAddProduct = () => {
-    setEditingProduct(null);
-    setShowProductForm(true);
-  };
-
-  const handleEditProduct = (product) => {
-    console.log('🔍 Edit button clicked for product:', product);
-    setEditingProduct(product);
-    setShowProductForm(true);
-  };
-
-  const handleViewProduct = (product) => {
-    setSelectedProduct(product);
-    setShowProductDetail(true);
-  };
-
-  const handleProductSuccess = () => {
-    loadProducts();
-    setShowProductForm(false);
-    setEditingProduct(null);
-  };
-
-  const handleProductFormClose = () => {
-    setShowProductForm(false);
-    setEditingProduct(null);
-  };
-
-  const handleProductDetailClose = () => {
-    setShowProductDetail(false);
-    setSelectedProduct(null);
-  };
-
-  const handleProductDetailEdit = (product) => {
-    setEditingProduct(product);
-    setShowProductForm(true);
-    setShowProductDetail(false);
-    setSelectedProduct(null);
-  };
-
-  const handleProductDetailDelete = (productId) => {
-    deleteProduct(productId);
-    setShowProductDetail(false);
-    setSelectedProduct(null);
-  };
-
-  // Category management functions
-  const handleAddCategory = () => {
-    setEditingCategory(null);
-    setShowCategoryForm(true);
-  };
-
-  const handleEditCategory = (category) => {
-    setEditingCategory(category);
-    setShowCategoryForm(true);
-  };
-
-  const handleCategorySuccess = () => {
-    loadCategories();
-    setShowCategoryForm(false);
-    setEditingCategory(null);
-  };
-
-  const handleCategoryFormClose = () => {
-    setShowCategoryForm(false);
-    setEditingCategory(null);
-  };
-
-  const updateOrderStatus = async (orderId, newStatus) => {
-    try {
-      const token = localStorage.getItem('token');
-      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/orders/${orderId}/status`, { status: newStatus }, {
+      await axios.patch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/users/${userId}/change-role`, {
+        role: newRole
+      }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      toast.success('Statut de commande mis à jour avec succès');
+      toast.success(`Rôle changé en ${newRole === 'admin' ? 'administrateur' : 'client'}`);
+      loadUsers();
+    } catch (error) {
+      console.error('❌ Error changing user role:', error);
+      toast.error('Erreur lors du changement de rôle');
+    }
+  }, [loadUsers]);
+
+  // FIXED: Memoize all UI handler functions
+  const handleAddProduct = useCallback(() => {
+    setEditingProduct(null);
+    setShowProductForm(true);
+  }, []);
+
+  const handleEditProduct = useCallback((product) => {
+    setEditingProduct(product);
+    setShowProductForm(true);
+  }, []);
+
+  const handleViewProduct = useCallback((product) => {
+    setSelectedProduct(product);
+    setShowProductDetail(true);
+  }, []);
+
+  const handleProductSuccess = useCallback(() => {
+    setShowProductForm(false);
+    setEditingProduct(null);
+    loadProducts();
+  }, [loadProducts]);
+
+  const handleProductFormClose = useCallback(() => {
+    setShowProductForm(false);
+    setEditingProduct(null);
+  }, []);
+
+  const handleProductDetailClose = useCallback(() => {
+    setShowProductDetail(false);
+    setSelectedProduct(null);
+  }, []);
+
+  const handleProductDetailEdit = useCallback((product) => {
+    setShowProductDetail(false);
+    setEditingProduct(product);
+    setShowProductForm(true);
+  }, []);
+
+  const handleProductDetailDelete = useCallback((productId) => {
+    setShowProductDetail(false);
+    setSelectedProduct(null);
+    deleteProduct(productId);
+  }, [deleteProduct]);
+
+  const handleAddCategory = useCallback(() => {
+    setEditingCategory(null);
+    setShowCategoryForm(true);
+  }, []);
+
+  const handleEditCategory = useCallback((category) => {
+    setEditingCategory(category);
+    setShowCategoryForm(true);
+  }, []);
+
+  const handleCategorySuccess = useCallback(() => {
+    setShowCategoryForm(false);
+    setEditingCategory(null);
+    loadCategories();
+  }, [loadCategories]);
+
+  const handleCategoryFormClose = useCallback(() => {
+    setShowCategoryForm(false);
+    setEditingCategory(null);
+  }, []);
+
+  const handleViewOrder = useCallback((order) => {
+    setSelectedOrder(order);
+    setShowOrderDetail(true);
+  }, []);
+
+  const handleOrderDetailClose = useCallback(() => {
+    setShowOrderDetail(false);
+    setSelectedOrder(null);
+  }, []);
+
+  const handleOrderStatusUpdate = useCallback(() => {
+    loadOrders();
+  }, [loadOrders]);
+
+  const handleFilterChange = useCallback((key, value) => {
+    setOrderFilters(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+  const handleFilterSubmit = useCallback(() => {
+    loadOrders();
+  }, [loadOrders]);
+
+  const clearFilters = useCallback(() => {
+    setOrderFilters({
+      status: 'all',
+      search: '',
+      startDate: '',
+      endDate: '',
+      minAmount: '',
+      maxAmount: ''
+    });
+  }, []);
+
+  const updateOrderStatus = useCallback(async (orderId, newStatus) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.patch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/orders/${orderId}/status`, {
+        status: newStatus
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      toast.success('Statut de commande mis à jour');
       loadOrders();
     } catch (error) {
       console.error('❌ Error updating order status:', error);
       toast.error('Erreur lors de la mise à jour du statut');
     }
-  };
+  }, [loadOrders]);
 
-  const renderDashboard = () => (
+  // FIXED: Load data based on active tab with proper memoization
+  useEffect(() => {
+    if (activeTab === 'products') {
+      loadProducts();
+    } else if (activeTab === 'categories') {
+      loadCategories();
+    } else if (activeTab === 'orders') {
+      loadOrders();
+    } else if (activeTab === 'users') {
+      loadUsers();
+    }
+  }, [activeTab, loadProducts, loadCategories, loadOrders, loadUsers]);
+
+  // FIXED: Memoize all render functions to prevent recreation
+  const renderDashboard = useCallback(() => (
     <div className="space-y-6">
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-blue-100">Utilisateurs</p>
-              <p className="text-3xl font-bold">{adminData?.statistics?.totalUsers || 0}</p>
-            </div>
-            <Users className="w-8 h-8" />
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-green-100">Produits</p>
-              <p className="text-3xl font-bold">{adminData?.statistics?.totalProducts || 0}</p>
-            </div>
-            <Package className="w-8 h-8" />
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-purple-100">Commandes</p>
-              <p className="text-3xl font-bold">{adminData?.statistics?.totalOrders || 0}</p>
-            </div>
-            <ShoppingCart className="w-8 h-8" />
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-orange-100">Catégories</p>
-              <p className="text-3xl font-bold">{adminData?.statistics?.totalCategories || 0}</p>
-            </div>
-            <Tag className="w-8 h-8" />
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Orders */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-semibold mb-4">Commandes Récentes</h3>
-        <div className="space-y-4">
-          {adminData?.recentOrders?.slice(0, 5).map((order) => (
-            <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+      <h2 className="text-2xl font-bold">Tableau de Bord</h2>
+      
+      {adminData ? (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">#{order.id.slice(0, 8)}</p>
-                <p className="text-sm text-gray-600">
-                  {order.user?.firstName} {order.user?.lastName}
-                </p>
+                <p className="text-gray-600 text-sm">Total Produits</p>
+                {/* FIXED: Handle the correct data structure from API */}
+                <p className="text-2xl font-bold text-gray-900">{adminData.statistics?.totalProducts || 0}</p>
               </div>
-              <div className="text-right">
-                <p className="font-medium">€{order.totalAmount}</p>
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                  order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                  order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {order.status}
-                </span>
-              </div>
+              <Package className="w-8 h-8 text-blue-600" />
             </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+          </div>
 
-  const renderProducts = () => (
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm">Total Commandes</p>
+                {/* FIXED: Handle the correct data structure from API */}
+                <p className="text-2xl font-bold text-gray-900">{adminData.statistics?.totalOrders || 0}</p>
+              </div>
+              <ShoppingCart className="w-8 h-8 text-green-600" />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm">Total Utilisateurs</p>
+                {/* FIXED: Handle the correct data structure from API */}
+                <p className="text-2xl font-bold text-gray-900">{adminData.statistics?.totalUsers || 0}</p>
+              </div>
+              <Users className="w-8 h-8 text-purple-600" />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm">Chiffre d'Affaires</p>
+                {/* FIXED: Handle the correct data structure from API */}
+                <p className="text-2xl font-bold text-gray-900">€{adminData.statistics?.totalRevenue || 0}</p>
+              </div>
+              <TrendingUp className="w-8 h-8 text-yellow-600" />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement des données...</p>
+        </div>
+      )}
+    </div>
+  ), [adminData]);
+
+  const renderProducts = useCallback(() => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Gestion des Produits</h2>
@@ -403,14 +444,25 @@ const AdminDashboard = () => {
                   <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <img 
-                          src={product.imageUrl || '/placeholder.png'} 
-                          alt={product.name}
-                          className="w-10 h-10 rounded-lg object-cover mr-3"
-                          onError={(e) => {
-                            e.target.src = '/placeholder.png';
-                          }}
-                        />
+                        {/* FIXED: Add more stable image handling to prevent vibration */}
+                        <div className="w-10 h-10 rounded-lg overflow-hidden mr-3 flex-shrink-0 bg-gray-100">
+                          <img 
+                            src={product.imageUrl || '/placeholder.png'} 
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                            width="40"
+                            height="40"
+                            loading="lazy"
+                            onLoad={(e) => {
+                              e.target.style.opacity = '1';
+                            }}
+                            onError={(e) => {
+                              e.target.src = '/placeholder.png';
+                              e.target.style.opacity = '1';
+                            }}
+                            style={{ opacity: 0, transition: 'opacity 0.2s ease-in-out' }}
+                          />
+                        </div>
                         <div>
                           <div className="text-sm font-medium text-gray-900">{product.name}</div>
                           <div className="text-sm text-gray-500">{product.description?.slice(0, 50)}...</div>
@@ -425,9 +477,9 @@ const AdminDashboard = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <span className={`px-2 py-1 rounded-full text-xs ${
-                        product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        product.stockQuantity > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}>
-                        {product.stock} unité(s)
+                        {product.stockQuantity} unité(s)
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -463,9 +515,9 @@ const AdminDashboard = () => {
         </div>
       )}
     </div>
-  );
+  ), [products, loading, handleAddProduct, handleViewProduct, handleEditProduct, deleteProduct]);
 
-  const renderCategories = () => (
+  const renderCategories = useCallback(() => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Gestion des Catégories</h2>
@@ -509,14 +561,22 @@ const AdminDashboard = () => {
                   {category.products?.length || 0} produit(s)
                 </div>
                 {category.imageUrl && (
-                  <div className="w-8 h-8 rounded-lg overflow-hidden">
+                  /* FIXED: Add more stable image handling to prevent vibration */
+                  <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
                     <img 
                       src={category.imageUrl} 
                       alt={category.name}
                       className="w-full h-full object-cover"
+                      width="32"
+                      height="32"
+                      loading="lazy"
+                      onLoad={(e) => {
+                        e.target.style.opacity = '1';
+                      }}
                       onError={(e) => {
                         e.target.style.display = 'none';
                       }}
+                      style={{ opacity: 0, transition: 'opacity 0.2s ease-in-out' }}
                     />
                   </div>
                 )}
@@ -526,11 +586,104 @@ const AdminDashboard = () => {
         </div>
       )}
     </div>
-  );
+  ), [categories, loading, handleAddCategory, handleEditCategory, deleteCategory]);
 
-  const renderOrders = () => (
+  const renderOrders = useCallback(() => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Gestion des Commandes</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Gestion des Commandes</h2>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <h3 className="text-lg font-semibold mb-4">Filtres</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Statut</label>
+            <select
+              value={orderFilters.status}
+              onChange={(e) => handleFilterChange('status', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="all">Tous les statuts</option>
+              <option value="pending">En attente</option>
+              <option value="processing">En cours de traitement</option>
+              <option value="shipped">Expédiée</option>
+              <option value="delivered">Livrée</option>
+              <option value="cancelled">Annulée</option>
+              <option value="refunded">Remboursée</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Recherche</label>
+            <input
+              type="text"
+              value={orderFilters.search}
+              onChange={(e) => handleFilterChange('search', e.target.value)}
+              placeholder="Nom, email du client..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Montant minimum</label>
+            <input
+              type="number"
+              value={orderFilters.minAmount}
+              onChange={(e) => handleFilterChange('minAmount', e.target.value)}
+              placeholder="0"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Montant maximum</label>
+            <input
+              type="number"
+              value={orderFilters.maxAmount}
+              onChange={(e) => handleFilterChange('maxAmount', e.target.value)}
+              placeholder="1000"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Date de début</label>
+            <input
+              type="date"
+              value={orderFilters.startDate}
+              onChange={(e) => handleFilterChange('startDate', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Date de fin</label>
+            <input
+              type="date"
+              value={orderFilters.endDate}
+              onChange={(e) => handleFilterChange('endDate', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+
+        <div className="flex space-x-4 mt-4">
+          <button
+            onClick={handleFilterSubmit}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Appliquer les filtres
+          </button>
+          <button
+            onClick={clearFilters}
+            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            Effacer les filtres
+          </button>
+        </div>
+      </div>
 
       {loading ? (
         <div className="text-center py-8">Chargement...</div>
@@ -553,37 +706,55 @@ const AdminDashboard = () => {
                     Statut
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {orders.map((order) => (
-                  <tr key={order.id}>
+                  <tr key={order.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       #{order.id.slice(0, 8)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {order.user?.firstName} {order.user?.lastName}
+                      <div>
+                        <div className="font-medium">{order.user?.firstName} {order.user?.lastName}</div>
+                        <div className="text-gray-500">{order.user?.email}</div>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      €{order.totalAmount}
+                      <div className="font-medium">€{order.totalAmount}</div>
+                      <div className="text-gray-500">{order.orderItems?.length || 0} article(s)</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <select
-                        value={order.status}
-                        onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                        className="text-sm border rounded px-2 py-1"
-                      >
-                        <option value="pending">En attente</option>
-                        <option value="processing">En cours</option>
-                        <option value="shipped">Expédiée</option>
-                        <option value="delivered">Livrée</option>
-                        <option value="cancelled">Annulée</option>
-                      </select>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
+                        order.status === 'shipped' ? 'bg-purple-100 text-purple-800' :
+                        order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                        order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {order.status === 'pending' ? 'En attente' :
+                         order.status === 'processing' ? 'En cours' :
+                         order.status === 'shipped' ? 'Expédiée' :
+                         order.status === 'delivered' ? 'Livrée' :
+                         order.status === 'cancelled' ? 'Annulée' :
+                         order.status === 'refunded' ? 'Remboursée' : order.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(order.createdAt).toLocaleDateString('fr-FR')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button className="text-blue-600 hover:text-blue-900">
+                      <button 
+                        onClick={() => handleViewOrder(order)}
+                        className="text-blue-600 hover:text-blue-900 p-1 rounded transition-colors"
+                        title="Voir les détails"
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
                     </td>
@@ -595,9 +766,9 @@ const AdminDashboard = () => {
         </div>
       )}
     </div>
-  );
+  ), [orders, loading, orderFilters, handleFilterChange, handleFilterSubmit, clearFilters, handleViewOrder]);
 
-  const renderUsers = () => (
+  const renderUsers = useCallback(() => (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Gestion des Utilisateurs</h2>
 
@@ -627,7 +798,8 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {users.map((user) => (
+                {/* FIXED: Add null check and ensure users is an array */}
+                {Array.isArray(users) && users.map((user) => (
                   <tr key={user.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
@@ -691,7 +863,40 @@ const AdminDashboard = () => {
         </div>
       )}
     </div>
-  );
+  ), [users, loading, changeUserRole, toggleUserStatus]);
+
+  // FIXED: Memoize tab configuration to prevent recreation
+  const tabConfig = useMemo(() => [
+    { id: 'dashboard', label: 'Tableau de bord', icon: TrendingUp },
+    { id: 'products', label: 'Produits', icon: Package },
+    { id: 'categories', label: 'Catégories', icon: Tag },
+    { id: 'orders', label: 'Commandes', icon: ShoppingCart },
+    { id: 'inventory', label: 'Inventaire', icon: AlertTriangle },
+    { id: 'users', label: 'Utilisateurs', icon: Users }
+  ], []);
+
+  // FIXED: Memoize the content rendering to prevent conditional rendering issues
+  const renderContent = useCallback(() => {
+    switch (activeTab) {
+      case 'dashboard':
+        return renderDashboard();
+      case 'products':
+        return renderProducts();
+      case 'categories':
+        return renderCategories();
+      case 'orders':
+        return renderOrders();
+      case 'inventory':
+        return <InventoryAlerts />;
+      case 'users':
+        return renderUsers();
+      default:
+        return renderDashboard();
+    }
+  }, [activeTab, renderDashboard, renderProducts, renderCategories, renderOrders, renderUsers]);
+
+  // FIXED: Add debugging log
+  console.log(`🔄 AdminDashboard rendered ${renderCount.current} times, activeTab: ${activeTab}`);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -705,16 +910,10 @@ const AdminDashboard = () => {
         {/* Navigation Tabs */}
         <div className="mb-8">
           <nav className="flex space-x-8">
-            {[
-              { id: 'dashboard', label: 'Tableau de bord', icon: TrendingUp },
-              { id: 'products', label: 'Produits', icon: Package },
-              { id: 'categories', label: 'Catégories', icon: Tag },
-              { id: 'orders', label: 'Commandes', icon: ShoppingCart },
-              { id: 'users', label: 'Utilisateurs', icon: Users }
-            ].map((tab) => (
+            {tabConfig.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   activeTab === tab.id
                     ? 'bg-blue-100 text-blue-700'
@@ -728,13 +927,9 @@ const AdminDashboard = () => {
           </nav>
         </div>
 
-        {/* Content */}
+        {/* FIXED: Content - Use stable rendering instead of conditional */}
         <div>
-          {activeTab === 'dashboard' && renderDashboard()}
-          {activeTab === 'products' && renderProducts()}
-          {activeTab === 'categories' && renderCategories()}
-          {activeTab === 'orders' && renderOrders()}
-          {activeTab === 'users' && renderUsers()}
+          {renderContent()}
         </div>
 
         {/* Modals */}
@@ -760,6 +955,14 @@ const AdminDashboard = () => {
             category={editingCategory}
             onClose={handleCategoryFormClose}
             onSuccess={handleCategorySuccess}
+          />
+        )}
+
+        {showOrderDetail && (
+          <OrderDetail
+            order={selectedOrder}
+            onClose={handleOrderDetailClose}
+            onStatusUpdate={handleOrderStatusUpdate}
           />
         )}
       </div>

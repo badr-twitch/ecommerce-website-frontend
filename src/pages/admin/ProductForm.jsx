@@ -8,7 +8,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
     name: '',
     description: '',
     price: '',
-    stock: '',
+    stockQuantity: '',
     categoryId: '',
     imageUrl: ''
   });
@@ -27,7 +27,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
         name: product.name || '',
         description: product.description || '',
         price: product.price || '',
-        stock: product.stock || '',
+        stockQuantity: product.stockQuantity !== undefined ? product.stockQuantity : '',
         categoryId: product.categoryId || '',
         imageUrl: product.imageUrl || ''
       });
@@ -37,14 +37,16 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
   const loadCategories = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/categories`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/categories`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
+      console.log('🔍 Categories loaded:', response.data);
       setCategories(response.data.data || []);
     } catch (error) {
       console.error('❌ Error loading categories:', error);
+      console.error('❌ Error response:', error.response?.data);
       toast.error('Erreur lors du chargement des catégories');
       setCategories([]);
     } finally {
@@ -54,9 +56,20 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log('🔍 Input change:', name, value);
+    
+    // Convert stockQuantity to number if it's a valid number
+    let processedValue = value;
+    if (name === 'stockQuantity' && value !== '') {
+      const numValue = parseInt(value, 10);
+      if (!isNaN(numValue)) {
+        processedValue = numValue;
+      }
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: processedValue
     }));
   };
 
@@ -65,6 +78,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
     setLoading(true);
 
     try {
+      console.log('🔍 Submitting form data:', formData);
       const token = localStorage.getItem('token');
       const url = isEditing 
         ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/products/${product.id}`
@@ -72,11 +86,17 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
 
       const method = isEditing ? 'put' : 'post';
       
+      console.log('🔍 Making request to:', url);
+      console.log('🔍 Request method:', method.toUpperCase());
+      console.log('🔍 Request headers:', { Authorization: `Bearer ${token}` });
+      
       const response = await axios[method](url, formData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
+      
+      console.log('✅ Response received:', response.data);
 
       toast.success(isEditing ? 'Produit mis à jour avec succès' : 'Produit créé avec succès');
       onSuccess();
@@ -165,8 +185,8 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
               </label>
               <input
                 type="number"
-                name="stock"
-                value={formData.stock}
+                name="stockQuantity"
+                value={formData.stockQuantity}
                 onChange={handleInputChange}
                 required
                 min="0"
