@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { CartContext } from '../../contexts/CartContext';
 import { WishlistContext } from '../../contexts/WishlistContext';
+import NotificationBell from '../notifications/NotificationBell';
 
 const Header = () => {
   const { user, logout } = useContext(AuthContext);
@@ -100,6 +101,9 @@ const Header = () => {
                 )}
               </div>
             </Link>
+
+            {/* Notifications - Only show for authenticated users */}
+            {user && <NotificationBell />}
 
             {/* User menu */}
             {user ? (

@@ -1,26 +1,94 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useAdmin } from '../../contexts/AdminContext';
-import axios from 'axios';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { 
-  Users, 
-  Package, 
-  ShoppingCart, 
-  Tag, 
   TrendingUp, 
+  Package, 
+  Tag, 
+  ShoppingCart, 
+  AlertTriangle, 
+  Users, 
+  Plus, 
+  Edit, 
+  Trash2, 
   Eye,
-  Edit,
-  Trash2,
-  Plus,
-  AlertTriangle
+  Settings,
+  DollarSign,
+  UserPlus,
+  BarChart3
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import axios from 'axios';
+import { useAdmin } from '../../contexts/AdminContext';
 import ProductForm from './ProductForm';
 import ProductDetail from './ProductDetail';
 import CategoryForm from './CategoryForm';
 import OrderDetail from './OrderDetail';
 import InventoryAlerts from './InventoryAlerts';
+import { 
+  LineChart, 
+  Line, 
+  AreaChart, 
+  Area, 
+  BarChart, 
+  Bar, 
+  PieChart, 
+  Pie, 
+  Cell,
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer 
+} from 'recharts';
 
-// FIXED: Remove unnecessary memoization since InventoryAlerts is already optimized
+// FIXED: Create a stable image component to prevent vibration
+const StableImage = React.memo(({ src, alt, width = 40, height = 40, className = "" }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  const handleLoad = useCallback(() => {
+    setImageLoaded(true);
+  }, []);
+
+  const handleError = useCallback(() => {
+    setImageError(true);
+    setImageLoaded(true);
+  }, []);
+
+  return (
+    <div 
+      className={`rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 ${className}`}
+      style={{ 
+        width: `${width}px`, 
+        height: `${height}px`,
+        minWidth: `${width}px`,
+        minHeight: `${height}px`,
+        maxWidth: `${width}px`,
+        maxHeight: `${height}px`
+      }}
+    >
+      <img 
+        src={imageError ? '/placeholder.png' : (src || '/placeholder.png')} 
+        alt={alt}
+        className="w-full h-full object-cover"
+        width={width}
+        height={height}
+        loading="lazy"
+        onLoad={handleLoad}
+        onError={handleError}
+        style={{ 
+          opacity: imageLoaded ? 1 : 0,
+          transition: 'opacity 0.3s ease-in-out',
+          transform: 'translateZ(0)', // Force hardware acceleration
+          backfaceVisibility: 'hidden' // Prevent flickering
+        }}
+      />
+    </div>
+  );
+});
+
+StableImage.displayName = 'StableImage';
+
 const AdminDashboard = () => {
   const { adminData, refreshAdminData } = useAdmin();
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -347,51 +415,217 @@ const AdminDashboard = () => {
       <h2 className="text-2xl font-bold">Tableau de Bord</h2>
       
       {adminData ? (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm">Total Produits</p>
-                {/* FIXED: Handle the correct data structure from API */}
-                <p className="text-2xl font-bold text-gray-900">{adminData.statistics?.totalProducts || 0}</p>
+        <>
+          {/* Enhanced Statistics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm">Total Produits</p>
+                  <p className="text-2xl font-bold text-gray-900">{adminData.statistics?.totalProducts || 0}</p>
+                </div>
+                <Package className="w-8 h-8 text-blue-600" />
               </div>
-              <Package className="w-8 h-8 text-blue-600" />
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm">Total Commandes</p>
+                  <p className="text-2xl font-bold text-gray-900">{adminData.statistics?.totalOrders || 0}</p>
+                  <p className="text-xs text-gray-500">
+                    {adminData.statistics?.orderGrowthRate > 0 ? '+' : ''}{adminData.statistics?.orderGrowthRate || 0}% ce mois
+                  </p>
+                </div>
+                <ShoppingCart className="w-8 h-8 text-green-600" />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm">Total Utilisateurs</p>
+                  <p className="text-2xl font-bold text-gray-900">{adminData.statistics?.totalUsers || 0}</p>
+                  <p className="text-xs text-gray-500">
+                    {adminData.statistics?.conversionRate || 0}% conversion
+                  </p>
+                </div>
+                <Users className="w-8 h-8 text-purple-600" />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm">Chiffre d'Affaires</p>
+                  <p className="text-2xl font-bold text-gray-900">€{adminData.statistics?.totalRevenue || 0}</p>
+                  <p className="text-xs text-gray-500">
+                    €{adminData.statistics?.averageOrderValue || 0} panier moyen
+                  </p>
+                </div>
+                <DollarSign className="w-8 h-8 text-yellow-600" />
+              </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm">Total Commandes</p>
-                {/* FIXED: Handle the correct data structure from API */}
-                <p className="text-2xl font-bold text-gray-900">{adminData.statistics?.totalOrders || 0}</p>
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Revenue Trend Chart */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Évolution des Revenus</h3>
+                <TrendingUp className="w-5 h-5 text-green-600" />
               </div>
-              <ShoppingCart className="w-8 h-8 text-green-600" />
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={adminData.charts?.revenueTrend || []}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="date" 
+                    tickFormatter={(value) => new Date(value).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
+                  />
+                  <YAxis />
+                  <Tooltip 
+                    formatter={(value) => [`€${value}`, 'Revenus']}
+                    labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR')}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="revenue" 
+                    stroke="#10b981" 
+                    strokeWidth={2}
+                    dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* User Registrations Chart */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Inscriptions Utilisateurs</h3>
+                <UserPlus className="w-5 h-5 text-blue-600" />
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={adminData.charts?.userRegistrations || []}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="date" 
+                    tickFormatter={(value) => new Date(value).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
+                  />
+                  <YAxis />
+                  <Tooltip 
+                    formatter={(value) => [value, 'Inscriptions']}
+                    labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR')}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="registrations" 
+                    stroke="#3b82f6" 
+                    fill="#3b82f6" 
+                    fillOpacity={0.3}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm">Total Utilisateurs</p>
-                {/* FIXED: Handle the correct data structure from API */}
-                <p className="text-2xl font-bold text-gray-900">{adminData.statistics?.totalUsers || 0}</p>
+          {/* Order Status Distribution & Top Products */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Order Status Distribution */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Répartition des Commandes</h3>
+                <BarChart3 className="w-5 h-5 text-purple-600" />
               </div>
-              <Users className="w-8 h-8 text-purple-600" />
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={adminData.charts?.orderStatusDistribution || []}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="count"
+                  >
+                    {adminData.charts?.orderStatusDistribution?.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={getStatusColor(entry.status)} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value, name) => [value, getStatusLabel(name)]} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Top Selling Products */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Produits les Plus Vendus</h3>
+                <Package className="w-5 h-5 text-orange-600" />
+              </div>
+              <div className="space-y-4">
+                {adminData.topProducts?.slice(0, 5).map((product, index) => (
+                  <div key={product.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-bold text-gray-600">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{product.name}</p>
+                        <p className="text-sm text-gray-500">{product.totalSold} vendus</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-gray-900">€{parseFloat(product.totalRevenue || 0).toFixed(2)}</p>
+                      <p className="text-xs text-gray-500">€{product.price} l'unité</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
+          {/* Recent Orders */}
           <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm">Chiffre d'Affaires</p>
-                {/* FIXED: Handle the correct data structure from API */}
-                <p className="text-2xl font-bold text-gray-900">€{adminData.statistics?.totalRevenue || 0}</p>
-              </div>
-              <TrendingUp className="w-8 h-8 text-yellow-600" />
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Commandes Récentes</h3>
+              <ShoppingCart className="w-5 h-5 text-green-600" />
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Commande</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Montant</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {adminData.recentOrders?.slice(0, 5).map((order) => (
+                    <tr key={order.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900">#{order.id.slice(0, 8)}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        {order.user?.firstName} {order.user?.lastName}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900">€{order.totalAmount}</td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(order.status)}`}>
+                          {getStatusLabel(order.status)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-500">
+                        {new Date(order.createdAt).toLocaleDateString('fr-FR')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
+        </>
       ) : (
         <div className="text-center py-8">
           <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -401,25 +635,62 @@ const AdminDashboard = () => {
     </div>
   ), [adminData]);
 
+  // Helper functions for chart colors and labels
+  const getStatusColor = useCallback((status) => {
+    const colors = {
+      'pending': '#f59e0b',
+      'processing': '#3b82f6',
+      'shipped': '#8b5cf6',
+      'delivered': '#10b981',
+      'cancelled': '#ef4444',
+      'refunded': '#6b7280'
+    };
+    return colors[status] || '#6b7280';
+  }, []);
+
+  const getStatusLabel = useCallback((status) => {
+    const labels = {
+      'pending': 'En attente',
+      'processing': 'En cours',
+      'shipped': 'Expédiée',
+      'delivered': 'Livrée',
+      'cancelled': 'Annulée',
+      'refunded': 'Remboursée'
+    };
+    return labels[status] || status;
+  }, []);
+
+  const getStatusBadgeColor = useCallback((status) => {
+    const colors = {
+      'pending': 'bg-yellow-100 text-yellow-800',
+      'processing': 'bg-blue-100 text-blue-800',
+      'shipped': 'bg-purple-100 text-purple-800',
+      'delivered': 'bg-green-100 text-green-800',
+      'cancelled': 'bg-red-100 text-red-800',
+      'refunded': 'bg-gray-100 text-gray-800'
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  }, []);
+
   const renderProducts = useCallback(() => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Gestion des Produits</h2>
         <button 
           onClick={handleAddProduct}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
+          className="admin-button bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 admin-icon" />
           Ajouter un produit
         </button>
       </div>
 
       {loading ? (
-        <div className="text-center py-8">Chargement...</div>
+        <div className="text-center py-8 admin-loading">Chargement...</div>
       ) : (
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="admin-card bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="admin-table w-full">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -441,31 +712,20 @@ const AdminDashboard = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {products.map((product) => (
-                  <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={product.id} className="admin-hover-transition hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {/* FIXED: Add more stable image handling to prevent vibration */}
-                        <div className="w-10 h-10 rounded-lg overflow-hidden mr-3 flex-shrink-0 bg-gray-100">
-                          <img 
-                            src={product.imageUrl || '/placeholder.png'} 
-                            alt={product.name}
-                            className="w-full h-full object-cover"
-                            width="40"
-                            height="40"
-                            loading="lazy"
-                            onLoad={(e) => {
-                              e.target.style.opacity = '1';
-                            }}
-                            onError={(e) => {
-                              e.target.src = '/placeholder.png';
-                              e.target.style.opacity = '1';
-                            }}
-                            style={{ opacity: 0, transition: 'opacity 0.2s ease-in-out' }}
-                          />
-                        </div>
+                      <div className="admin-flex-container flex items-center">
+                        {/* FIXED: Use StableImage component with admin CSS classes */}
+                        <StableImage 
+                          src={product.imageUrl} 
+                          alt={product.name}
+                          width={40}
+                          height={40}
+                          className="mr-3 admin-image-container"
+                        />
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                          <div className="text-sm text-gray-500">{product.description?.slice(0, 50)}...</div>
+                          <div className="admin-text text-sm font-medium text-gray-900">{product.name}</div>
+                          <div className="admin-text text-sm text-gray-500">{product.description?.slice(0, 50)}...</div>
                         </div>
                       </div>
                     </td>
@@ -476,34 +736,34 @@ const AdminDashboard = () => {
                       €{product.price}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
+                      <span className={`admin-badge px-2 py-1 rounded-full text-xs ${
                         product.stockQuantity > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}>
                         {product.stockQuantity} unité(s)
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
+                      <div className="admin-flex-container flex space-x-2">
                         <button 
                           onClick={() => handleViewProduct(product)}
-                          className="p-1 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded transition-colors"
+                          className="admin-button p-1 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded transition-colors"
                           title="Voir les détails"
                         >
-                          <Eye className="w-4 h-4" />
+                          <Eye className="w-4 h-4 admin-icon" />
                         </button>
                         <button 
                           onClick={() => handleEditProduct(product)}
-                          className="p-1 text-green-600 hover:text-green-900 hover:bg-green-50 rounded transition-colors"
+                          className="admin-button p-1 text-green-600 hover:text-green-900 hover:bg-green-50 rounded transition-colors"
                           title="Modifier"
                         >
-                          <Edit className="w-4 h-4" />
+                          <Edit className="w-4 h-4 admin-icon" />
                         </button>
                         <button 
                           onClick={() => deleteProduct(product.id)}
-                          className="p-1 text-red-600 hover:text-red-900 hover:bg-red-50 rounded transition-colors"
+                          className="admin-button p-1 text-red-600 hover:text-red-900 hover:bg-red-50 rounded transition-colors"
                           title="Supprimer"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4 admin-icon" />
                         </button>
                       </div>
                     </td>
@@ -562,23 +822,12 @@ const AdminDashboard = () => {
                 </div>
                 {category.imageUrl && (
                   /* FIXED: Add more stable image handling to prevent vibration */
-                  <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
-                    <img 
-                      src={category.imageUrl} 
-                      alt={category.name}
-                      className="w-full h-full object-cover"
-                      width="32"
-                      height="32"
-                      loading="lazy"
-                      onLoad={(e) => {
-                        e.target.style.opacity = '1';
-                      }}
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                      }}
-                      style={{ opacity: 0, transition: 'opacity 0.2s ease-in-out' }}
-                    />
-                  </div>
+                  <StableImage 
+                    src={category.imageUrl} 
+                    alt={category.name}
+                    width={32}
+                    height={32}
+                  />
                 )}
               </div>
             </div>

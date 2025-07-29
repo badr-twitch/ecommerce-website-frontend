@@ -1,7 +1,55 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Plus, Settings, AlertTriangle, Package, TrendingUp, Users } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import axios from 'axios';
-import toast from 'react-hot-toast';
-import { AlertTriangle, Package, TrendingDown, Eye, Plus, Minus, Settings } from 'lucide-react';
+
+// FIXED: Create a stable image component to prevent vibration
+const StableImage = React.memo(({ src, alt, width = 40, height = 40, className = "" }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  const handleLoad = useCallback(() => {
+    setImageLoaded(true);
+  }, []);
+
+  const handleError = useCallback(() => {
+    setImageError(true);
+    setImageLoaded(true);
+  }, []);
+
+  return (
+    <div 
+      className={`rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 ${className}`}
+      style={{ 
+        width: `${width}px`, 
+        height: `${height}px`,
+        minWidth: `${width}px`,
+        minHeight: `${height}px`,
+        maxWidth: `${width}px`,
+        maxHeight: `${height}px`
+      }}
+    >
+      <img 
+        src={imageError ? '/placeholder.png' : (src || '/placeholder.png')} 
+        alt={alt}
+        className="w-full h-full object-cover"
+        width={width}
+        height={height}
+        loading="lazy"
+        onLoad={handleLoad}
+        onError={handleError}
+        style={{ 
+          opacity: imageLoaded ? 1 : 0,
+          transition: 'opacity 0.3s ease-in-out',
+          transform: 'translateZ(0)', // Force hardware acceleration
+          backfaceVisibility: 'hidden' // Prevent flickering
+        }}
+      />
+    </div>
+  );
+});
+
+StableImage.displayName = 'StableImage';
 
 // FIXED: Completely isolated table component with aggressive memoization
 const InventoryTable = React.memo(({ alerts, onPlusClick, onSettingsClick, getStockStatusColor, getStockStatusText }) => {
@@ -13,31 +61,20 @@ const InventoryTable = React.memo(({ alerts, onPlusClick, onSettingsClick, getSt
 
   // FIXED: Memoize each row individually
   const renderRow = useCallback((product, index) => (
-    <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+    <tr key={product.id} className="admin-hover-transition hover:bg-gray-50 transition-colors">
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex items-center">
-          {/* FIXED: Add more stable image handling to prevent vibration */}
-          <div className="w-10 h-10 rounded-lg overflow-hidden mr-3 flex-shrink-0 bg-gray-100">
-            <img 
-              src={product.imageUrl || '/placeholder.png'} 
-              alt={product.name}
-              className="w-full h-full object-cover"
-              width="40"
-              height="40"
-              loading="lazy"
-              onLoad={(e) => {
-                e.target.style.opacity = '1';
-              }}
-              onError={(e) => {
-                e.target.src = '/placeholder.png';
-                e.target.style.opacity = '1';
-              }}
-              style={{ opacity: 0, transition: 'opacity 0.2s ease-in-out' }}
-            />
-          </div>
+        <div className="admin-flex-container flex items-center">
+          {/* FIXED: Use StableImage component with admin CSS classes */}
+          <StableImage 
+            src={product.imageUrl} 
+            alt={product.name}
+            width={40}
+            height={40}
+            className="mr-3 admin-image-container"
+          />
           <div>
-            <div className="text-sm font-medium text-gray-900">{product.name}</div>
-            <div className="text-sm text-gray-500">SKU: {product.sku}</div>
+            <div className="admin-text text-sm font-medium text-gray-900">{product.name}</div>
+            <div className="admin-text text-sm text-gray-500">SKU: {product.sku}</div>
           </div>
         </div>
       </td>
@@ -51,25 +88,25 @@ const InventoryTable = React.memo(({ alerts, onPlusClick, onSettingsClick, getSt
         {product.minStockLevel}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStockStatusColor(product)}`}>
+        <span className={`admin-badge px-2 py-1 rounded-full text-xs font-medium ${getStockStatusColor(product)}`}>
           {getStockStatusText(product)}
         </span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <div className="flex space-x-2">
+        <div className="admin-flex-container flex space-x-2">
           <button
             onClick={() => onPlusClick(product)}
-            className="text-blue-600 hover:text-blue-900 p-1 rounded transition-colors"
+            className="admin-button text-blue-600 hover:text-blue-900 p-1 rounded transition-colors"
             title="Mettre à jour le stock"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 admin-icon" />
           </button>
           <button
             onClick={() => onSettingsClick(product)}
-            className="text-green-600 hover:text-green-900 p-1 rounded transition-colors"
+            className="admin-button text-green-600 hover:text-green-900 p-1 rounded transition-colors"
             title="Ajuster le stock"
           >
-            <Settings className="w-4 h-4" />
+            <Settings className="w-4 h-4 admin-icon" />
           </button>
         </div>
       </td>
@@ -84,7 +121,7 @@ const InventoryTable = React.memo(({ alerts, onPlusClick, onSettingsClick, getSt
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full">
+      <table className="admin-table w-full">
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -339,7 +376,7 @@ const InventoryAlerts = React.memo(() => {
               <p className="text-gray-600 text-sm">Rupture de Stock</p>
               <p className="text-2xl font-bold text-red-600">{stableStats.outOfStockProducts || 0}</p>
             </div>
-            <TrendingDown className="w-8 h-8 text-red-600" />
+            <TrendingUp className="w-8 h-8 text-red-600" />
           </div>
         </div>
 

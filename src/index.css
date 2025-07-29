@@ -209,3 +209,122 @@
 .PhoneInputCountryIcon {
   @apply w-5 h-5;
 }
+
+/* Custom styles for react-phone-number-input */
+.PhoneInput {
+  @apply flex items-center space-x-2;
+}
+
+.PhoneInputCountry {
+  @apply flex items-center space-x-2;
+}
+
+.PhoneInputCountrySelect {
+  @apply border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+}
+
+.PhoneInputInput {
+  @apply flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+}
+
+/* FIXED: Prevent image vibration and layout shifts */
+.admin-image-container {
+  contain: layout style paint;
+  will-change: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.admin-image {
+  contain: layout style paint;
+  will-change: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* FIXED: Prevent table layout shifts */
+.admin-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.admin-table th,
+.admin-table td {
+  contain: layout style paint;
+  will-change: auto;
+}
+
+/* FIXED: Prevent flex layout shifts */
+.admin-flex-container {
+  contain: layout style paint;
+  will-change: auto;
+}
+
+/* FIXED: Prevent hover state layout shifts */
+.admin-hover-transition {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  will-change: auto;
+}
+
+/* FIXED: Prevent button layout shifts */
+.admin-button {
+  contain: layout style paint;
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+/* FIXED: Prevent modal layout shifts */
+.admin-modal {
+  contain: layout style paint;
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+/* FIXED: Prevent card layout shifts */
+.admin-card {
+  contain: layout style paint;
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+/* FIXED: Prevent badge layout shifts */
+.admin-badge {
+  contain: layout style paint;
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+/* FIXED: Prevent icon layout shifts */
+.admin-icon {
+  contain: layout style paint;
+  will-change: auto;
+  transform: translateZ(0);
+  flex-shrink: 0;
+}
+
+/* FIXED: Prevent text layout shifts */
+.admin-text {
+  contain: layout style paint;
+  will-change: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* FIXED: Prevent loading state layout shifts */
+.admin-loading {
+  contain: layout style paint;
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+/* FIXED: Prevent empty state layout shifts */
+.admin-empty {
+  contain: layout style paint;
+  will-change: auto;
+  transform: translateZ(0);
+}
