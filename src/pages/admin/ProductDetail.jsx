@@ -4,6 +4,21 @@ import { X, Edit, Trash2 } from 'lucide-react';
 const ProductDetail = ({ product, onClose, onEdit, onDelete }) => {
   if (!product) return null;
 
+  // Helper function to format stock
+  const formatStock = (stockQuantity) => {
+    if (stockQuantity === null || stockQuantity === undefined) return '0 unité(s)';
+    if (stockQuantity === 0) return '0 unité(s)';
+    if (stockQuantity === 1) return '1 unité';
+    return `${stockQuantity} unités`;
+  };
+
+  // Helper function to get stock color
+  const getStockColor = (stockQuantity) => {
+    if (!stockQuantity || stockQuantity === 0) return 'text-red-600';
+    if (stockQuantity <= 5) return 'text-orange-600';
+    return 'text-green-600';
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -68,10 +83,8 @@ const ProductDetail = ({ product, onClose, onEdit, onDelete }) => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-500">Stock</label>
-                <p className={`text-lg font-semibold ${
-                  product.stock > 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {product.stock} unité(s)
+                <p className={`text-lg font-semibold ${getStockColor(product.stockQuantity)}`}>
+                  {formatStock(product.stockQuantity)}
                 </p>
               </div>
             </div>

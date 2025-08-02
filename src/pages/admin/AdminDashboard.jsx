@@ -23,6 +23,7 @@ import ProductDetail from './ProductDetail';
 import CategoryForm from './CategoryForm';
 import OrderDetail from './OrderDetail';
 import InventoryAlerts from './InventoryAlerts';
+import AnalyticsDashboard from './AnalyticsDashboard';
 import { 
   LineChart, 
   Line, 
@@ -117,6 +118,22 @@ const AdminDashboard = () => {
   // FIXED: Add render counter for debugging
   const renderCount = useRef(0);
   renderCount.current += 1;
+
+  // BULK ORDER OPERATIONS: Add new state for bulk operations
+  const [selectedOrders, setSelectedOrders] = useState([]);
+  const [selectAllOrders, setSelectAllOrders] = useState(false);
+  const [showBulkActions, setShowBulkActions] = useState(false);
+  const [bulkActionLoading, setBulkActionLoading] = useState(false);
+  const [showBulkStatusModal, setShowBulkStatusModal] = useState(false);
+  const [showBulkNotifyModal, setShowBulkNotifyModal] = useState(false);
+  const [bulkStatusForm, setBulkStatusForm] = useState({
+    status: 'processing',
+    comment: ''
+  });
+  const [bulkNotifyForm, setBulkNotifyForm] = useState({
+    notificationType: 'status_update',
+    customMessage: ''
+  });
 
   // FIXED: Memoize the tab change handler to prevent unnecessary re-renders
   const handleTabChange = useCallback((tabId) => {
@@ -395,6 +412,146 @@ const AdminDashboard = () => {
       toast.error('Erreur lors de la mise à jour du statut');
     }
   }, [loadOrders]);
+
+  // BULK ORDER OPERATIONS: Add bulk operation functions
+  const handleOrderSelection = useCallback((orderId, checked) => {
+    setSelectedOrders(prev => {
+      if (checked) {
+        return [...prev, orderId];
+      } else {
+        return prev.filter(id => id !== orderId);
+      }
+    });
+  }, []);
+
+  const handleSelectAllOrders = useCallback((checked) => {
+    setSelectAllOrders(checked);
+    if (checked) {
+      setSelectedOrders(orders.map(order => order.id));
+    } else {
+      setSelectedOrders([]);
+    }
+  }, [orders]);
+
+  const handleBulkStatusUpdate = useCallback(async () => {
+    if (selectedOrders.length === 0) {
+      toast.error('Aucune commande sélectionnée');
+      return;
+    }
+
+    setBulkActionLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/orders/bulk/status`,
+        {
+          orderIds: selectedOrders,
+          status: bulkStatusForm.status,
+          comment: bulkStatusForm.comment
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      toast.success(response.data.message);
+      setSelectedOrders([]);
+      setSelectAllOrders(false);
+      setShowBulkStatusModal(false);
+      setBulkStatusForm({ status: 'processing', comment: '' });
+      loadOrders();
+    } catch (error) {
+      console.error('❌ Error updating bulk order status:', error);
+      toast.error('Erreur lors de la mise à jour en masse');
+    } finally {
+      setBulkActionLoading(false);
+    }
+  }, [selectedOrders, bulkStatusForm, loadOrders]);
+
+  const handleBulkExport = useCallback(async () => {
+    if (selectedOrders.length === 0) {
+      toast.error('Aucune commande sélectionnée');
+      return;
+    }
+
+    setBulkActionLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/orders/bulk/export`,
+        {
+          orderIds: selectedOrders
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      // Create and download CSV file
+      const csvData = response.data.data.csvData;
+      const csvContent = [
+        Object.keys(csvData[0]).join(','),
+        ...csvData.map(row => Object.values(row).map(value => `"${value}"`).join(','))
+      ].join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `orders_export_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success(response.data.message);
+    } catch (error) {
+      console.error('❌ Error exporting orders:', error);
+      toast.error('Erreur lors de l\'export');
+    } finally {
+      setBulkActionLoading(false);
+    }
+  }, [selectedOrders]);
+
+  const handleBulkNotify = useCallback(async () => {
+    if (selectedOrders.length === 0) {
+      toast.error('Aucune commande sélectionnée');
+      return;
+    }
+
+    setBulkActionLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/orders/bulk/notify`,
+        {
+          orderIds: selectedOrders,
+          notificationType: bulkNotifyForm.notificationType,
+          customMessage: bulkNotifyForm.customMessage
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      toast.success(response.data.message);
+      setSelectedOrders([]);
+      setSelectAllOrders(false);
+      setShowBulkNotifyModal(false);
+      setBulkNotifyForm({ notificationType: 'status_update', customMessage: '' });
+    } catch (error) {
+      console.error('❌ Error sending bulk notifications:', error);
+      toast.error('Erreur lors de l\'envoi des notifications');
+    } finally {
+      setBulkActionLoading(false);
+    }
+  }, [selectedOrders, bulkNotifyForm]);
 
   // FIXED: Load data based on active tab with proper memoization
   useEffect(() => {
@@ -843,6 +1000,51 @@ const AdminDashboard = () => {
         <h2 className="text-2xl font-bold">Gestion des Commandes</h2>
       </div>
 
+      {/* Bulk Actions Bar */}
+      {selectedOrders.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium text-blue-900">
+                {selectedOrders.length} commande(s) sélectionnée(s)
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setShowBulkStatusModal(true)}
+                disabled={bulkActionLoading}
+                className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
+              >
+                {bulkActionLoading ? 'Mise à jour...' : 'Mettre à jour le statut'}
+              </button>
+              <button
+                onClick={handleBulkExport}
+                disabled={bulkActionLoading}
+                className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:opacity-50"
+              >
+                {bulkActionLoading ? 'Export...' : 'Exporter CSV'}
+              </button>
+              <button
+                onClick={() => setShowBulkNotifyModal(true)}
+                disabled={bulkActionLoading}
+                className="px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 disabled:opacity-50"
+              >
+                {bulkActionLoading ? 'Envoi...' : 'Envoyer notifications'}
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedOrders([]);
+                  setSelectAllOrders(false);
+                }}
+                className="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <h3 className="text-lg font-semibold mb-4">Filtres</h3>
@@ -943,6 +1145,14 @@ const AdminDashboard = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <input
+                      type="checkbox"
+                      checked={selectAllOrders}
+                      onChange={(e) => handleSelectAllOrders(e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Commande
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -965,6 +1175,14 @@ const AdminDashboard = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {orders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <input
+                        type="checkbox"
+                        checked={selectedOrders.includes(order.id)}
+                        onChange={(e) => handleOrderSelection(order.id, e.target.checked)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       #{order.id.slice(0, 8)}
                     </td>
@@ -1015,7 +1233,7 @@ const AdminDashboard = () => {
         </div>
       )}
     </div>
-  ), [orders, loading, orderFilters, handleFilterChange, handleFilterSubmit, clearFilters, handleViewOrder]);
+  ), [orders, loading, orderFilters, selectedOrders, selectAllOrders, bulkActionLoading, handleFilterChange, handleFilterSubmit, clearFilters, handleViewOrder, handleOrderSelection, handleSelectAllOrders, handleBulkExport]);
 
   const renderUsers = useCallback(() => (
     <div className="space-y-6">
@@ -1114,9 +1332,140 @@ const AdminDashboard = () => {
     </div>
   ), [users, loading, changeUserRole, toggleUserStatus]);
 
+  const renderProductDetail = useCallback(() => (
+    <ProductDetail 
+      product={selectedProduct} 
+      onClose={handleProductDetailClose} 
+      onEdit={handleProductDetailEdit} 
+      onDelete={handleProductDetailDelete} 
+      onSuccess={handleProductSuccess}
+    />
+  ), [selectedProduct, handleProductDetailClose, handleProductDetailEdit, handleProductDetailDelete, handleProductSuccess]);
+
+  const renderProductForm = useCallback(() => (
+    <ProductForm 
+      product={editingProduct} 
+      categories={categories} 
+      onClose={handleProductFormClose} 
+      onSuccess={handleProductSuccess} 
+    />
+  ), [editingProduct, categories, handleProductFormClose, handleProductSuccess]);
+
+  const renderCategoryForm = useCallback(() => (
+    <CategoryForm 
+      category={editingCategory} 
+      onClose={handleCategoryFormClose} 
+      onSuccess={handleCategorySuccess} 
+    />
+  ), [editingCategory, handleCategoryFormClose, handleCategorySuccess]);
+
+  const renderOrderDetail = useCallback(() => (
+    <OrderDetail 
+      order={selectedOrder} 
+      onClose={handleOrderDetailClose} 
+      onStatusUpdate={updateOrderStatus}
+    />
+  ), [selectedOrder, handleOrderDetailClose, updateOrderStatus]);
+
+  const renderBulkStatusModal = useCallback(() => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+        <h3 className="text-lg font-semibold mb-4">Mettre à jour le statut des commandes</h3>
+        <div className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+            <select
+              value={bulkStatusForm.status}
+              onChange={(e) => setBulkStatusForm(prev => ({ ...prev, status: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="pending">En attente</option>
+              <option value="processing">En cours de traitement</option>
+              <option value="shipped">Expédiée</option>
+              <option value="delivered">Livrée</option>
+              <option value="cancelled">Annulée</option>
+              <option value="refunded">Remboursée</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire (optionnel)</label>
+            <textarea
+              value={bulkStatusForm.comment}
+              onChange={(e) => setBulkStatusForm(prev => ({ ...prev, comment: e.target.value }))}
+              rows="3"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            ></textarea>
+          </div>
+          <div className="flex justify-end space-x-2">
+            <button
+              onClick={() => setShowBulkStatusModal(false)}
+              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Annuler
+            </button>
+            <button
+              onClick={handleBulkStatusUpdate}
+              disabled={bulkActionLoading}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              {bulkActionLoading ? 'Mise à jour...' : 'Mettre à jour le statut'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  ), [bulkStatusForm, handleBulkStatusUpdate, bulkActionLoading]);
+
+  const renderBulkNotifyModal = useCallback(() => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+        <h3 className="text-lg font-semibold mb-4">Envoyer des notifications aux commandes</h3>
+        <div className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Type de notification</label>
+            <select
+              value={bulkNotifyForm.notificationType}
+              onChange={(e) => setBulkNotifyForm(prev => ({ ...prev, notificationType: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="status_update">Mise à jour du statut</option>
+              <option value="shipping_update">Mise à jour de l'expédition</option>
+              <option value="custom">Message personnalisé</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Message personnalisé (optionnel)</label>
+            <textarea
+              value={bulkNotifyForm.customMessage}
+              onChange={(e) => setBulkNotifyForm(prev => ({ ...prev, customMessage: e.target.value }))}
+              rows="3"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            ></textarea>
+          </div>
+          <div className="flex justify-end space-x-2">
+            <button
+              onClick={() => setShowBulkNotifyModal(false)}
+              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Annuler
+            </button>
+            <button
+              onClick={handleBulkNotify}
+              disabled={bulkActionLoading}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+            >
+              {bulkActionLoading ? 'Envoi...' : 'Envoyer les notifications'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  ), [bulkNotifyForm, handleBulkNotify, bulkActionLoading]);
+
   // FIXED: Memoize tab configuration to prevent recreation
   const tabConfig = useMemo(() => [
     { id: 'dashboard', label: 'Tableau de bord', icon: TrendingUp },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'products', label: 'Produits', icon: Package },
     { id: 'categories', label: 'Catégories', icon: Tag },
     { id: 'orders', label: 'Commandes', icon: ShoppingCart },
@@ -1129,6 +1478,8 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case 'dashboard':
         return renderDashboard();
+      case 'analytics':
+        return <AnalyticsDashboard />;
       case 'products':
         return renderProducts();
       case 'categories':
@@ -1214,9 +1565,105 @@ const AdminDashboard = () => {
             onStatusUpdate={handleOrderStatusUpdate}
           />
         )}
+
+        {/* Bulk Operation Modals */}
+        {showBulkStatusModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+              <h3 className="text-lg font-semibold mb-4">Mettre à jour le statut des commandes</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                  <select
+                    value={bulkStatusForm.status}
+                    onChange={(e) => setBulkStatusForm(prev => ({ ...prev, status: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="pending">En attente</option>
+                    <option value="processing">En cours de traitement</option>
+                    <option value="shipped">Expédiée</option>
+                    <option value="delivered">Livrée</option>
+                    <option value="cancelled">Annulée</option>
+                    <option value="refunded">Remboursée</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire (optionnel)</label>
+                  <textarea
+                    value={bulkStatusForm.comment}
+                    onChange={(e) => setBulkStatusForm(prev => ({ ...prev, comment: e.target.value }))}
+                    rows="3"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  ></textarea>
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    onClick={() => setShowBulkStatusModal(false)}
+                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    onClick={handleBulkStatusUpdate}
+                    disabled={bulkActionLoading}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  >
+                    {bulkActionLoading ? 'Mise à jour...' : 'Mettre à jour le statut'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showBulkNotifyModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+              <h3 className="text-lg font-semibold mb-4">Envoyer des notifications aux commandes</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Type de notification</label>
+                  <select
+                    value={bulkNotifyForm.notificationType}
+                    onChange={(e) => setBulkNotifyForm(prev => ({ ...prev, notificationType: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="status_update">Mise à jour du statut</option>
+                    <option value="shipping_update">Mise à jour de l'expédition</option>
+                    <option value="custom">Message personnalisé</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Message personnalisé (optionnel)</label>
+                  <textarea
+                    value={bulkNotifyForm.customMessage}
+                    onChange={(e) => setBulkNotifyForm(prev => ({ ...prev, customMessage: e.target.value }))}
+                    rows="3"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  ></textarea>
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    onClick={() => setShowBulkNotifyModal(false)}
+                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    onClick={handleBulkNotify}
+                    disabled={bulkActionLoading}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+                  >
+                    {bulkActionLoading ? 'Envoi...' : 'Envoyer les notifications'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default AdminDashboard; 
+export default AdminDashboard;
