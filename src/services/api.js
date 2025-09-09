@@ -13,8 +13,13 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+    console.log('🔍 API Request Interceptor - URL:', config.url);
+    console.log('🔍 API Request Interceptor - Token exists:', !!token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('🔍 API Request Interceptor - Authorization header set');
+    } else {
+      console.log('🔍 API Request Interceptor - No token found');
     }
     return config;
   },
@@ -27,11 +32,22 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.log('🔍 API Response Interceptor - Error status:', error.response?.status);
+    console.log('🔍 API Response Interceptor - Error URL:', error.config?.url);
+    
     if (error.response?.status === 401) {
+      console.log('🔍 API Response Interceptor - 401 Unauthorized error');
       // Token expired or invalid
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      
+      // Only redirect to login for non-orders requests to prevent infinite redirects
+      if (!error.config?.url?.includes('/orders')) {
+        console.log('🔍 API Response Interceptor - Redirecting to login');
+        window.location.href = '/login';
+      } else {
+        console.log('🔍 API Response Interceptor - Orders request, not redirecting');
+      }
     }
     return Promise.reject(error);
   }
@@ -96,6 +112,21 @@ export const cartAPI = {
   updateItem: (itemId, data) => api.put(`/cart/items/${itemId}`, data),
   removeItem: (itemId) => api.delete(`/cart/items/${itemId}`),
   clear: () => api.delete('/cart'),
+};
+
+// Recommendations API
+export const recommendationsAPI = {
+  getUserRecommendations: (limit = 10) => api.get('/recommendations/user', { params: { limit } }),
+  getProductRecommendations: (productId, limit = 6) => api.get(`/recommendations/product/${productId}`, { params: { limit } }),
+  getCategoryRecommendations: (categoryId, limit = 8) => api.get(`/recommendations/category/${categoryId}`, { params: { limit } }),
+  getTrendingRecommendations: (limit = 12, categoryId = null) => {
+    const params = { limit };
+    if (categoryId) params.categoryId = categoryId;
+    return api.get('/recommendations/trending', { params });
+  },
+  getFrequentlyBoughtTogether: (productId, limit = 4) => api.get(`/recommendations/frequently-bought/${productId}`, { params: { limit } }),
+  getSimilarUsers: (userId, limit = 5) => api.get(`/recommendations/similar-users/${userId}`, { params: { limit } }),
+  getInsights: () => api.get('/recommendations/insights'),
 };
 
 // Health check

@@ -5,18 +5,26 @@ import { auth } from '../config/firebase';
 import AddPaymentModal from '../components/profile/AddPaymentModal';
 import AddAddressModal from '../components/profile/AddAddressModal';
 import ProfilePhotoUpload from '../components/profile/ProfilePhotoUpload';
+import { OrderSummary } from '../components/orders';
 import { paymentService } from '../services/paymentService';
 import { shippingService } from '../services/shippingService';
 import userService from '../services/userService';
+import { useOrders } from '../hooks/useOrders';
 import toast from 'react-hot-toast';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
+import { Package } from 'lucide-react';
 
 const ProfilePage = () => {
   const { user, updateProfile, changePassword, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   
   const [activeTab, setActiveTab] = useState('profile');
+  
+  // Orders hook
+  const { orders: userOrders, loading: ordersLoading } = useOrders();
+  
+  console.log('🔍 ProfilePage - userOrders:', userOrders, 'ordersLoading:', ordersLoading);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -662,6 +670,16 @@ const ProfilePage = () => {
                 Profil
               </button>
               <button
+                onClick={() => setActiveTab('orders')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'orders'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Mes Commandes
+              </button>
+              <button
                 onClick={() => setActiveTab('security')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'security'
@@ -1004,6 +1022,46 @@ const ProfilePage = () => {
                     </form>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Orders Tab */}
+            {activeTab === 'orders' && (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-semibold text-gray-900">Mes Commandes</h2>
+                  <Link
+                    to="/orders"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Voir toutes les commandes
+                  </Link>
+                </div>
+                
+                {ordersLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="text-gray-600 mt-2">Chargement des commandes...</p>
+                  </div>
+                ) : userOrders && userOrders.length > 0 ? (
+                  <OrderSummary orders={userOrders} />
+                ) : (
+                  <div className="text-center py-8">
+                    <Package className="mx-auto h-12 w-12 text-gray-400" />
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">Aucune commande</h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Vous n'avez pas encore passé de commande.
+                    </p>
+                    <div className="mt-6">
+                      <Link
+                        to="/products"
+                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                      >
+                        Découvrir nos produits
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

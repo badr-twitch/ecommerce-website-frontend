@@ -2,6 +2,7 @@ import React, { useContext, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../contexts/CartContext';
 import { WishlistContext } from '../contexts/WishlistContext';
+import { ProductRecommendations } from '../components/recommendations';
 
 const HomePage = () => {
   const { addItem } = useContext(CartContext);
@@ -208,6 +209,17 @@ const HomePage = () => {
               Voir tous les produits
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Personalized Recommendations */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ProductRecommendations 
+            type="user"
+            limit={8}
+            showTitle={true}
+          />
         </div>
       </section>
 

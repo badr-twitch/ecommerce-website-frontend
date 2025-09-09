@@ -13,7 +13,8 @@ import {
   Settings,
   DollarSign,
   UserPlus,
-  BarChart3
+  BarChart3,
+  MessageSquare
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
@@ -24,6 +25,7 @@ import CategoryForm from './CategoryForm';
 import OrderDetail from './OrderDetail';
 import InventoryAlerts from './InventoryAlerts';
 import AnalyticsDashboard from './AnalyticsDashboard';
+import ReviewModeration from '../../components/reviews/ReviewModeration';
 import { 
   LineChart, 
   Line, 
@@ -1469,6 +1471,7 @@ const AdminDashboard = () => {
     { id: 'products', label: 'Produits', icon: Package },
     { id: 'categories', label: 'Catégories', icon: Tag },
     { id: 'orders', label: 'Commandes', icon: ShoppingCart },
+    { id: 'reviews', label: 'Avis', icon: MessageSquare },
     { id: 'inventory', label: 'Inventaire', icon: AlertTriangle },
     { id: 'users', label: 'Utilisateurs', icon: Users }
   ], []);
@@ -1486,6 +1489,8 @@ const AdminDashboard = () => {
         return renderCategories();
       case 'orders':
         return renderOrders();
+      case 'reviews':
+        return <ReviewModeration />;
       case 'inventory':
         return <InventoryAlerts />;
       case 'users':
