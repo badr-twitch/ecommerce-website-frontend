@@ -308,7 +308,7 @@ const PaymentForm = ({ total, onSubmit, onBack, isProcessing }) => {
                 <span>Traitement...</span>
               </div>
             ) : (
-              `Payer ${total.toFixed(2)} €`
+              `Payer ${total.toFixed(2)} DH`
             )}
           </button>
         </div>

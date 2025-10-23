@@ -77,12 +77,23 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
 // Helper function to make API calls
 const apiCall = async (endpoint, options = {}) => {
-  const token = localStorage.getItem('token');
+  // Get fresh Firebase ID token instead of using stored token
+  let token = null;
+  if (auth.currentUser && !options.headers?.Authorization) {
+    try {
+      token = await auth.currentUser.getIdToken();
+    } catch (error) {
+      console.error('Error getting fresh Firebase token:', error);
+      // Fallback to stored token
+      token = localStorage.getItem('token');
+    }
+  }
+  
   const config = {
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,
-      // Only add Authorization from localStorage if not provided in options
+      // Only add Authorization if not provided in options
       ...(token && !options.headers?.Authorization && { Authorization: `Bearer ${token}` }),
     },
     ...options,

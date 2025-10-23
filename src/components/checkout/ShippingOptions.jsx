@@ -38,7 +38,7 @@ const ShippingOptions = ({ shippingData, onSelect, onBack }) => {
       price: 3.99,
       icon: '📦',
       estimatedDays: '2-3 jours',
-      features: ['Retrait en point relais', 'Horaires étendus', 'Gratuit après 30€']
+      features: ['Retrait en point relais', 'Horaires étendus', 'Gratuit après 322 DH']
     }
   ];
 
@@ -104,7 +104,7 @@ const ShippingOptions = ({ shippingData, onSelect, onBack }) => {
                   <div className="mt-3">
                     <div className="flex items-center space-x-4 text-sm text-gray-600">
                       <span>⏱️ {method.estimatedDays}</span>
-                      <span>💰 {method.price.toFixed(2)} €</span>
+                      <span>💰 {method.price.toFixed(2)} DH</span>
                     </div>
                     <div className="mt-2">
                       <ul className="text-xs text-gray-500 space-y-1">
@@ -121,11 +121,11 @@ const ShippingOptions = ({ shippingData, onSelect, onBack }) => {
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-gray-900">
-                  {method.price.toFixed(2)} €
+                  {method.price.toFixed(2)} DH
                 </div>
                 {method.id === 'pickup' && (
                   <div className="text-xs text-green-600 mt-1">
-                    Gratuit après 30€
+                    Gratuit après 322 DH
                   </div>
                 )}
               </div>
@@ -141,7 +141,7 @@ const ShippingOptions = ({ shippingData, onSelect, onBack }) => {
           <div>
             <h4 className="font-medium text-gray-900">Offres spéciales</h4>
             <p className="text-sm text-gray-600">
-              Livraison gratuite pour les commandes de plus de 50€
+              Livraison gratuite pour les commandes de plus de 536 DH
             </p>
           </div>
         </div>

@@ -83,7 +83,20 @@ const ProductRecommendations = ({
             .sort((a, b) => (b.relevanceScore || 0) - (a.relevanceScore || 0))
             .slice(0, limit);
           
-          data = uniqueRecommendations;
+          // If no user recommendations, fall back to trending
+          if (uniqueRecommendations.length === 0) {
+            console.log('No user recommendations found, fetching trending recommendations...');
+            try {
+              const trendingResponse = await axios.get('/api/recommendations/trending', { params });
+              if (trendingResponse.data.success) {
+                data = trendingResponse.data.data;
+              }
+            } catch (trendingError) {
+              console.error('Error fetching trending recommendations:', trendingError);
+            }
+          } else {
+            data = uniqueRecommendations;
+          }
         }
         
         setRecommendations(data);
@@ -275,7 +288,7 @@ const ProductRecommendations = ({
 
               <div className="flex items-center justify-between mb-3">
                 <span className="text-lg font-semibold text-gray-900">
-                  {product.price ? `${product.price.toFixed(2)} €` : 'Prix non disponible'}
+                  {product.price ? `${product.price.toFixed(2)} DH` : 'Prix non disponible'}
                 </span>
                 
                 {product.relevanceScore && (

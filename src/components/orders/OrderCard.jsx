@@ -11,7 +11,11 @@ import {
   AlertCircle,
   Eye,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  RotateCcw,
+  MessageCircle,
+  Download,
+  Star
 } from 'lucide-react';
 
 const OrderCard = ({ order, showDetails = false, onToggleDetails }) => {
@@ -21,38 +25,52 @@ const OrderCard = ({ order, showDetails = false, onToggleDetails }) => {
     const statusConfig = {
       pending: { 
         label: 'En attente', 
-        color: 'bg-yellow-100 text-yellow-800', 
-        icon: Clock 
+        color: 'bg-yellow-100 text-yellow-800 border-yellow-200', 
+        icon: Clock,
+        bgColor: 'bg-yellow-50',
+        progress: 20
       },
       confirmed: { 
         label: 'Confirmée', 
-        color: 'bg-blue-100 text-blue-800', 
-        icon: CheckCircle 
+        color: 'bg-blue-100 text-blue-800 border-blue-200', 
+        icon: CheckCircle,
+        bgColor: 'bg-blue-50',
+        progress: 40
       },
       processing: { 
         label: 'En traitement', 
-        color: 'bg-purple-100 text-purple-800', 
-        icon: Package 
+        color: 'bg-purple-100 text-purple-800 border-purple-200', 
+        icon: Package,
+        bgColor: 'bg-purple-50',
+        progress: 60
       },
       shipped: { 
         label: 'Expédiée', 
-        color: 'bg-indigo-100 text-indigo-800', 
-        icon: Truck 
+        color: 'bg-indigo-100 text-indigo-800 border-indigo-200', 
+        icon: Truck,
+        bgColor: 'bg-indigo-50',
+        progress: 80
       },
       delivered: { 
         label: 'Livrée', 
-        color: 'bg-green-100 text-green-800', 
-        icon: CheckCircle 
+        color: 'bg-green-100 text-green-800 border-green-200', 
+        icon: CheckCircle,
+        bgColor: 'bg-green-50',
+        progress: 100
       },
       cancelled: { 
         label: 'Annulée', 
-        color: 'bg-red-100 text-red-800', 
-        icon: AlertCircle 
+        color: 'bg-red-100 text-red-800 border-red-200', 
+        icon: AlertCircle,
+        bgColor: 'bg-red-50',
+        progress: 0
       },
       refunded: { 
         label: 'Remboursée', 
-        color: 'bg-gray-100 text-gray-800', 
-        icon: AlertCircle 
+        color: 'bg-gray-100 text-gray-800 border-gray-200', 
+        icon: AlertCircle,
+        bgColor: 'bg-gray-50',
+        progress: 0
       }
     };
 
@@ -72,7 +90,7 @@ const OrderCard = ({ order, showDetails = false, onToggleDetails }) => {
   const formatPrice = (price) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'MAD'
     }).format(price);
   };
 
@@ -87,12 +105,12 @@ const OrderCard = ({ order, showDetails = false, onToggleDetails }) => {
   const StatusIcon = statusInfo.icon;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ${statusInfo.bgColor}`}>
       {/* Order Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${statusInfo.color}`}>
+            <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${statusInfo.color}`}>
               <StatusIcon className="h-3 w-3 mr-1" />
               {statusInfo.label}
             </div>
@@ -108,7 +126,7 @@ const OrderCard = ({ order, showDetails = false, onToggleDetails }) => {
             
             <button
               onClick={toggleExpansion}
-              className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+              className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
             >
               {isExpanded ? (
                 <>
@@ -124,6 +142,27 @@ const OrderCard = ({ order, showDetails = false, onToggleDetails }) => {
             </button>
           </div>
         </div>
+
+        {/* Progress Bar */}
+        {statusInfo.progress > 0 && (
+          <div className="mt-4">
+            <div className="flex justify-between text-xs text-gray-600 mb-1">
+              <span>Progression de la commande</span>
+              <span>{statusInfo.progress}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  statusInfo.progress === 100 ? 'bg-green-500' : 
+                  statusInfo.progress >= 80 ? 'bg-indigo-500' : 
+                  statusInfo.progress >= 60 ? 'bg-purple-500' : 
+                  statusInfo.progress >= 40 ? 'bg-blue-500' : 'bg-yellow-500'
+                }`}
+                style={{ width: `${statusInfo.progress}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
 
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-600">
           <div className="flex items-center gap-2">
@@ -226,18 +265,42 @@ const OrderCard = ({ order, showDetails = false, onToggleDetails }) => {
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               to={`/orders/${order.id}`}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
             >
               <Eye className="h-4 w-4 mr-2" />
               Voir la commande complète
             </Link>
             
             {order.trackingNumber && (
-              <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+              <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
                 <Truck className="h-4 w-4 mr-2" />
                 Suivre le colis
               </button>
             )}
+
+            {order.status === 'delivered' && (
+              <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                <Star className="h-4 w-4 mr-2" />
+                Évaluer
+              </button>
+            )}
+
+            {order.status === 'delivered' && (
+              <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Recommander
+              </button>
+            )}
+
+            <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+              <Download className="h-4 w-4 mr-2" />
+              Facture
+            </button>
+
+            <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Support
+            </button>
           </div>
         </div>
       )}

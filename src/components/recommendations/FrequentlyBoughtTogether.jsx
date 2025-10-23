@@ -288,7 +288,7 @@ const FrequentlyBoughtTogether = ({
 
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-lg font-semibold text-gray-900">
-                    {product.price ? `${product.price.toFixed(2)} €` : 'Prix non disponible'}
+                    {product.price ? `${product.price.toFixed(2)} DH` : 'Prix non disponible'}
                   </span>
                 </div>
 

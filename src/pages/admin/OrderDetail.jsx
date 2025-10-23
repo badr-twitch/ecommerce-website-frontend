@@ -161,7 +161,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
                 </span>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-gray-900">€{orderDetails.totalAmount}</p>
+                <p className="text-2xl font-bold text-gray-900">{orderDetails.totalAmount} DH</p>
                 <p className="text-sm text-gray-600">{orderDetails.orderItems?.length || 0} article(s)</p>
               </div>
             </div>
@@ -242,13 +242,13 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          €{item.unitPrice}
+                          {item.unitPrice} DH
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {item.quantity}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          €{(item.unitPrice * item.quantity).toFixed(2)}
+                          {(item.unitPrice * item.quantity).toFixed(2)} DH
                         </td>
                       </tr>
                     ))}

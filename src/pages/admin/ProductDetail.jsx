@@ -79,7 +79,19 @@ const ProductDetail = ({ product, onClose, onEdit, onDelete }) => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-500">Prix</label>
-                <p className="text-lg font-semibold text-gray-900">€{product.price}</p>
+                <div className="flex items-center space-x-2">
+                  <p className="text-lg font-semibold text-gray-900">{product.price} DH</p>
+                  {product.isOnSale && (
+                    <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
+                      PROMO
+                    </span>
+                  )}
+                </div>
+                {product.isOnSale && product.originalPrice && (
+                  <p className="text-sm text-gray-500 line-through">
+                    Prix original: {product.originalPrice} DH
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-500">Stock</label>
@@ -88,6 +100,37 @@ const ProductDetail = ({ product, onClose, onEdit, onDelete }) => {
                 </p>
               </div>
             </div>
+
+            {/* Promotion Details */}
+            {product.isOnSale && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Détails de la Promotion</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {product.salePercentage && (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500">Réduction</label>
+                      <p className="text-lg font-semibold text-orange-600">-{product.salePercentage}%</p>
+                    </div>
+                  )}
+                  {product.saleStartDate && (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500">Début</label>
+                      <p className="text-sm text-gray-900">
+                        {new Date(product.saleStartDate).toLocaleDateString('fr-FR')}
+                      </p>
+                    </div>
+                  )}
+                  {product.saleEndDate && (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500">Fin</label>
+                      <p className="text-sm text-gray-900">
+                        {new Date(product.saleEndDate).toLocaleDateString('fr-FR')}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-500">Catégorie</label>

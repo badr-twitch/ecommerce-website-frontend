@@ -8,9 +8,15 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
     name: '',
     description: '',
     price: '',
+    originalPrice: '',
     stockQuantity: '',
     categoryId: '',
-    imageUrl: ''
+    imageUrl: '',
+    isOnSale: false,
+    salePercentage: '',
+    saleStartDate: '',
+    saleEndDate: '',
+    isFeatured: false
   });
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,9 +33,15 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
         name: product.name || '',
         description: product.description || '',
         price: product.price || '',
+        originalPrice: product.originalPrice || '',
         stockQuantity: product.stockQuantity !== undefined ? product.stockQuantity : '',
         categoryId: product.categoryId || '',
-        imageUrl: product.imageUrl || ''
+        imageUrl: product.imageUrl || '',
+        isOnSale: product.isOnSale || false,
+        salePercentage: product.salePercentage || '',
+        saleStartDate: product.saleStartDate || '',
+        saleEndDate: product.saleEndDate || '',
+        isFeatured: product.isFeatured || false
       });
     }
   }, [product]);
@@ -55,8 +67,17 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    console.log('🔍 Input change:', name, value);
+    const { name, value, type, checked } = e.target;
+    console.log('🔍 Input change:', name, value, type, checked);
+    
+    // Handle checkboxes
+    if (type === 'checkbox') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: checked
+      }));
+      return;
+    }
     
     // Convert stockQuantity to number if it's a valid number
     let processedValue = value;
@@ -67,18 +88,42 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
       }
     }
     
-    setFormData(prev => ({
-      ...prev,
-      [name]: processedValue
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [name]: processedValue
+      };
+      
+      // Auto-calculate percentage when original price and sale price are both set
+      if (name === 'originalPrice' || name === 'price') {
+        const originalPrice = parseFloat(name === 'originalPrice' ? processedValue : prev.originalPrice);
+        const salePrice = parseFloat(name === 'price' ? processedValue : prev.price);
+        
+        if (originalPrice && salePrice && originalPrice > salePrice) {
+          const percentage = Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+          newData.salePercentage = percentage;
+        }
+      }
+      
+      return newData;
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    
+    // Clean up form data - convert empty date strings to null
+    const cleanedData = { ...formData };
+    if (cleanedData.saleStartDate === '') {
+      cleanedData.saleStartDate = null;
+    }
+    if (cleanedData.saleEndDate === '') {
+      cleanedData.saleEndDate = null;
+    }
 
     try {
-      console.log('🔍 Submitting form data:', formData);
+      console.log('🔍 Submitting form data:', cleanedData);
       const token = localStorage.getItem('token');
       const url = isEditing 
         ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/products/${product.id}`
@@ -90,7 +135,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
       console.log('🔍 Request method:', method.toUpperCase());
       console.log('🔍 Request headers:', { Authorization: `Bearer ${token}` });
       
-      const response = await axios[method](url, formData, {
+      const response = await axios[method](url, cleanedData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -164,7 +209,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Prix (€) *
+                Prix (DH) *
               </label>
               <input
                 type="number"
@@ -193,6 +238,187 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 placeholder="0"
               />
+            </div>
+          </div>
+
+          {/* Promotion Controls */}
+          <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-xl p-6">
+            <div className="flex items-center mb-4">
+              <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-orange-600 text-lg">🏷️</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Contrôle des Promotions</h3>
+            </div>
+
+            {/* Sale Toggle */}
+            <div className="mb-6">
+              <label className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  name="isOnSale"
+                  checked={formData.isOnSale}
+                  onChange={handleInputChange}
+                  className="w-5 h-5 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  Activer la promotion
+                </span>
+              </label>
+            </div>
+
+            {formData.isOnSale && (
+              <div className="space-y-4">
+                {/* Original Price */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Prix Original (DH)
+                  </label>
+                  <input
+                    type="number"
+                    name="originalPrice"
+                    value={formData.originalPrice}
+                    onChange={handleInputChange}
+                    min="0"
+                    step="0.01"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                    placeholder="Prix avant promotion"
+                  />
+                </div>
+
+                {/* Sale Price and Percentage */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Prix de Vente (DH)
+                    </label>
+                    <input
+                      type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleInputChange}
+                      min="0"
+                      step="0.01"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                      placeholder="Prix avec promotion"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Pourcentage de Réduction (%)
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="number"
+                        name="salePercentage"
+                        value={formData.salePercentage}
+                        onChange={handleInputChange}
+                        min="0"
+                        max="100"
+                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                        placeholder="Ex: 20"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const originalPrice = parseFloat(formData.originalPrice);
+                          const salePrice = parseFloat(formData.price);
+                          if (originalPrice && salePrice && originalPrice > salePrice) {
+                            const percentage = Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+                            setFormData(prev => ({ ...prev, salePercentage: percentage }));
+                          }
+                        }}
+                        className="px-3 py-3 bg-orange-100 text-orange-600 rounded-lg hover:bg-orange-200 transition-colors"
+                        title="Recalculer automatiquement"
+                      >
+                        🔄
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Saisissez manuellement ou cliquez sur 🔄 pour calculer automatiquement
+                    </p>
+                  </div>
+                </div>
+
+                {/* Sale Dates */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Date de Début
+                    </label>
+                    <input
+                      type="datetime-local"
+                      name="saleStartDate"
+                      value={formData.saleStartDate}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Date de Fin
+                    </label>
+                    <input
+                      type="datetime-local"
+                      name="saleEndDate"
+                      value={formData.saleEndDate}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                {/* Price Preview */}
+                {formData.originalPrice && formData.price && (
+                  <div className="bg-white border border-orange-200 rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Aperçu des Prix</h4>
+                    <div className="flex items-center space-x-4">
+                      <div className="text-lg text-gray-500 line-through">
+                        {formData.originalPrice} DH
+                      </div>
+                      <div className="text-xl font-bold text-orange-600">
+                        {formData.price} DH
+                      </div>
+                      {formData.salePercentage && (
+                        <div className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-sm font-medium">
+                          -{formData.salePercentage}%
+                        </div>
+                      )}
+                    </div>
+                    {formData.originalPrice && formData.price && parseFloat(formData.originalPrice) > parseFloat(formData.price) && (
+                      <div className="mt-2 text-sm text-green-600">
+                        💰 Économie: {(parseFloat(formData.originalPrice) - parseFloat(formData.price)).toFixed(2)} DH
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Product Status */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+            <div className="flex items-center mb-4">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-blue-600 text-lg">⭐</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Statut du Produit</h3>
+            </div>
+
+            <div className="space-y-4">
+              <label className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  name="isFeatured"
+                  checked={formData.isFeatured}
+                  onChange={handleInputChange}
+                  className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  Produit en vedette (affiché sur la page d'accueil)
+                </span>
+              </label>
             </div>
           </div>
 

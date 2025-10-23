@@ -220,8 +220,32 @@ const ProductDetailPage = () => {
             </div>
 
             {/* Price */}
-            <div className="text-3xl font-bold text-gray-900">
-              {product.price ? `${product.price.toFixed(2)} €` : 'Prix non disponible'}
+            <div className="space-y-2">
+              {product.isOnSale && product.originalPrice ? (
+                <div className="flex items-center space-x-4">
+                  <div className="text-3xl font-bold text-gray-900">
+                    {product.price ? `${product.price.toFixed(2)} DH` : 'Prix non disponible'}
+                  </div>
+                  <div className="text-xl text-gray-500 line-through">
+                    {product.originalPrice.toFixed(2)} DH
+                  </div>
+                  {product.salePercentage && (
+                    <div className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">
+                      -{product.salePercentage}%
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-3xl font-bold text-gray-900">
+                  {product.price ? `${product.price.toFixed(2)} DH` : 'Prix non disponible'}
+                </div>
+              )}
+              
+              {product.isOnSale && (
+                <div className="text-sm text-orange-600 font-medium">
+                  🏷️ Produit en promotion
+                </div>
+              )}
             </div>
 
             {/* Stock Status */}

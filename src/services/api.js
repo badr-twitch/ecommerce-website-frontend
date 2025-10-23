@@ -11,15 +11,25 @@ const api = axios.create({
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    console.log('🔍 API Request Interceptor - URL:', config.url);
-    console.log('🔍 API Request Interceptor - Token exists:', !!token);
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-      console.log('🔍 API Request Interceptor - Authorization header set');
+  async (config) => {
+    // Get fresh Firebase ID token instead of using stored token
+    const { auth } = await import('../config/firebase');
+    if (auth.currentUser) {
+      try {
+        const token = await auth.currentUser.getIdToken();
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log('🔍 API Request Interceptor - Fresh Firebase token added');
+      } catch (error) {
+        console.error('🔍 API Request Interceptor - Error getting fresh token:', error);
+        // Fallback to stored token if fresh token fails
+        const storedToken = localStorage.getItem('token');
+        if (storedToken) {
+          config.headers.Authorization = `Bearer ${storedToken}`;
+          console.log('🔍 API Request Interceptor - Using stored token as fallback');
+        }
+      }
     } else {
-      console.log('🔍 API Request Interceptor - No token found');
+      console.log('🔍 API Request Interceptor - No authenticated user');
     }
     return config;
   },

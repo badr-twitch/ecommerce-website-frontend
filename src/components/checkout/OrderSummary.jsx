@@ -29,7 +29,7 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod }) 
             </div>
             <div className="flex-shrink-0">
               <p className="text-sm font-medium text-gray-900">
-                {(item.price * item.quantity).toFixed(2)} €
+                {(item.price * item.quantity).toFixed(2)} DH
               </p>
             </div>
           </div>
@@ -40,7 +40,7 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod }) 
       <div className="space-y-3 border-t border-gray-200 pt-4">
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Sous-total</span>
-          <span className="text-gray-900">{subtotal.toFixed(2)} €</span>
+          <span className="text-gray-900">{subtotal.toFixed(2)} DH</span>
         </div>
         
         {shippingMethod && (
@@ -48,7 +48,7 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod }) 
             <span className="text-gray-600">
               Livraison ({shippingMethod.name})
             </span>
-            <span className="text-gray-900">{shippingCost.toFixed(2)} €</span>
+            <span className="text-gray-900">{shippingCost.toFixed(2)} DH</span>
           </div>
         )}
 
@@ -62,7 +62,7 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod }) 
               </span>
             </div>
             <p className="text-xs text-green-600 mt-1">
-              Votre commande dépasse 50€
+              Votre commande dépasse 536 DH
             </p>
           </div>
         )}
@@ -70,7 +70,7 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod }) 
         <div className="border-t border-gray-200 pt-3">
           <div className="flex justify-between text-lg font-bold">
             <span>Total</span>
-            <span>{total.toFixed(2)} €</span>
+            <span>{total.toFixed(2)} DH</span>
           </div>
           <p className="text-xs text-gray-500 mt-1">
             TVA incluse

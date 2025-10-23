@@ -617,9 +617,9 @@ const AdminDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-600 text-sm">Chiffre d'Affaires</p>
-                  <p className="text-2xl font-bold text-gray-900">€{adminData.statistics?.totalRevenue || 0}</p>
+                  <p className="text-2xl font-bold text-gray-900">{adminData.statistics?.totalRevenue || 0} DH</p>
                   <p className="text-xs text-gray-500">
-                    €{adminData.statistics?.averageOrderValue || 0} panier moyen
+                    {adminData.statistics?.averageOrderValue || 0} DH panier moyen
                   </p>
                 </div>
                 <DollarSign className="w-8 h-8 text-yellow-600" />
@@ -644,7 +644,7 @@ const AdminDashboard = () => {
                   />
                   <YAxis />
                   <Tooltip 
-                    formatter={(value) => [`€${value}`, 'Revenus']}
+                    formatter={(value) => [`${value} DH`, 'Revenus']}
                     labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR')}
                   />
                   <Line 
@@ -736,8 +736,8 @@ const AdminDashboard = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-gray-900">€{parseFloat(product.totalRevenue || 0).toFixed(2)}</p>
-                      <p className="text-xs text-gray-500">€{product.price} l'unité</p>
+                      <p className="font-semibold text-gray-900">{parseFloat(product.totalRevenue || 0).toFixed(2)} DH</p>
+                      <p className="text-xs text-gray-500">{product.price} DH l'unité</p>
                     </div>
                   </div>
                 ))}
@@ -769,7 +769,7 @@ const AdminDashboard = () => {
                       <td className="px-4 py-3 text-sm text-gray-900">
                         {order.user?.firstName} {order.user?.lastName}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-900">€{order.totalAmount}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{order.totalAmount} DH</td>
                       <td className="px-4 py-3">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(order.status)}`}>
                           {getStatusLabel(order.status)}
@@ -892,7 +892,21 @@ const AdminDashboard = () => {
                       {product.category?.name || 'Non catégorisé'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      €{product.price}
+                      <div className="flex flex-col">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-medium">{product.price} DH</span>
+                          {product.isOnSale && (
+                            <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
+                              PROMO
+                            </span>
+                          )}
+                        </div>
+                        {product.isOnSale && product.originalPrice && (
+                          <span className="text-xs text-gray-500 line-through">
+                            {product.originalPrice} DH
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <span className={`admin-badge px-2 py-1 rounded-full text-xs ${
@@ -1195,7 +1209,7 @@ const AdminDashboard = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className="font-medium">€{order.totalAmount}</div>
+                      <div className="font-medium">{order.totalAmount} DH</div>
                       <div className="text-gray-500">{order.orderItems?.length || 0} article(s)</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

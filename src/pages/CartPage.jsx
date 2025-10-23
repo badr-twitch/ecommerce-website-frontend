@@ -11,7 +11,7 @@ const CartPage = () => {
   const formatPrice = (price) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'MAD'
     }).format(price);
   };
 
@@ -287,7 +287,7 @@ const CartPage = () => {
                   📦
                 </div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Produit Recommandé</h3>
-                <p className="text-2xl font-bold text-blue-600 mb-4">€99</p>
+                <p className="text-2xl font-bold text-blue-600 mb-4">1 061 DH</p>
                 <button className="w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-300">
                   Ajouter au panier
                 </button>

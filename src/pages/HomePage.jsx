@@ -25,21 +25,21 @@ const HomePage = () => {
     {
       id: 1,
       name: "Produit Premium",
-      price: "€299",
+      price: "9 653 DH",
       image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop",
       category: "Électronique"
     },
     {
       id: 2,
       name: "Collection Exclusive",
-      price: "€199",
+      price: "3 216 DH",
       image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop",
       category: "Mode"
     },
     {
       id: 3,
       name: "Édition Limitée",
-      price: "€399",
+      price: "13 939 DH",
       image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop",
       category: "Lifestyle"
     }

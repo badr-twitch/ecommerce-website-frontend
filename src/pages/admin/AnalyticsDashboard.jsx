@@ -286,7 +286,7 @@ const AnalyticsDashboard = () => {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Chiffre d'affaires</p>
-                    <p className="text-2xl font-bold text-gray-900">€{salesData.summary.totalRevenue}</p>
+                    <p className="text-2xl font-bold text-gray-900">{salesData.summary.totalRevenue} DH</p>
                   </div>
                 </div>
               </div>
@@ -310,7 +310,7 @@ const AnalyticsDashboard = () => {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Panier moyen</p>
-                    <p className="text-2xl font-bold text-gray-900">€{salesData.summary.averageOrderValue}</p>
+                    <p className="text-2xl font-bold text-gray-900">{salesData.summary.averageOrderValue} DH</p>
                   </div>
                 </div>
               </div>
@@ -326,7 +326,7 @@ const AnalyticsDashboard = () => {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis />
-                    <Tooltip formatter={(value) => [`€${value}`, 'Revenus']} />
+                    <Tooltip formatter={(value) => [`${value} DH`, 'Revenus']} />
                     <Legend />
                     <Line type="monotone" dataKey="revenue" stroke="#8884d8" strokeWidth={2} />
                   </LineChart>
@@ -376,7 +376,7 @@ const AnalyticsDashboard = () => {
                           {new Date(day.date).toLocaleDateString('fr-FR')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                          €{day.revenue}
+                          {day.revenue} DH
                         </td>
                       </tr>
                     ))}
@@ -457,7 +457,7 @@ const AnalyticsDashboard = () => {
                         <p className="text-sm text-gray-600">{customer.customer.email}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium text-green-600">€{customer.totalSpent}</p>
+                        <p className="font-medium text-green-600">{customer.totalSpent} DH</p>
                         <p className="text-sm text-gray-600">{customer.orderCount} commande(s)</p>
                       </div>
                     </div>
@@ -479,7 +479,7 @@ const AnalyticsDashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
-                  <Tooltip formatter={(value) => [`€${value}`, 'Revenus']} />
+                  <Tooltip formatter={(value) => [`${value} DH`, 'Revenus']} />
                   <Legend />
                   <Bar dataKey="revenue" fill="#8884d8" />
                 </BarChart>
@@ -504,7 +504,7 @@ const AnalyticsDashboard = () => {
                       <tr key={product.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{product.category}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">€{product.price}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">{product.price} DH</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                             product.stockQuantity === 0 
