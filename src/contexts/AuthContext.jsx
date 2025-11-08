@@ -476,6 +476,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const refreshUser = async () => {
+    try {
+      const response = await apiCall('/auth/me', {
+        method: 'GET',
+      });
+
+      if (response.success && response.user) {
+        localStorage.setItem('user', JSON.stringify(response.user));
+        dispatch({ type: 'UPDATE_USER', payload: response.user });
+        return response.user;
+      }
+
+      throw new Error(response.message || 'Impossible de récupérer le profil');
+    } catch (error) {
+      console.error('❌ Error refreshing user:', error);
+      throw error;
+    }
+  };
+
   // Change password function
   const changePassword = async (currentPassword, newPassword) => {
     try {
@@ -535,6 +554,7 @@ export const AuthProvider = ({ children }) => {
     signInWithFacebook,
     logout,
     updateProfile,
+    refreshUser,
     changePassword,
     forgotPassword,
     resetPassword,

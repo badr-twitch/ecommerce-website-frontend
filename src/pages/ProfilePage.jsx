@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { auth } from '../config/firebase';
 import AddPaymentModal from '../components/profile/AddPaymentModal';
@@ -14,10 +14,13 @@ import toast from 'react-hot-toast';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { Package } from 'lucide-react';
+import { membershipAPI } from '../services/api';
+import MembershipManageModal from '../components/membership/MembershipManageModal';
 
 const ProfilePage = () => {
-  const { user, updateProfile, changePassword, logout } = useContext(AuthContext);
+  const { user, updateProfile, changePassword, logout, refreshUser } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
   
   const [activeTab, setActiveTab] = useState('profile');
   
@@ -83,6 +86,253 @@ const ProfilePage = () => {
   const [showAddPayment, setShowAddPayment] = useState(false);
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
+const [membershipModalOpen, setMembershipModalOpen] = useState(false);
+const [membershipData, setMembershipData] = useState(null);
+const [membershipPlanData, setMembershipPlanData] = useState(null);
+const [membershipLoading, setMembershipLoading] = useState(false);
+const [membershipActionLoading, setMembershipActionLoading] = useState(false);
+const [membershipError, setMembershipError] = useState('');
+  useEffect(() => {
+    console.log('🔁 ProfilePage - membershipModalOpen changed:', membershipModalOpen);
+  }, [membershipModalOpen]);
+
+const currentMembership = membershipData || {
+  membershipStatus: user?.membershipStatus || 'none',
+  membershipPlan: user?.membershipPlan || 'umod-prime',
+  membershipPrice: user?.membershipPrice ?? null,
+  membershipCurrency: user?.membershipCurrency || 'MAD',
+  membershipActivatedAt: user?.membershipActivatedAt || null,
+  membershipExpiresAt: user?.membershipExpiresAt || null,
+  membershipAutoRenew: user?.membershipAutoRenew ?? true,
+};
+
+const membershipStatus = currentMembership.membershipStatus || 'none';
+const membershipActivatedAt = currentMembership.membershipActivatedAt ? new Date(currentMembership.membershipActivatedAt) : null;
+const membershipExpiresAt = currentMembership.membershipExpiresAt ? new Date(currentMembership.membershipExpiresAt) : null;
+const membershipPrice =
+  currentMembership.membershipPrice !== undefined && currentMembership.membershipPrice !== null
+    ? currentMembership.membershipPrice
+    : membershipPlanData?.price ?? null;
+const membershipCurrency = currentMembership.membershipCurrency || membershipPlanData?.currency || 'MAD';
+const membershipPlanName =
+  currentMembership.membershipPlan === 'umod-prime'
+    ? 'UMOD Prime'
+    : currentMembership.membershipPlan || 'UMOD Prime';
+const membershipPriceDisplay =
+  membershipPrice !== undefined && membershipPrice !== null
+    ? new Intl.NumberFormat('fr-FR', {
+        style: 'currency',
+        currency: membershipCurrency,
+      }).format(Number(membershipPrice))
+    : null;
+const membershipStatusLabelMap = {
+  active: 'Actif',
+  cancelled: 'Renouvellement arrêté',
+  expired: 'Expiré',
+  pending: 'En attente',
+  none: 'Inactif',
+};
+const membershipBadgeClasses = {
+  active: 'bg-emerald-400/10 text-emerald-200 border border-emerald-300/30',
+  cancelled: 'bg-amber-400/10 text-amber-200 border border-amber-300/30',
+  expired: 'bg-rose-500/10 text-rose-100 border border-rose-400/40',
+  pending: 'bg-blue-500/10 text-blue-100 border border-blue-400/30',
+  none: 'bg-white/10 text-white/60 border border-white/10',
+};
+const membershipStatusLabel = membershipStatusLabelMap[membershipStatus] || membershipStatusLabelMap.none;
+const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || membershipBadgeClasses.none;
+
+  const formatMembershipDate = (date) => {
+    if (!date) return 'Non défini';
+    try {
+      return new Intl.DateTimeFormat('fr-FR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      }).format(date);
+    } catch (error) {
+      return 'Non défini';
+    }
+  };
+
+  const fallbackMembershipPerks = [
+    {
+      title: 'Livraison express illimitée',
+      description: 'Expédition prioritaire partout au Maroc sans minimum d’achat.',
+    },
+    {
+      title: 'Conciergerie shopping 7j/7',
+      description: 'Un expert UMOD vous accompagne sur WhatsApp et téléphone.',
+    },
+    {
+      title: 'Offres et ventes privées',
+      description: 'Accès anticipé aux drops, remises supplémentaires et cadeaux exclusifs.',
+    },
+    {
+      title: 'Retours simplifiés',
+      description: 'Échanges gratuits pendant 60 jours avec prise en charge à domicile.',
+    },
+  ];
+
+  const displayedMembershipPerks =
+    membershipPlanData?.perks && membershipPlanData.perks.length > 0
+      ? membershipPlanData.perks
+      : fallbackMembershipPerks;
+
+  const loadMembershipPlan = useCallback(async () => {
+    console.log('🔍 ProfilePage - Loading membership plan');
+    try {
+      const response = await membershipAPI.getPlan();
+      if (response.data?.success) {
+        console.log('✅ ProfilePage - Membership plan loaded');
+        setMembershipPlanData(response.data.data);
+      }
+    } catch (error) {
+      console.error('❌ Error loading membership plan:', error);
+    }
+  }, []);
+
+  const loadMembershipData = useCallback(
+    async (showToast = false) => {
+      if (!user) {
+        setMembershipData(null);
+        return;
+      }
+
+      try {
+        setMembershipLoading(true);
+        console.log('🔍 ProfilePage - Loading membership status');
+        setMembershipError('');
+        const response = await membershipAPI.getStatus();
+
+        if (response.data?.success) {
+          console.log('✅ ProfilePage - Membership status loaded:', response.data.data);
+          setMembershipData(response.data.data);
+        } else {
+          setMembershipData({
+            membershipStatus: 'none',
+            membershipPlan: 'umod-prime',
+            membershipAutoRenew: true,
+          });
+        }
+      } catch (error) {
+        if (error.response?.status === 404) {
+          console.warn('⚠️ ProfilePage - Membership status 404');
+          setMembershipData({
+            membershipStatus: 'none',
+            membershipPlan: 'umod-prime',
+            membershipAutoRenew: true,
+          });
+        } else {
+          console.error('❌ Error loading membership status:', error);
+          const message = error.response?.data?.error || 'Impossible de charger votre abonnement';
+          setMembershipError(message);
+          if (showToast) {
+            toast.error(message);
+          }
+        }
+      } finally {
+        setMembershipLoading(false);
+      }
+    },
+    [user]
+  );
+
+  const handleMembershipRefresh = useCallback(() => loadMembershipData(true), [loadMembershipData]);
+
+  const handleMembershipModalOpen = useCallback(async () => {
+    if (!user) {
+      toast.error('Connectez-vous pour gérer votre abonnement');
+      navigate('/login', { state: { from: '/profile' } });
+      return;
+    }
+
+    console.log('🔍 ProfilePage - Opening membership modal (before set state)');
+    setMembershipModalOpen(true);
+    console.log('🔍 ProfilePage - membershipModalOpen state should be true (right after set)');
+    setTimeout(() => {
+      console.log('⏳ ProfilePage - membershipModalOpen state (deferred):', true);
+    }, 0);
+    setMembershipError('');
+
+    try {
+      await loadMembershipData(true);
+    } catch (error) {
+      // loadMembershipData already gère les erreurs et les toasts
+    }
+  }, [user, navigate, loadMembershipData]);
+
+  const handleMembershipModalClose = useCallback(() => {
+    if (!membershipActionLoading) {
+      setMembershipModalOpen(false);
+    }
+  }, [membershipActionLoading]);
+
+  const handleMembershipCancel = useCallback(async () => {
+    try {
+      setMembershipActionLoading(true);
+      console.log('🔄 ProfilePage - Cancelling membership auto-renew');
+      const response = await membershipAPI.cancel();
+      if (response.data?.success) {
+        console.log('✅ ProfilePage - Membership auto-renew cancelled');
+        toast.success(response.data.message || 'Renouvellement automatique suspendu.');
+        await loadMembershipData();
+        if (typeof refreshUser === 'function') {
+          await refreshUser();
+        }
+      } else {
+        console.warn('⚠️ ProfilePage - Membership cancel failed', response.data);
+        toast.error(response.data?.error || 'Impossible de suspendre le renouvellement.');
+      }
+    } catch (error) {
+      console.error('❌ ProfilePage - Error cancelling membership:', error);
+      toast.error(error.response?.data?.error || 'Impossible de suspendre le renouvellement.');
+    } finally {
+      setMembershipActionLoading(false);
+    }
+  }, [loadMembershipData, refreshUser]);
+
+  const handleMembershipSubscribe = useCallback(async () => {
+    try {
+      setMembershipActionLoading(true);
+      console.log('🔄 ProfilePage - Subscribing to membership');
+      const response = await membershipAPI.subscribe();
+      if (response.data?.success) {
+        console.log('✅ ProfilePage - Membership subscription activated');
+        toast.success(response.data.message || 'UMOD Prime activé !');
+        await loadMembershipData();
+        if (typeof refreshUser === 'function') {
+          await refreshUser();
+        }
+      } else {
+        console.warn('⚠️ ProfilePage - Membership subscription failed', response.data);
+        toast.error(response.data?.error || 'Impossible d’activer l’abonnement.');
+      }
+    } catch (error) {
+      console.error('❌ ProfilePage - Error subscribing membership:', error);
+      toast.error(error.response?.data?.error || 'Impossible d’activer l’abonnement.');
+    } finally {
+      setMembershipActionLoading(false);
+    }
+  }, [loadMembershipData, refreshUser]);
+
+  useEffect(() => {
+    loadMembershipPlan();
+  }, [loadMembershipPlan]);
+
+  useEffect(() => {
+    loadMembershipData();
+  }, [loadMembershipData]);
+
+  useEffect(() => {
+    if (location.state?.openMembershipModal) {
+      console.log('🔍 ProfilePage - location state requests membership modal');
+      handleMembershipModalOpen();
+
+      const { openMembershipModal, ...restState } = location.state;
+      navigate(location.pathname, { replace: true, state: restState });
+    }
+  }, [location.state, location.pathname, handleMembershipModalOpen, navigate]);
 
   // Phone verification states
   const [showPhoneVerification, setShowPhoneVerification] = useState(false);
@@ -1022,6 +1272,154 @@ const ProfilePage = () => {
                     </form>
                   </div>
                 </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-900 to-blue-900 text-white shadow-xl">
+                    <div className="absolute inset-0">
+                      <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/40 blur-3xl rounded-full"></div>
+                      <div className="absolute bottom-0 left-8 w-48 h-48 bg-purple-500/30 blur-3xl rounded-full"></div>
+                    </div>
+                    <div className="relative p-8 space-y-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="inline-flex items-center px-4 py-1 rounded-full bg-white/10 border border-white/20 text-xs uppercase tracking-widest">
+                            UMOD Prime
+                          </span>
+                          <h3 className="mt-4 text-2xl font-semibold">Votre abonnement premium</h3>
+                        </div>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            membershipStatus === 'active'
+                              ? 'bg-emerald-400/10 text-emerald-200 border border-emerald-300/30'
+                              : 'bg-white/10 text-white/60 border border-white/10'
+                          }`}
+                        >
+                          {membershipStatus === 'active' ? 'Actif' : 'Inactif'}
+                        </span>
+                      </div>
+
+                      {membershipStatus === 'active' ? (
+                        <div className="space-y-4">
+                          <div className="flex items-center space-x-4">
+                            <div className="text-4xl">🌟</div>
+                            <div>
+                              <p className="text-sm text-white/60">Plan actuel</p>
+                              <p className="text-lg font-semibold">{membershipPlanName}</p>
+                            </div>
+                          </div>
+                          <p className="text-sm text-white/70">
+                            {currentMembership.membershipAutoRenew === false
+                              ? `Le renouvellement automatique est désactivé. Votre abonnement restera actif jusqu’au ${formatMembershipDate(membershipExpiresAt)}.`
+                              : 'Votre abonnement se renouvelle automatiquement chaque mois.'}
+                          </p>
+                          <div className="grid sm:grid-cols-2 gap-4 text-sm text-white/70">
+                            <div className="p-4 rounded-2xl bg-white/10 border border-white/10">
+                              <p className="uppercase tracking-wide text-xs text-white/50">Activé le</p>
+                              <p className="mt-1 font-semibold">{formatMembershipDate(membershipActivatedAt)}</p>
+                            </div>
+                            <div className="p-4 rounded-2xl bg-white/10 border border-white/10">
+                              <p className="uppercase tracking-wide text-xs text-white/50">Renouvellement</p>
+                              <p className="mt-1 font-semibold">{formatMembershipDate(membershipExpiresAt)}</p>
+                            </div>
+                          </div>
+                          <ul className="space-y-2 text-sm text-white/70">
+                            {displayedMembershipPerks.slice(0, 3).map((perk) => (
+                              <li key={perk.title} className="flex items-center space-x-2">
+                                <span className="text-lg text-emerald-300">✔</span>
+                                <span>{perk.title}</span>
+                              </li>
+                            ))}
+                          </ul>
+                          <button
+                            type="button"
+                            onClick={handleMembershipModalOpen}
+                            disabled={membershipActionLoading}
+                            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-white text-slate-900 font-semibold hover:-translate-y-0.5 transition-transform disabled:opacity-60"
+                          >
+                            {membershipActionLoading ? 'Ouverture...' : 'Gérer mon abonnement'}
+                            <span>→</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="p-4 rounded-2xl bg-white/10 border border-white/10 text-sm text-white/70">
+                            {membershipPriceDisplay ? (
+                              <p>
+                                Bénéficiez de tous les avantages UMOD Prime pour{' '}
+                                <span className="font-semibold text-white">{membershipPriceDisplay}</span>{' '}
+                                par mois.
+                              </p>
+                            ) : (
+                              <p>
+                                Bénéficiez de la livraison express illimitée, d’un concierge shopping 7j/7 et d’offres exclusives pour
+                                69,99 DH / mois.
+                              </p>
+                            )}
+                          </div>
+                          <ul className="space-y-2 text-sm text-white/70">
+                            {displayedMembershipPerks.slice(0, 3).map((perk) => (
+                              <li key={perk.title} className="flex items-start space-x-2">
+                                <span className="text-lg">✨</span>
+                                <div>
+                                  <span className="font-medium">{perk.title}</span>
+                                  {perk.description && (
+                                    <p className="text-xs text-white/60">{perk.description}</p>
+                                  )}
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                          <button
+                            type="button"
+                            onClick={() => navigate('/membership')}
+                            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 font-semibold shadow-lg shadow-blue-500/40 hover:-translate-y-0.5 transition-transform"
+                          >
+                            Découvrir UMOD Prime
+                            <span>→</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="rounded-3xl border border-gray-200/60 bg-white/80 backdrop-blur p-6 space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Vos prochains avantages UMOD Prime</h3>
+                    <p className="text-sm text-gray-600">
+                      Consolidez votre expérience d’achat au Maroc avec un abonnement pensé pour la rapidité et la sécurité.
+                    </p>
+                    <div className="space-y-3 text-sm text-gray-700">
+                      <div className="flex items-start space-x-3">
+                        <span className="text-xl">🛡️</span>
+                        <div>
+                          <p className="font-medium text-gray-900">Protection colis premium</p>
+                          <p className="text-gray-600">Assurance incluse et échanges gratuits pendant 60 jours.</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start space-x-3">
+                        <span className="text-xl">🎁</span>
+                        <div>
+                          <p className="font-medium text-gray-900">Cadeaux de bienvenue</p>
+                          <p className="text-gray-600">Carte cadeau de 50 DH et accès aux masterclass UMOD.</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start space-x-3">
+                        <span className="text-xl">💎</span>
+                        <div>
+                          <p className="font-medium text-gray-900">Points fidélité boostés</p>
+                          <p className="text-gray-600">Cumulez 2x plus de points pour débloquer des chèques cadeaux.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => navigate('/membership')}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-gray-800 hover:bg-gray-100 transition"
+                    >
+                      En savoir plus sur UMOD Prime
+                      <span>→</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -1372,6 +1770,18 @@ const ProfilePage = () => {
       </div>
 
       {/* Modals */}
+      <MembershipManageModal
+        isOpen={membershipModalOpen}
+        onClose={handleMembershipModalClose}
+        status={currentMembership}
+        plan={membershipPlanData}
+        loading={membershipActionLoading}
+        statusLoading={membershipLoading}
+        onCancel={handleMembershipCancel}
+        onSubscribe={handleMembershipSubscribe}
+        onRefresh={handleMembershipRefresh}
+      />
+
       <AddPaymentModal
         isOpen={showAddPayment}
         onClose={() => setShowAddPayment(false)}

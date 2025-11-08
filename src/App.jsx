@@ -17,6 +17,7 @@ import OrderSuccessPage from './pages/OrderSuccessPage';
 import NotFoundPage from './pages/NotFoundPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import NotificationPreferencesPage from './pages/NotificationPreferencesPage';
+import MembershipPage from './pages/MembershipPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { WishlistProvider } from './contexts/WishlistContext';
@@ -48,6 +49,7 @@ function App() {
                     <Route path="/orders/:id" element={<OrderDetailPage />} />
                     <Route path="/checkout" element={<CheckoutPage />} />
                     <Route path="/order-success" element={<OrderSuccessPage />} />
+                    <Route path="/membership" element={<MembershipPage />} />
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/notification-preferences" element={<NotificationPreferencesPage />} />
                     <Route path="*" element={<NotFoundPage />} />

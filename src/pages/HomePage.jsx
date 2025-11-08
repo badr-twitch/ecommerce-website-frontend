@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { CartContext } from '../contexts/CartContext';
 import { WishlistContext } from '../contexts/WishlistContext';
 import { ProductRecommendations } from '../components/recommendations';
+import MembershipHighlight from '../components/membership/MembershipHighlight';
 
 const HomePage = () => {
   const { addItem } = useContext(CartContext);
@@ -81,6 +82,11 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* Membership Highlight */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 pb-10">
+        <MembershipHighlight />
+      </div>
 
       {/* Features Section */}
       <section className="py-20">

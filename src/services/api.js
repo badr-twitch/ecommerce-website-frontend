@@ -170,6 +170,14 @@ export const formatDateTime = (date) => {
   }).format(new Date(date));
 };
 
+// Membership API
+export const membershipAPI = {
+  getPlan: () => api.get('/membership/plan'),
+  getStatus: () => api.get('/membership/status'),
+  subscribe: (data = {}) => api.post('/membership/subscribe', data),
+  cancel: () => api.post('/membership/cancel'),
+};
+
 // Error handling utility
 export const handleAPIError = (error) => {
   if (error.response) {
