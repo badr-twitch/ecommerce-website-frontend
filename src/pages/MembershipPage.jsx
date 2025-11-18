@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { membershipAPI, formatPrice } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { paymentService } from '../services/paymentService';
 
 const MembershipPage = () => {
   const navigate = useNavigate();
@@ -13,6 +14,44 @@ const MembershipPage = () => {
   const [subscribing, setSubscribing] = useState(false);
   const [error, setError] = useState('');
   const [status, setStatus] = useState(null);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [paymentMethodsLoading, setPaymentMethodsLoading] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState(null);
+  const [autoRenewPreference, setAutoRenewPreference] = useState(true);
+  const [paymentError, setPaymentError] = useState('');
+
+  const selectedPaymentMethod = paymentMethods.find(
+    (method) => method.id === selectedPaymentMethodId,
+  );
+
+  const loadPaymentMethods = useCallback(async () => {
+    if (!isAuthenticated) {
+      setPaymentMethods([]);
+      return [];
+    }
+
+    setPaymentMethodsLoading(true);
+    setPaymentError('');
+
+    try {
+      const response = await paymentService.getPaymentMethods();
+      if (response.success) {
+        const methods = response.paymentMethods || [];
+        setPaymentMethods(methods);
+        return methods;
+      }
+
+      setPaymentError('Impossible de charger vos méthodes de paiement.');
+      return [];
+    } catch (loadError) {
+      console.error('❌ Error loading membership payment methods:', loadError);
+      setPaymentError('Impossible de charger vos méthodes de paiement.');
+      return [];
+    } finally {
+      setPaymentMethodsLoading(false);
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const fetchPlan = async () => {
@@ -40,6 +79,14 @@ const MembershipPage = () => {
     fetchPlan();
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadPaymentMethods();
+    } else {
+      setPaymentMethods([]);
+    }
+  }, [isAuthenticated, loadPaymentMethods]);
+
   const handleSubscribe = async () => {
     if (!isAuthenticated) {
       toast.error('Connectez-vous pour rejoindre UMOD Prime');
@@ -47,23 +94,23 @@ const MembershipPage = () => {
       return;
     }
 
-    setSubscribing(true);
-    try {
-      const response = await membershipAPI.subscribe();
-      if (response.data.success) {
-        toast.success(response.data.message || 'Bienvenue dans UMOD Prime !');
-        setStatus(response.data.data);
+    const methods =
+      paymentMethods.length > 0 ? paymentMethods : await loadPaymentMethods();
 
-        if (typeof refreshUser === 'function') {
-          await refreshUser();
-        }
-      }
-    } catch (subscribeError) {
-      console.error('❌ Membership subscription error:', subscribeError);
-      toast.error(subscribeError.response?.data?.error || 'Impossible d’activer l’abonnement');
-    } finally {
-      setSubscribing(false);
+    const availableMethods = (methods || []).filter((method) => method?.isActive !== false);
+
+    if (!availableMethods.length) {
+      toast.error('Ajoutez une méthode de paiement pour activer UMOD Prime');
+      navigate('/profile', { state: { openPaymentTab: true } });
+      return;
     }
+
+    const defaultMethod = availableMethods.find((method) => method.isDefault) || availableMethods[0];
+
+    setSelectedPaymentMethodId(defaultMethod?.id || null);
+    setAutoRenewPreference(true);
+    setPaymentError('');
+    setPaymentModalOpen(true);
   };
 
   const handleManageMembership = () => {
@@ -75,6 +122,47 @@ const MembershipPage = () => {
     }
 
     navigate('/profile', { state: { openMembershipModal: true } });
+  };
+
+  const handleClosePaymentModal = () => {
+    if (!subscribing) {
+      setPaymentModalOpen(false);
+      setPaymentError('');
+    }
+  };
+
+  const handleConfirmSubscription = async () => {
+    if (!selectedPaymentMethodId) {
+      toast.error('Sélectionnez une méthode de paiement pour continuer');
+      return;
+    }
+
+    setSubscribing(true);
+
+    try {
+      const response = await membershipAPI.subscribe({
+        paymentMethodId: selectedPaymentMethodId,
+        autoRenew: autoRenewPreference,
+      });
+
+      if (response.data.success) {
+        toast.success(
+          response.data.message ||
+            'Bienvenue dans UMOD Prime ! Votre carte a été débitée avec succès.',
+        );
+        setStatus(response.data.data);
+        setPaymentModalOpen(false);
+
+        if (typeof refreshUser === 'function') {
+          await refreshUser();
+        }
+      }
+    } catch (subscribeError) {
+      console.error('❌ Membership subscription error:', subscribeError);
+      toast.error(subscribeError.response?.data?.error || 'Impossible d’activer l’abonnement');
+    } finally {
+      setSubscribing(false);
+    }
   };
 
   if (loading) {
@@ -311,6 +399,149 @@ const MembershipPage = () => {
           </section>
         </div>
       </div>
+
+      {paymentModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 py-6">
+          <div className="w-full max-w-lg overflow-hidden rounded-3xl bg-white text-slate-900 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                  UMOD Prime
+                </p>
+                <h2 className="mt-1 text-lg font-semibold text-slate-900">Confirmer l’activation</h2>
+              </div>
+              <button
+                onClick={handleClosePaymentModal}
+                disabled={subscribing}
+                className="rounded-full bg-slate-100 p-2 text-slate-500 transition hover:bg-slate-200 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-5 px-6 py-6">
+              <p className="text-sm text-slate-600">
+                Votre carte sera débitée de{' '}
+                {plan ? formatPrice(plan.price, plan.currency) : '69,99 DH'} pour activer UMOD Prime
+                immédiatement.
+              </p>
+
+              {paymentError && (
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                  {paymentError}
+                </div>
+              )}
+
+              {paymentMethodsLoading ? (
+                <div className="flex items-center gap-3 text-sm text-slate-600">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+                  Chargement des méthodes de paiement…
+                </div>
+              ) : paymentMethods.length ? (
+                <div className="space-y-3">
+                  {paymentMethods.map((method) => (
+                    <label
+                      key={method.id}
+                      className={`flex items-center justify-between rounded-2xl border px-4 py-3 transition ${
+                        selectedPaymentMethodId === method.id
+                          ? 'border-blue-500 bg-blue-50/70'
+                          : 'border-slate-200 hover:border-blue-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="membership-payment-method"
+                          value={method.id}
+                          checked={selectedPaymentMethodId === method.id}
+                          onChange={() => setSelectedPaymentMethodId(method.id)}
+                          disabled={subscribing}
+                          className="text-blue-500 focus:ring-blue-500"
+                        />
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">
+                            {(method.brand || method.type || 'Carte').toUpperCase()} •••• {method.last4}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            Exp. {method.expiry} — {method.cardholderName}
+                          </p>
+                        </div>
+                      </div>
+                      {method.isDefault && (
+                        <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-600">
+                          Par défaut
+                        </span>
+                      )}
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                  Aucune méthode de paiement active. Ajoutez une carte avant de poursuivre.
+                </div>
+              )}
+
+              <label className="flex items-start gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-600">
+                <input
+                  type="checkbox"
+                  checked={autoRenewPreference}
+                  onChange={(event) => setAutoRenewPreference(event.target.checked)}
+                  disabled={subscribing}
+                  className="mt-1 text-blue-500 focus:ring-blue-500"
+                />
+                <span>
+                  Activer le renouvellement automatique chaque mois. Vous pourrez modifier ce réglage à tout
+                  moment depuis votre profil.
+                </span>
+              </label>
+
+              {selectedPaymentMethod && (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-500">
+                  Paiement avec {selectedPaymentMethod.brand || selectedPaymentMethod.type || 'votre carte'} se
+                  terminant par {selectedPaymentMethod.last4}. Transaction sécurisée via notre partenaire
+                  de paiement.
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-3 border-t border-slate-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <button
+                onClick={() => {
+                  setPaymentModalOpen(false);
+                  setPaymentError('');
+                  navigate('/profile', { state: { openPaymentTab: true } });
+                }}
+                disabled={subscribing}
+                className="text-sm font-semibold text-blue-600 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Gérer mes méthodes de paiement
+              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleClosePaymentModal}
+                  disabled={subscribing}
+                  className="rounded-full px-5 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleConfirmSubscription}
+                  disabled={subscribing || !selectedPaymentMethodId || !paymentMethods.length}
+                  className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/40 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {subscribing ? (
+                    <>
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                      Activation…
+                    </>
+                  ) : (
+                    <>Payer {plan ? formatPrice(plan.price, plan.currency) : '69,99 DH'}</>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

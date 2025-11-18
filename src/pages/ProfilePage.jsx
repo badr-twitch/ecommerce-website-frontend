@@ -240,6 +240,24 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
   const handleMembershipRefresh = useCallback(() => loadMembershipData(true), [loadMembershipData]);
 
+  const loadPaymentMethods = useCallback(async () => {
+    console.log('🔍 ProfilePage - loadPaymentMethods invoked');
+    try {
+      setLoadingPaymentMethods(true);
+      const response = await paymentService.getPaymentMethods();
+      const methods = response.paymentMethods || [];
+      console.log('🔍 ProfilePage - loadPaymentMethods received methods:', methods);
+      setPaymentMethods(methods);
+      return methods;
+    } catch (error) {
+      console.error('❌ ProfilePage - Error loading payment methods:', error);
+      toast.error('Erreur lors du chargement des méthodes de paiement');
+      return [];
+    } finally {
+      setLoadingPaymentMethods(false);
+    }
+  }, []);
+
   const handleMembershipModalOpen = useCallback(async () => {
     if (!user) {
       toast.error('Connectez-vous pour gérer votre abonnement');
@@ -295,11 +313,39 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
   const handleMembershipSubscribe = useCallback(async () => {
     try {
       setMembershipActionLoading(true);
-      console.log('🔄 ProfilePage - Subscribing to membership');
-      const response = await membershipAPI.subscribe();
+      console.log('🔄 ProfilePage - Preparing membership subscription with payment');
+
+      let methods = paymentMethods.filter((method) => method?.isActive !== false);
+      console.log('🔍 ProfilePage - Existing in-state payment methods:', methods);
+
+      if (!methods.length) {
+        const fetched = await loadPaymentMethods();
+        methods = (fetched || []).filter((method) => method?.isActive !== false);
+        console.log('🔍 ProfilePage - Refetched payment methods:', methods);
+      }
+
+      if (!methods.length) {
+        toast.error('Ajoutez une méthode de paiement pour activer UMOD Prime');
+        setActiveTab('payment');
+        setShowAddPayment(true);
+        setMembershipActionLoading(false);
+        return;
+      }
+
+      const defaultMethod = methods.find((method) => method.isDefault) || methods[0];
+
+      console.log('🔄 ProfilePage - Subscribing to membership with payment method:', defaultMethod.id);
+      const response = await membershipAPI.subscribe({
+        paymentMethodId: defaultMethod.id,
+        autoRenew: true,
+      });
+
       if (response.data?.success) {
         console.log('✅ ProfilePage - Membership subscription activated');
-        toast.success(response.data.message || 'UMOD Prime activé !');
+        toast.success(
+          response.data.message ||
+            `UMOD Prime activé ! Carte terminant par ${defaultMethod.last4} débitée avec succès.`,
+        );
         await loadMembershipData();
         if (typeof refreshUser === 'function') {
           await refreshUser();
@@ -314,7 +360,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
     } finally {
       setMembershipActionLoading(false);
     }
-  }, [loadMembershipData, refreshUser]);
+  }, [paymentMethods, loadPaymentMethods, loadMembershipData, refreshUser]);
 
   useEffect(() => {
     loadMembershipPlan();
@@ -325,14 +371,26 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
   }, [loadMembershipData]);
 
   useEffect(() => {
-    if (location.state?.openMembershipModal) {
-      console.log('🔍 ProfilePage - location state requests membership modal');
-      handleMembershipModalOpen();
+    if (location.state?.openMembershipModal || location.state?.openPaymentTab) {
+      if (location.state?.openMembershipModal) {
+        console.log('🔍 ProfilePage - location state requests membership modal');
+        handleMembershipModalOpen();
+      }
 
-      const { openMembershipModal, ...restState } = location.state;
+      if (location.state?.openPaymentTab) {
+        console.log('🔍 ProfilePage - location state requests payment tab');
+        setActiveTab('payment');
+        loadPaymentMethods();
+
+        if (location.state.openPaymentTab === 'add') {
+          setShowAddPayment(true);
+        }
+      }
+
+      const { openMembershipModal, openPaymentTab, ...restState } = location.state;
       navigate(location.pathname, { replace: true, state: restState });
     }
-  }, [location.state, location.pathname, handleMembershipModalOpen, navigate]);
+  }, [location.state, location.pathname, handleMembershipModalOpen, navigate, loadPaymentMethods]);
 
   // Phone verification states
   const [showPhoneVerification, setShowPhoneVerification] = useState(false);
@@ -346,23 +404,11 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
   // Load payment methods and shipping addresses on component mount
   useEffect(() => {
     if (user) {
+      console.log('🔍 ProfilePage - user detected, triggering initial payment methods load');
       loadPaymentMethods();
       loadShippingAddresses();
     }
-  }, [user]);
-
-  const loadPaymentMethods = async () => {
-    try {
-      setLoadingPaymentMethods(true);
-      const response = await paymentService.getPaymentMethods();
-      setPaymentMethods(response.paymentMethods);
-    } catch (error) {
-      console.error('Error loading payment methods:', error);
-      toast.error('Erreur lors du chargement des méthodes de paiement');
-    } finally {
-      setLoadingPaymentMethods(false);
-    }
-  };
+  }, [user, loadPaymentMethods]);
 
   const loadShippingAddresses = async () => {
     try {
@@ -381,6 +427,16 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
     e.preventDefault();
     setIsLoading(true);
 
+    // Check if user is trying to add a phone number for the first time
+    if (profileData.phone && !user?.phone) {
+      // First-time phone addition requires SMS verification
+      setIsLoading(false);
+      setNewPhoneNumber(profileData.phone);
+      setShowPhoneVerification(true);
+      toast.info('Vérification SMS requise pour ajouter un numéro de téléphone');
+      return;
+    }
+
     // Validate phone number if provided
     if (profileData.phone && profileData.phone.length < 10) {
       toast.error('Le numéro de téléphone doit contenir au moins 10 chiffres');
@@ -388,18 +444,33 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
       return;
     }
 
-    console.log('📱 Updating profile with phone number:', profileData.phone);
+    console.log('📱 Updating profile (without phone):', profileData);
 
     try {
-      const result = await updateProfile({
+      // Remove phone from update data - phone changes require SMS verification
+      const updateData = {
         displayName: profileData.displayName,
-        photoURL: profileData.photoURL,
-        phone: profileData.phone
-      });
+        photoURL: profileData.photoURL
+      };
+
+      const result = await updateProfile(updateData);
 
       if (result.success) {
         toast.success('Profil mis à jour avec succès !');
+        if (result.user) {
+          // Update local user state if returned
+          if (typeof refreshUser === 'function') {
+            await refreshUser();
+          }
+        }
       } else {
+        // If error mentions SMS verification, show phone verification modal
+        if (result.error && result.error.includes('SMS')) {
+          if (profileData.phone) {
+            setNewPhoneNumber(profileData.phone);
+            setShowPhoneVerification(true);
+          }
+        }
         toast.error(result.error || 'Erreur lors de la mise à jour du profil');
       }
     } catch (error) {
@@ -738,6 +809,95 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
     }
   };
 
+  // Send SMS verification for NEW phone number (first-time addition)
+  const handleSendNewPhoneVerification = async () => {
+    if (!newPhoneNumber || newPhoneNumber.length < 10) {
+      toast.error('Veuillez entrer un numéro de téléphone valide');
+      return;
+    }
+
+    try {
+      setIsSendingVerification(true);
+      console.log('📱 Sending SMS verification for new phone:', newPhoneNumber);
+      
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/send-new-phone-verification`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ newPhoneNumber })
+      });
+
+      const result = await response.json();
+      console.log('📱 New phone verification SMS result:', result);
+      
+      if (result.success) {
+        toast.success('SMS de vérification envoyé ! Vérifiez votre téléphone.');
+        // Don't close modal - user needs to enter code
+      } else {
+        toast.error(result.error || 'Erreur lors de l\'envoi du SMS de vérification');
+      }
+    } catch (error) {
+      console.error('❌ Error sending new phone verification:', error);
+      toast.error('Erreur lors de l\'envoi du SMS de vérification');
+    } finally {
+      setIsSendingVerification(false);
+    }
+  };
+
+  // Verify NEW phone number with code (first-time addition)
+  const handleVerifyNewPhone = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      toast.error('Veuillez entrer un code de vérification valide (6 chiffres)');
+      return;
+    }
+
+    if (!newPhoneNumber || newPhoneNumber.length < 10) {
+      toast.error('Numéro de téléphone invalide');
+      return;
+    }
+
+    try {
+      setIsVerifyingCode(true);
+      console.log('📱 Verifying new phone number:', newPhoneNumber);
+      
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/verify-new-phone`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ verificationCode, newPhoneNumber })
+      });
+
+      const result = await response.json();
+      console.log('📱 Verify new phone result:', result);
+      
+      if (result.success) {
+        toast.success('Numéro de téléphone vérifié et enregistré avec succès !');
+        setShowPhoneVerification(false);
+        setVerificationCode('');
+        setNewPhoneNumber('');
+        
+        // Refresh user data
+        if (typeof refreshUser === 'function') {
+          await refreshUser();
+        }
+        
+        // Update profile data
+        setProfileData(prev => ({ ...prev, phone: result.phone }));
+      } else {
+        toast.error(result.error || 'Code de vérification invalide');
+      }
+    } catch (error) {
+      console.error('❌ Error verifying new phone:', error);
+      toast.error('Erreur lors de la vérification du numéro de téléphone');
+    } finally {
+      setIsVerifyingCode(false);
+    }
+  };
+
   const handleSetNewPhone = async () => {
     if (!newPhoneNumber || newPhoneNumber.length < 10) {
       toast.error('Veuillez entrer un numéro de téléphone valide');
@@ -1063,16 +1223,16 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       <div>
                         <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
                           Numéro de téléphone
-                          {profileData.phone && (
+                          {user?.phone && (
                             <span className="ml-2 text-xs text-green-600">✓ Configuré</span>
                           )}
                         </label>
                         
-                        {profileData.phone ? (
-                          // Show current phone number with change/remove options
+                        {user?.phone ? (
+                          // Show current phone number with change/remove options (only if saved in database)
                           <div className="space-y-3">
                             <div className="px-3 py-2 bg-gray-100 rounded-lg text-gray-900">
-                              {profileData.phone}
+                              {user.phone}
                             </div>
                             <div className="flex gap-2">
                               <button
@@ -1101,7 +1261,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               international
                               defaultCountry="FR"
                               value={profileData.phone}
-                              onChange={(value) => setProfileData({...profileData, phone: value})}
+                              onChange={(value) => setProfileData({...profileData, phone: value || ''})}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               placeholder="Entrez votre numéro de téléphone"
                             />
@@ -1117,11 +1277,101 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                              {newPhoneNumber === 'REMOVE' ? 'Supprimer le numéro de téléphone' : 'Modifier le numéro de téléphone'}
+                              {!user?.phone 
+                                ? 'Ajouter un numéro de téléphone'
+                                : newPhoneNumber === 'REMOVE' 
+                                  ? 'Supprimer le numéro de téléphone' 
+                                  : 'Modifier le numéro de téléphone'}
                             </h3>
                             
-                            {!currentPhoneVerified ? (
-                              // Step 1: Verify current phone number
+                            {!user?.phone ? (
+                              // First-time phone addition flow
+                              <div className="space-y-4">
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                  <p className="text-sm text-blue-800">
+                                    <strong>Vérification SMS requise</strong>
+                                  </p>
+                                  <p className="text-sm text-blue-700 mt-1">
+                                    Un code de vérification sera envoyé au numéro que vous entrez pour confirmer que vous êtes bien le propriétaire
+                                  </p>
+                                </div>
+                                
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Numéro de téléphone
+                                  </label>
+                                  <PhoneInput
+                                    international
+                                    defaultCountry="FR"
+                                    value={newPhoneNumber}
+                                    onChange={(value) => setNewPhoneNumber(value || '')}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="+33 6 12 34 56 78"
+                                  />
+                                </div>
+                                
+                                {verificationCode ? (
+                                  // Step 2: Enter verification code
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                      Code de vérification (6 chiffres)
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={verificationCode}
+                                      onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center text-lg font-mono"
+                                      placeholder="000000"
+                                      maxLength={6}
+                                    />
+                                    <div className="flex gap-2 mt-4">
+                                      <button
+                                        type="button"
+                                        onClick={handleVerifyNewPhone}
+                                        disabled={isVerifyingCode || verificationCode.length !== 6}
+                                        className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                                      >
+                                        {isVerifyingCode ? 'Vérification...' : 'Vérifier'}
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setShowPhoneVerification(false);
+                                          setVerificationCode('');
+                                          setNewPhoneNumber('');
+                                        }}
+                                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                                      >
+                                        Annuler
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  // Step 1: Send verification SMS
+                                  <div className="flex gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={handleSendNewPhoneVerification}
+                                      disabled={isSendingVerification || !newPhoneNumber || newPhoneNumber.length < 10}
+                                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                                    >
+                                      {isSendingVerification ? 'Envoi...' : 'Envoyer le code SMS'}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setShowPhoneVerification(false);
+                                        setNewPhoneNumber('');
+                                      }}
+                                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                                    >
+                                      Annuler
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            ) : !currentPhoneVerified ? (
+                              // Step 1: Verify current phone number (for change/remove)
                               <div className="space-y-4">
                                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                                   <p className="text-sm text-blue-800">
