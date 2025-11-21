@@ -9,7 +9,16 @@ const RegisterPage = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    acceptTerms: false
+    acceptTerms: false,
+    clientType: 'particulier',
+    // Business fields (for professionnel)
+    companyName: '',
+    siret: '',
+    vatNumber: '',
+    billingAddress: '',
+    billingCity: '',
+    billingPostalCode: '',
+    billingCountry: 'France'
   });
   
   const [errors, setErrors] = useState({});
@@ -54,6 +63,46 @@ const RegisterPage = () => {
         if (value !== formData.password) return 'Les mots de passe ne correspondent pas';
         return '';
       
+      case 'companyName':
+        if (formData.clientType === 'professionnel' && !value.trim()) {
+          return 'Le nom de l\'entreprise est requis';
+        }
+        return '';
+      
+      case 'siret':
+        if (formData.clientType === 'professionnel') {
+          if (!value.trim()) return 'Le numéro SIRET est requis';
+          if (!/^\d{14}$/.test(value.replace(/\s/g, ''))) {
+            return 'Le SIRET doit contenir exactement 14 chiffres';
+          }
+        }
+        return '';
+      
+      case 'vatNumber':
+        // Optional field, no validation needed
+        return '';
+      
+      case 'billingAddress':
+        if (formData.clientType === 'professionnel' && !value.trim()) {
+          return 'L\'adresse de facturation est requise';
+        }
+        return '';
+      
+      case 'billingCity':
+        if (formData.clientType === 'professionnel' && !value.trim()) {
+          return 'La ville de facturation est requise';
+        }
+        return '';
+      
+      case 'billingPostalCode':
+        if (formData.clientType === 'professionnel' && !value.trim()) {
+          return 'Le code postal de facturation est requis';
+        }
+        if (value && !/^\d{5}$/.test(value.replace(/\s/g, ''))) {
+          return 'Le code postal doit contenir 5 chiffres';
+        }
+        return '';
+      
       default:
         return '';
     }
@@ -91,10 +140,28 @@ const RegisterPage = () => {
     const { name, value, type, checked } = e.target;
     const newValue = type === 'checkbox' ? checked : value;
     
-    setFormData({
-      ...formData,
-      [name]: newValue
-    });
+    // Special handling for clientType change
+    if (name === 'clientType') {
+      setFormData({
+        ...formData,
+        [name]: newValue,
+        // Clear business fields if switching to particulier
+        ...(newValue === 'particulier' ? {
+          companyName: '',
+          siret: '',
+          vatNumber: '',
+          billingAddress: '',
+          billingCity: '',
+          billingPostalCode: '',
+          billingCountry: 'France'
+        } : {})
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: newValue
+      });
+    }
 
     // Real-time validation
     if (touched[name]) {
@@ -153,12 +220,26 @@ const RegisterPage = () => {
     setIsLoading(true);
 
     try {
-      const result = await register({
+      const registerData = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         email: formData.email.trim(),
-        password: formData.password
-      });
+        password: formData.password,
+        clientType: formData.clientType
+      };
+
+      // Add business fields if professionnel
+      if (formData.clientType === 'professionnel') {
+        registerData.companyName = formData.companyName.trim();
+        registerData.siret = formData.siret.replace(/\s/g, '');
+        registerData.vatNumber = formData.vatNumber.trim() || null;
+        registerData.billingAddress = formData.billingAddress.trim();
+        registerData.billingCity = formData.billingCity.trim();
+        registerData.billingPostalCode = formData.billingPostalCode.replace(/\s/g, '');
+        registerData.billingCountry = formData.billingCountry || 'France';
+      }
+
+      const result = await register(registerData);
       
       if (result.success) {
         navigate('/');
@@ -233,6 +314,53 @@ const RegisterPage = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white/80 backdrop-blur-sm py-8 px-4 shadow-xl rounded-2xl sm:px-10 border border-gray-200/50">
           <form className="space-y-6" onSubmit={handleSubmit} noValidate>
+            {/* Client Type Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Type de compte <span className="text-red-500">*</span>
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                <label className={`relative flex cursor-pointer rounded-xl border-2 p-4 transition-all duration-300 ${
+                  formData.clientType === 'particulier'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}>
+                  <input
+                    type="radio"
+                    name="clientType"
+                    value="particulier"
+                    checked={formData.clientType === 'particulier'}
+                    onChange={handleChange}
+                    className="sr-only"
+                  />
+                  <div className="flex flex-col items-center text-center">
+                    <span className="text-2xl mb-2">👤</span>
+                    <span className="text-sm font-semibold text-gray-900">Particulier</span>
+                    <span className="text-xs text-gray-500 mt-1">Achat personnel</span>
+                  </div>
+                </label>
+                <label className={`relative flex cursor-pointer rounded-xl border-2 p-4 transition-all duration-300 ${
+                  formData.clientType === 'professionnel'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}>
+                  <input
+                    type="radio"
+                    name="clientType"
+                    value="professionnel"
+                    checked={formData.clientType === 'professionnel'}
+                    onChange={handleChange}
+                    className="sr-only"
+                  />
+                  <div className="flex flex-col items-center text-center">
+                    <span className="text-2xl mb-2">🏢</span>
+                    <span className="text-sm font-semibold text-gray-900">Professionnel</span>
+                    <span className="text-xs text-gray-500 mt-1">Achat entreprise</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
             {/* Name Fields */}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
@@ -391,6 +519,202 @@ const RegisterPage = () => {
                 )}
               </div>
             </div>
+
+            {/* Business Fields (only for professionnel) */}
+            {formData.clientType === 'professionnel' && (
+              <div className="space-y-6 pt-4 border-t border-gray-200">
+                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                  <h3 className="text-sm font-semibold text-blue-900 mb-2 flex items-center">
+                    <span className="mr-2">🏢</span>
+                    Informations professionnelles
+                  </h3>
+                  <p className="text-xs text-blue-700">
+                    Les champs marqués d'un astérisque (*) sont obligatoires pour les comptes professionnels.
+                  </p>
+                </div>
+
+                {/* Company Name */}
+                <div>
+                  <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">
+                    Nom de l'entreprise <span className="text-red-500">*</span>
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      id="companyName"
+                      name="companyName"
+                      type="text"
+                      value={formData.companyName}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                        errors.companyName && touched.companyName
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                          : 'border-gray-300'
+                      }`}
+                      placeholder="Nom de votre entreprise"
+                    />
+                    {errors.companyName && touched.companyName && (
+                      <p className="mt-1 text-sm text-red-600">{errors.companyName}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* SIRET */}
+                <div>
+                  <label htmlFor="siret" className="block text-sm font-medium text-gray-700">
+                    Numéro SIRET <span className="text-red-500">*</span>
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      id="siret"
+                      name="siret"
+                      type="text"
+                      value={formData.siret}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '').slice(0, 14);
+                        handleChange({ ...e, target: { ...e.target, value } });
+                      }}
+                      onBlur={handleBlur}
+                      className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                        errors.siret && touched.siret
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                          : 'border-gray-300'
+                      }`}
+                      placeholder="12345678901234"
+                      maxLength={14}
+                    />
+                    {errors.siret && touched.siret && (
+                      <p className="mt-1 text-sm text-red-600">{errors.siret}</p>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">14 chiffres (sans espaces)</p>
+                  </div>
+                </div>
+
+                {/* VAT Number */}
+                <div>
+                  <label htmlFor="vatNumber" className="block text-sm font-medium text-gray-700">
+                    Numéro TVA (optionnel)
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      id="vatNumber"
+                      name="vatNumber"
+                      type="text"
+                      value={formData.vatNumber}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300"
+                      placeholder="FR12345678901"
+                    />
+                  </div>
+                </div>
+
+                {/* Billing Address */}
+                <div>
+                  <label htmlFor="billingAddress" className="block text-sm font-medium text-gray-700">
+                    Adresse de facturation <span className="text-red-500">*</span>
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      id="billingAddress"
+                      name="billingAddress"
+                      type="text"
+                      value={formData.billingAddress}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                        errors.billingAddress && touched.billingAddress
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                          : 'border-gray-300'
+                      }`}
+                      placeholder="Numéro et nom de rue"
+                    />
+                    {errors.billingAddress && touched.billingAddress && (
+                      <p className="mt-1 text-sm text-red-600">{errors.billingAddress}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Billing City and Postal Code */}
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="billingCity" className="block text-sm font-medium text-gray-700">
+                      Ville <span className="text-red-500">*</span>
+                    </label>
+                    <div className="mt-1">
+                      <input
+                        id="billingCity"
+                        name="billingCity"
+                        type="text"
+                        value={formData.billingCity}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                          errors.billingCity && touched.billingCity
+                            ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                            : 'border-gray-300'
+                        }`}
+                        placeholder="Ville"
+                      />
+                      {errors.billingCity && touched.billingCity && (
+                        <p className="mt-1 text-sm text-red-600">{errors.billingCity}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="billingPostalCode" className="block text-sm font-medium text-gray-700">
+                      Code postal <span className="text-red-500">*</span>
+                    </label>
+                    <div className="mt-1">
+                      <input
+                        id="billingPostalCode"
+                        name="billingPostalCode"
+                        type="text"
+                        value={formData.billingPostalCode}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '').slice(0, 5);
+                          handleChange({ ...e, target: { ...e.target, value } });
+                        }}
+                        onBlur={handleBlur}
+                        className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                          errors.billingPostalCode && touched.billingPostalCode
+                            ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                            : 'border-gray-300'
+                        }`}
+                        placeholder="75001"
+                        maxLength={5}
+                      />
+                      {errors.billingPostalCode && touched.billingPostalCode && (
+                        <p className="mt-1 text-sm text-red-600">{errors.billingPostalCode}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Billing Country */}
+                <div>
+                  <label htmlFor="billingCountry" className="block text-sm font-medium text-gray-700">
+                    Pays
+                  </label>
+                  <div className="mt-1">
+                    <select
+                      id="billingCountry"
+                      name="billingCountry"
+                      value={formData.billingCountry}
+                      onChange={handleChange}
+                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300"
+                    >
+                      <option value="France">France</option>
+                      <option value="Belgique">Belgique</option>
+                      <option value="Suisse">Suisse</option>
+                      <option value="Luxembourg">Luxembourg</option>
+                      <option value="Autre">Autre</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Terms Checkbox */}
             <div className="flex items-center">

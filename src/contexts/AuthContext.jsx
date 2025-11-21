@@ -130,7 +130,7 @@ export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   // Sync user with database
-  const syncUserWithDatabase = async (firebaseUser) => {
+  const syncUserWithDatabase = async (firebaseUser, additionalData = {}) => {
     try {
       // Get custom claims (including phone number)
       const tokenResult = await firebaseUser.getIdTokenResult();
@@ -140,11 +140,20 @@ export const AuthProvider = ({ children }) => {
       const userData = {
         firebaseUid: firebaseUser.uid,
         email: firebaseUser.email,
-        firstName: firebaseUser.displayName?.split(' ')[0] || '',
-        lastName: firebaseUser.displayName?.split(' ').slice(1).join(' ') || '',
+        firstName: firebaseUser.displayName?.split(' ')[0] || additionalData.firstName || '',
+        lastName: firebaseUser.displayName?.split(' ').slice(1).join(' ') || additionalData.lastName || '',
         emailVerified: firebaseUser.emailVerified,
         photoURL: firebaseUser.photoURL,
-        phone: customClaims.phone || '', // Get phone from custom claims
+        phone: customClaims.phone || additionalData.phone || '',
+        // Include clientType and business fields from additionalData
+        clientType: additionalData.clientType || 'particulier',
+        companyName: additionalData.companyName || null,
+        siret: additionalData.siret || null,
+        vatNumber: additionalData.vatNumber || null,
+        billingAddress: additionalData.billingAddress || null,
+        billingCity: additionalData.billingCity || null,
+        billingPostalCode: additionalData.billingPostalCode || null,
+        billingCountry: additionalData.billingCountry || 'France',
       };
       
       console.log('📱 User data with phone from custom claims:', userData);
@@ -283,7 +292,7 @@ export const AuthProvider = ({ children }) => {
     try {
       dispatch({ type: 'AUTH_START' });
       
-      const { email, password, firstName, lastName } = userData;
+      const { email, password, firstName, lastName, clientType, companyName, siret, vatNumber, billingAddress, billingCity, billingPostalCode, billingCountry } = userData;
       
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
@@ -296,8 +305,22 @@ export const AuthProvider = ({ children }) => {
       const token = await firebaseUser.getIdToken();
       localStorage.setItem('token', token);
       
+      // Prepare additional data for database sync
+      const additionalData = {
+        firstName,
+        lastName,
+        clientType: clientType || 'particulier',
+        companyName,
+        siret,
+        vatNumber,
+        billingAddress,
+        billingCity,
+        billingPostalCode,
+        billingCountry
+      };
+      
       // Sync with database
-      const updatedUserData = await syncUserWithDatabase(firebaseUser);
+      const updatedUserData = await syncUserWithDatabase(firebaseUser, additionalData);
       localStorage.setItem('user', JSON.stringify(updatedUserData));
       
       dispatch({

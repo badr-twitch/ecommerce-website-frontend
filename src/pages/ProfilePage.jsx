@@ -37,7 +37,16 @@ const ProfilePage = () => {
     displayName: '',
     email: '',
     photoURL: '',
-    phone: ''
+    phone: '',
+    clientType: 'particulier',
+    // Business fields
+    companyName: '',
+    siret: '',
+    vatNumber: '',
+    billingAddress: '',
+    billingCity: '',
+    billingPostalCode: '',
+    billingCountry: 'France'
   });
 
   // Profile editing state
@@ -55,7 +64,15 @@ const ProfilePage = () => {
         displayName: user.displayName || user.fullName || '',
         email: user.email || '',
         photoURL: user.photoURL || user.profilePhoto || '',
-        phone: user.phone || ''
+        phone: user.phone || '',
+        clientType: user.clientType || 'particulier',
+        companyName: user.companyName || '',
+        siret: user.siret || '',
+        vatNumber: user.vatNumber || '',
+        billingAddress: user.billingAddress || '',
+        billingCity: user.billingCity || '',
+        billingPostalCode: user.billingPostalCode || '',
+        billingCountry: user.billingCountry || 'France'
       });
     }
   }, [user]);
@@ -450,8 +467,41 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
       // Remove phone from update data - phone changes require SMS verification
       const updateData = {
         displayName: profileData.displayName,
-        photoURL: profileData.photoURL
+        photoURL: profileData.photoURL,
+        clientType: profileData.clientType
       };
+
+      // Add business fields if professionnel
+      if (profileData.clientType === 'professionnel') {
+        // Validate required business fields
+        if (!profileData.companyName || !profileData.companyName.trim()) {
+          toast.error('Le nom de l\'entreprise est requis pour les clients professionnels');
+          setIsLoading(false);
+          return;
+        }
+        if (!profileData.siret || profileData.siret.length !== 14) {
+          toast.error('Le numéro SIRET est requis et doit contenir 14 chiffres');
+          setIsLoading(false);
+          return;
+        }
+
+        updateData.companyName = profileData.companyName.trim();
+        updateData.siret = profileData.siret.replace(/\s/g, '');
+        updateData.vatNumber = profileData.vatNumber?.trim() || null;
+        updateData.billingAddress = profileData.billingAddress?.trim() || null;
+        updateData.billingCity = profileData.billingCity?.trim() || null;
+        updateData.billingPostalCode = profileData.billingPostalCode?.replace(/\s/g, '') || null;
+        updateData.billingCountry = profileData.billingCountry || 'France';
+      } else {
+        // Clear business fields if switching to particulier
+        updateData.companyName = null;
+        updateData.siret = null;
+        updateData.vatNumber = null;
+        updateData.billingAddress = null;
+        updateData.billingCity = null;
+        updateData.billingPostalCode = null;
+        updateData.billingCountry = 'France';
+      }
 
       const result = await updateProfile(updateData);
 
@@ -1506,6 +1556,212 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                 )}
                               </div>
                             )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Client Type Selection */}
+                      <div className="pt-4 border-t border-gray-200">
+                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                          Type de compte <span className="text-red-500">*</span>
+                        </label>
+                        <div className="grid grid-cols-2 gap-4">
+                          <label className={`relative flex cursor-pointer rounded-xl border-2 p-4 transition-all duration-300 ${
+                            profileData.clientType === 'particulier'
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="clientType"
+                              value="particulier"
+                              checked={profileData.clientType === 'particulier'}
+                              onChange={(e) => {
+                                setProfileData({
+                                  ...profileData,
+                                  clientType: e.target.value,
+                                  // Clear business fields if switching to particulier
+                                  companyName: '',
+                                  siret: '',
+                                  vatNumber: '',
+                                  billingAddress: '',
+                                  billingCity: '',
+                                  billingPostalCode: '',
+                                  billingCountry: 'France'
+                                });
+                              }}
+                              className="sr-only"
+                            />
+                            <div className="flex flex-col items-center text-center w-full">
+                              <span className="text-2xl mb-2">👤</span>
+                              <span className="text-sm font-semibold text-gray-900">Particulier</span>
+                              <span className="text-xs text-gray-500 mt-1">Achat personnel</span>
+                            </div>
+                          </label>
+                          <label className={`relative flex cursor-pointer rounded-xl border-2 p-4 transition-all duration-300 ${
+                            profileData.clientType === 'professionnel'
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="clientType"
+                              value="professionnel"
+                              checked={profileData.clientType === 'professionnel'}
+                              onChange={(e) => setProfileData({...profileData, clientType: e.target.value})}
+                              className="sr-only"
+                            />
+                            <div className="flex flex-col items-center text-center w-full">
+                              <span className="text-2xl mb-2">🏢</span>
+                              <span className="text-sm font-semibold text-gray-900">Professionnel</span>
+                              <span className="text-xs text-gray-500 mt-1">Achat entreprise</span>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Business Fields (only for professionnel) */}
+                      {profileData.clientType === 'professionnel' && (
+                        <div className="pt-4 border-t border-gray-200 space-y-4">
+                          <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                            <h3 className="text-sm font-semibold text-blue-900 mb-2 flex items-center">
+                              <span className="mr-2">🏢</span>
+                              Informations professionnelles
+                            </h3>
+                            <p className="text-xs text-blue-700">
+                              Les champs marqués d'un astérisque (*) sont obligatoires pour les comptes professionnels.
+                            </p>
+                          </div>
+
+                          {/* Company Name */}
+                          <div>
+                            <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
+                              Nom de l'entreprise <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              id="companyName"
+                              name="companyName"
+                              value={profileData.companyName}
+                              onChange={(e) => setProfileData({...profileData, companyName: e.target.value})}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Nom de votre entreprise"
+                              required={profileData.clientType === 'professionnel'}
+                            />
+                          </div>
+
+                          {/* SIRET */}
+                          <div>
+                            <label htmlFor="siret" className="block text-sm font-medium text-gray-700 mb-1">
+                              Numéro SIRET <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              id="siret"
+                              name="siret"
+                              value={profileData.siret}
+                              onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, '').slice(0, 14);
+                                setProfileData({...profileData, siret: value});
+                              }}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="12345678901234"
+                              maxLength={14}
+                              required={profileData.clientType === 'professionnel'}
+                            />
+                            <p className="mt-1 text-xs text-gray-500">14 chiffres (sans espaces)</p>
+                          </div>
+
+                          {/* VAT Number */}
+                          <div>
+                            <label htmlFor="vatNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                              Numéro TVA (optionnel)
+                            </label>
+                            <input
+                              type="text"
+                              id="vatNumber"
+                              name="vatNumber"
+                              value={profileData.vatNumber}
+                              onChange={(e) => setProfileData({...profileData, vatNumber: e.target.value})}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="FR12345678901"
+                            />
+                          </div>
+
+                          {/* Billing Address */}
+                          <div>
+                            <label htmlFor="billingAddress" className="block text-sm font-medium text-gray-700 mb-1">
+                              Adresse de facturation <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              id="billingAddress"
+                              name="billingAddress"
+                              value={profileData.billingAddress}
+                              onChange={(e) => setProfileData({...profileData, billingAddress: e.target.value})}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Numéro et nom de rue"
+                              required={profileData.clientType === 'professionnel'}
+                            />
+                          </div>
+
+                          {/* Billing City and Postal Code */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <label htmlFor="billingCity" className="block text-sm font-medium text-gray-700 mb-1">
+                                Ville <span className="text-red-500">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                id="billingCity"
+                                name="billingCity"
+                                value={profileData.billingCity}
+                                onChange={(e) => setProfileData({...profileData, billingCity: e.target.value})}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Ville"
+                                required={profileData.clientType === 'professionnel'}
+                              />
+                            </div>
+
+                            <div>
+                              <label htmlFor="billingPostalCode" className="block text-sm font-medium text-gray-700 mb-1">
+                                Code postal <span className="text-red-500">*</span>
+                              </label>
+                              <input
+                                type="text"
+                                id="billingPostalCode"
+                                name="billingPostalCode"
+                                value={profileData.billingPostalCode}
+                                onChange={(e) => {
+                                  const value = e.target.value.replace(/\D/g, '').slice(0, 5);
+                                  setProfileData({...profileData, billingPostalCode: value});
+                                }}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="75001"
+                                maxLength={5}
+                                required={profileData.clientType === 'professionnel'}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Billing Country */}
+                          <div>
+                            <label htmlFor="billingCountry" className="block text-sm font-medium text-gray-700 mb-1">
+                              Pays
+                            </label>
+                            <select
+                              id="billingCountry"
+                              name="billingCountry"
+                              value={profileData.billingCountry}
+                              onChange={(e) => setProfileData({...profileData, billingCountry: e.target.value})}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                              <option value="France">France</option>
+                              <option value="Belgique">Belgique</option>
+                              <option value="Suisse">Suisse</option>
+                              <option value="Luxembourg">Luxembourg</option>
+                              <option value="Autre">Autre</option>
+                            </select>
                           </div>
                         </div>
                       )}
