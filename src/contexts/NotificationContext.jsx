@@ -27,7 +27,8 @@ export const NotificationProvider = ({ children }) => {
 
   // Initialize socket connection
   const initializeSocket = useCallback(() => {
-    if (!isAuthenticated || socketRef.current) return;
+    if (!isAuthenticated) return;
+    if (socketRef.current?.connected) return;
 
     try {
       socketRef.current = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
@@ -92,7 +93,7 @@ export const NotificationProvider = ({ children }) => {
     } catch (error) {
       console.error('❌ Error initializing socket:', error);
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Get priority color for notifications
   const getPriorityColor = (priority) => {
@@ -264,7 +265,7 @@ export const NotificationProvider = ({ children }) => {
 
   // Initialize socket when user is authenticated
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated) {
       initializeSocket();
     }
 
@@ -274,7 +275,7 @@ export const NotificationProvider = ({ children }) => {
         socketRef.current = null;
       }
     };
-  }, [isAuthenticated, user, initializeSocket]);
+  }, [isAuthenticated, initializeSocket]);
 
   // Load data when authenticated
   useEffect(() => {

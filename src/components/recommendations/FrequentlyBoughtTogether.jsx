@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
+import { recommendationsAPI } from '../../services/api';
 
 const FrequentlyBoughtTogether = ({ 
   productId, 
@@ -13,7 +13,7 @@ const FrequentlyBoughtTogether = ({
   className = ''
 }) => {
   const { user } = useAuth();
-  const { addToCart, cartItems } = useCart();
+  const { addItem, cartItems } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   
   const [recommendations, setRecommendations] = useState([]);
@@ -32,9 +32,7 @@ const FrequentlyBoughtTogether = ({
       setLoading(true);
       setError(null);
 
-      const response = await axios.get(`/api/recommendations/frequently-bought/${productId}`, {
-        params: { limit }
-      });
+      const response = await recommendationsAPI.getFrequentlyBoughtTogether(productId, limit);
       
       if (response.data.success) {
         setRecommendations(response.data.data);
@@ -58,6 +56,10 @@ const FrequentlyBoughtTogether = ({
   };
 
   const handleAddSelectedToCart = async () => {
+    if (!user) {
+      toast.error('Connectez-vous pour ajouter des produits au panier');
+      return;
+    }
     if (selectedProducts.size === 0) {
       toast.error('Veuillez sélectionner au moins un produit');
       return;
@@ -68,7 +70,7 @@ const FrequentlyBoughtTogether = ({
       for (const productId of selectedProducts) {
         const product = recommendations.find(p => p.id === productId);
         if (product && product.stockQuantity > 0) {
-          await addToCart(product, 1);
+          await addItem(product, 1);
           addedCount++;
         }
       }
@@ -85,9 +87,12 @@ const FrequentlyBoughtTogether = ({
   };
 
   const handleAddToCart = async (product) => {
+    if (!user) {
+      toast.error('Connectez-vous pour ajouter des produits au panier');
+      return;
+    }
     try {
-      await addToCart(product, 1);
-      toast.success(`${product.name} ajouté au panier`);
+      await addItem(product, 1);
     } catch (error) {
       toast.error('Erreur lors de l\'ajout au panier');
     }
@@ -108,7 +113,7 @@ const FrequentlyBoughtTogether = ({
   };
 
   const isInCart = (productId) => {
-    return cartItems.some(item => item.product.id === productId);
+    return cartItems.some(item => item.id === productId);
   };
 
   if (loading) {
@@ -223,7 +228,7 @@ const FrequentlyBoughtTogether = ({
               {/* Product Image */}
               <div className="relative">
                 <img
-                  src={product.imageUrl || '/placeholder-product.jpg'}
+                  src={product.mainImage || product.images?.[0] || '/placeholder-product.jpg'}
                   alt={product.name}
                   className="w-full h-24 object-cover rounded-t-lg"
                   onError={(e) => {
@@ -288,7 +293,7 @@ const FrequentlyBoughtTogether = ({
 
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-lg font-semibold text-gray-900">
-                    {product.price ? `${product.price.toFixed(2)} DH` : 'Prix non disponible'}
+                    {product.price ? `${parseFloat(product.price).toFixed(2)} DH` : 'Prix non disponible'}
                   </span>
                 </div>
 

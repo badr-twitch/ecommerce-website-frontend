@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
+import { recommendationsAPI } from '../../services/api';
 
 const ProductRecommendations = ({ 
   type = 'user', 
@@ -15,7 +15,7 @@ const ProductRecommendations = ({
   className = ''
 }) => {
   const { user } = useAuth();
-  const { addToCart } = useCart();
+  const { addItem } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   
   const [recommendations, setRecommendations] = useState([]);
@@ -31,36 +31,31 @@ const ProductRecommendations = ({
       setLoading(true);
       setError(null);
 
-      let endpoint = '';
-      let params = { limit };
+      let response;
 
       switch (type) {
         case 'user':
           if (!user) {
-            // If no user, get trending recommendations instead
-            endpoint = '/api/recommendations/trending';
+            response = await recommendationsAPI.getTrendingRecommendations(limit);
           } else {
-            endpoint = '/api/recommendations/user';
+            response = await recommendationsAPI.getUserRecommendations(limit);
           }
           break;
         case 'product':
-          endpoint = `/api/recommendations/product/${productId}`;
+          response = await recommendationsAPI.getProductRecommendations(productId, limit);
           break;
         case 'category':
-          endpoint = `/api/recommendations/category/${categoryId}`;
+          response = await recommendationsAPI.getCategoryRecommendations(categoryId, limit);
           break;
         case 'trending':
-          endpoint = '/api/recommendations/trending';
-          if (categoryId) params.categoryId = categoryId;
+          response = await recommendationsAPI.getTrendingRecommendations(limit, categoryId);
           break;
         case 'frequently-bought':
-          endpoint = `/api/recommendations/frequently-bought/${productId}`;
+          response = await recommendationsAPI.getFrequentlyBoughtTogether(productId, limit);
           break;
         default:
-          endpoint = '/api/recommendations/trending';
+          response = await recommendationsAPI.getTrendingRecommendations(limit);
       }
-
-      const response = await axios.get(endpoint, { params });
       
       if (response.data.success) {
         let data = response.data.data;
@@ -87,7 +82,7 @@ const ProductRecommendations = ({
           if (uniqueRecommendations.length === 0) {
             console.log('No user recommendations found, fetching trending recommendations...');
             try {
-              const trendingResponse = await axios.get('/api/recommendations/trending', { params });
+              const trendingResponse = await recommendationsAPI.getTrendingRecommendations(limit);
               if (trendingResponse.data.success) {
                 data = trendingResponse.data.data;
               }
@@ -111,8 +106,7 @@ const ProductRecommendations = ({
 
   const handleAddToCart = async (product) => {
     try {
-      await addToCart(product, 1);
-      toast.success(`${product.name} ajouté au panier`);
+      await addItem(product, 1);
     } catch (error) {
       toast.error('Erreur lors de l\'ajout au panier');
     }
@@ -233,7 +227,7 @@ const ProductRecommendations = ({
             {/* Product Image */}
             <div className="relative">
               <img
-                src={product.imageUrl || '/placeholder-product.jpg'}
+                src={product.mainImage || product.images?.[0] || '/placeholder-product.jpg'}
                 alt={product.name}
                 className="w-full h-32 object-cover rounded-t-lg"
                 onError={(e) => {
@@ -288,7 +282,7 @@ const ProductRecommendations = ({
 
               <div className="flex items-center justify-between mb-3">
                 <span className="text-lg font-semibold text-gray-900">
-                  {product.price ? `${product.price.toFixed(2)} DH` : 'Prix non disponible'}
+                  {product.price ? `${parseFloat(product.price).toFixed(2)} DH` : 'Prix non disponible'}
                 </span>
                 
                 {product.relevanceScore && (

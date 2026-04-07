@@ -5,14 +5,14 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
+import { productsAPI } from '../services/api';
 import { ProductRecommendations, FrequentlyBoughtTogether } from '../components/recommendations';
 
 const ProductDetailPage = () => {
-  const { productId } = useParams();
+  const { id: productId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { addToCart, cartItems } = useCart();
+  const { addItem, cartItems } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   const [product, setProduct] = useState(null);
@@ -32,7 +32,7 @@ const ProductDetailPage = () => {
       setLoading(true);
       setError(null);
 
-      const response = await axios.get(`/api/products/${productId}`);
+      const response = await productsAPI.getById(productId);
       if (response.data.success) {
         setProduct(response.data.data);
       }
@@ -56,7 +56,7 @@ const ProductDetailPage = () => {
     }
 
     try {
-      await addToCart(product, quantity);
+      await addItem(product, quantity);
       toast.success(`${product.name} ajouté au panier`);
       setQuantity(1);
     } catch (error) {
@@ -84,7 +84,7 @@ const ProductDetailPage = () => {
   };
 
   const isInCart = () => {
-    return cartItems.some(item => item.product.id === productId);
+    return cartItems.some(item => item.id === productId);
   };
 
   const getStockStatus = () => {
@@ -162,7 +162,7 @@ const ProductDetailPage = () => {
           <div className="space-y-4">
             <div className="w-full h-96 bg-gray-100 rounded-lg overflow-hidden">
               <img
-                src={product.imageUrl || '/placeholder-product.jpg'}
+                src={product.mainImage || product.images?.[0] || '/placeholder-product.jpg'}
                 alt={product.name}
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -224,10 +224,10 @@ const ProductDetailPage = () => {
               {product.isOnSale && product.originalPrice ? (
                 <div className="flex items-center space-x-4">
                   <div className="text-3xl font-bold text-gray-900">
-                    {product.price ? `${product.price.toFixed(2)} DH` : 'Prix non disponible'}
+                    {product.price ? `${parseFloat(product.price).toFixed(2)} DH` : 'Prix non disponible'}
                   </div>
                   <div className="text-xl text-gray-500 line-through">
-                    {product.originalPrice.toFixed(2)} DH
+                    {parseFloat(product.originalPrice).toFixed(2)} DH
                   </div>
                   {product.salePercentage && (
                     <div className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">
@@ -237,7 +237,7 @@ const ProductDetailPage = () => {
                 </div>
               ) : (
                 <div className="text-3xl font-bold text-gray-900">
-                  {product.price ? `${product.price.toFixed(2)} DH` : 'Prix non disponible'}
+                  {product.price ? `${parseFloat(product.price).toFixed(2)} DH` : 'Prix non disponible'}
                 </div>
               )}
               

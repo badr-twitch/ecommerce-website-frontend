@@ -35,16 +35,18 @@ import { CartProvider } from './contexts/CartContext';
 import { WishlistProvider } from './contexts/WishlistContext';
 import { AdminProvider } from './contexts/AdminContext';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   console.log('App component rendering...'); // Debug log
-  
+
   return (
     <AuthProvider>
       <CartProvider>
         <WishlistProvider>
           <AdminProvider>
             <NotificationProvider>
+              <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
               <Router>
                 <Layout>
                   <Routes>

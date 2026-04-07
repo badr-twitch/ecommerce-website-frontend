@@ -78,31 +78,20 @@ const cartReducer = (state, action) => {
   }
 };
 
-export const CartProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(cartReducer, initialState);
-
-  // Calculate totals whenever items change
-  useEffect(() => {
-    const total = state.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const itemCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
-    
-    // Update totals in state
-    dispatch({ type: 'SET_TOTALS', payload: { total, itemCount } });
-  }, [state.items]);
-
-  // Load cart from localStorage on mount
-  useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      try {
-        const cartData = JSON.parse(savedCart);
-        dispatch({ type: 'SET_CART', payload: cartData });
-      } catch (error) {
-        console.error('Error loading cart from localStorage:', error);
-        localStorage.removeItem('cart');
-      }
+const getInitialCartState = () => {
+  const savedCart = localStorage.getItem('cart');
+  if (savedCart) {
+    try {
+      return { ...initialState, items: JSON.parse(savedCart) };
+    } catch {
+      localStorage.removeItem('cart');
     }
-  }, []);
+  }
+  return initialState;
+};
+
+export const CartProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(cartReducer, null, getInitialCartState);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {

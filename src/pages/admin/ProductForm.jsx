@@ -6,6 +6,7 @@ import { X, Save, Plus } from 'lucide-react';
 const ProductForm = ({ product = null, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     name: '',
+    sku: '',
     description: '',
     price: '',
     originalPrice: '',
@@ -31,6 +32,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
       setIsEditing(true);
       setFormData({
         name: product.name || '',
+        sku: product.sku || '',
         description: product.description || '',
         price: product.price || '',
         originalPrice: product.originalPrice || '',
@@ -186,6 +188,22 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               placeholder="Nom du produit"
+            />
+          </div>
+
+          {/* SKU */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              SKU (Référence) *
+            </label>
+            <input
+              type="text"
+              name="sku"
+              value={formData.sku}
+              onChange={handleInputChange}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="Ex: PROD-001"
             />
           </div>
 

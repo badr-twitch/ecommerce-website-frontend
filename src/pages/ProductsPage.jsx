@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { productsAPI, categoriesAPI, formatPrice } from '../services/api';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
@@ -160,6 +160,7 @@ const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { addItem } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const navigate = useNavigate();
 
   // Filter states
   const [filters, setFilters] = useState({
@@ -330,15 +331,18 @@ const ProductsPage = () => {
   }, []);
 
   const ProductCard = React.memo(({ product }) => (
-    <div className="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden group hover:shadow-2xl transition-all duration-500 border border-gray-200/50 transform hover:-translate-y-2 hover:scale-105">
+    <div
+      onClick={() => navigate(`/products/${product.id}`)}
+      className="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden group hover:shadow-2xl transition-all duration-500 border border-gray-200/50 transform hover:-translate-y-2 hover:scale-105 cursor-pointer"
+    >
       <div className="relative overflow-hidden">
-        <img 
-          src={product.mainImage || product.images?.[0] || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop'} 
+        <img
+          src={product.mainImage || product.images?.[0] || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop'}
           alt={product.name}
           className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        
+
         {/* Badges */}
         <div className="absolute top-4 left-4 flex flex-col gap-2">
           {product.isFeatured && (
@@ -362,7 +366,7 @@ const ProductsPage = () => {
         <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           {/* Wishlist button */}
           <button
-            onClick={() => handleToggleWishlist(product)}
+            onClick={(e) => { e.stopPropagation(); handleToggleWishlist(product); }}
             className={`p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 ${
               isInWishlist(product.id)
                 ? 'bg-red-500 hover:bg-red-600 text-white'
@@ -371,10 +375,10 @@ const ProductsPage = () => {
           >
             {isInWishlist(product.id) ? '💝' : '🤍'}
           </button>
-          
+
           {/* Quick add to cart button */}
           <button
-            onClick={() => handleAddToCart(product)}
+            onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
             disabled={!product.inStock}
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -387,7 +391,7 @@ const ProductsPage = () => {
         <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors duration-300">
           {product.name}
         </h3>
-        
+
         {/* Rating */}
         {product.averageRating > 0 && (
           <div className="flex items-center gap-2 mb-3">
@@ -426,14 +430,14 @@ const ProductsPage = () => {
         {/* Actions */}
         <div className="flex gap-3">
           <button
-            onClick={() => handleAddToCart(product)}
+            onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
             disabled={!product.inStock}
             className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             🛒 Ajouter
           </button>
           <button
-            onClick={() => handleToggleWishlist(product)}
+            onClick={(e) => { e.stopPropagation(); handleToggleWishlist(product); }}
             className={`px-4 py-3 rounded-xl transition-all duration-300 hover:shadow-lg ${
               isInWishlist(product.id)
                 ? 'bg-red-500 hover:bg-red-600 text-white'

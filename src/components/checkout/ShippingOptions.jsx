@@ -104,7 +104,7 @@ const ShippingOptions = ({ shippingData, onSelect, onBack }) => {
                   <div className="mt-3">
                     <div className="flex items-center space-x-4 text-sm text-gray-600">
                       <span>⏱️ {method.estimatedDays}</span>
-                      <span>💰 {method.price.toFixed(2)} DH</span>
+                      <span>💰 {parseFloat(method.price).toFixed(2)} DH</span>
                     </div>
                     <div className="mt-2">
                       <ul className="text-xs text-gray-500 space-y-1">
@@ -121,7 +121,7 @@ const ShippingOptions = ({ shippingData, onSelect, onBack }) => {
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-gray-900">
-                  {method.price.toFixed(2)} DH
+                  {parseFloat(method.price).toFixed(2)} DH
                 </div>
                 {method.id === 'pickup' && (
                   <div className="text-xs text-green-600 mt-1">
