@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { Lock, UserPlus, Loader2, AlertCircle, RefreshCw, Heart, ShoppingBag, FolderOpen, ShoppingCart, Trash2, Eye, Package, Check, X } from 'lucide-react';
 import { WishlistContext } from '../contexts/WishlistContext';
 import { CartContext } from '../contexts/CartContext';
 import { AuthContext } from '../contexts/AuthContext';
@@ -71,30 +72,30 @@ const WishlistPage = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="min-h-screen bg-mesh">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
-            <div className="w-32 h-32 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center text-6xl mx-auto mb-8">
-              🔐
+            <div className="w-32 h-32 bg-gradient-to-r from-primary-500/20 to-secondary-500/20 rounded-full flex items-center justify-center mx-auto mb-8">
+              <Lock className="w-16 h-16 text-primary-600" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl font-bold text-gradient mb-4">
               Connexion requise
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
+            <p className="text-xl text-gray-500 mb-8 max-w-md mx-auto">
               Connectez-vous pour accéder à votre wishlist et sauvegarder vos produits préférés !
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
                 to="/login" 
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white text-lg font-semibold rounded-xl shadow-glow-primary hover:-translate-y-0.5 transition-all duration-300"
               >
-                🔐 Se connecter
+                <Lock className="w-5 h-5 inline-block mr-2" />Se connecter
               </Link>
               <Link 
                 to="/register" 
-                className="px-8 py-4 bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 hover:text-blue-600 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white hover:shadow-lg"
+                className="px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 hover:text-primary-600 hover:border-primary-300 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white hover:shadow-lg"
               >
-                📝 Créer un compte
+                <UserPlus className="w-5 h-5 inline-block mr-2" />Créer un compte
               </Link>
             </div>
           </div>
@@ -105,16 +106,16 @@ const WishlistPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="min-h-screen bg-mesh">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
-            <div className="w-32 h-32 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center text-6xl mx-auto mb-8 animate-pulse">
-              ⏳
+            <div className="w-32 h-32 bg-gradient-to-r from-primary-500/20 to-secondary-500/20 rounded-full flex items-center justify-center mx-auto mb-8">
+              <Loader2 className="w-16 h-16 text-primary-600 animate-spin" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl font-bold text-gradient mb-4">
               Chargement...
             </h1>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-500">
               Chargement de votre wishlist
             </p>
           </div>
@@ -125,23 +126,23 @@ const WishlistPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="min-h-screen bg-mesh">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
-            <div className="w-32 h-32 bg-gradient-to-r from-red-500/20 to-pink-500/20 rounded-full flex items-center justify-center text-6xl mx-auto mb-8">
-              ❌
+            <div className="w-32 h-32 bg-gradient-to-r from-red-500/20 to-pink-500/20 rounded-full flex items-center justify-center mx-auto mb-8">
+              <AlertCircle className="w-16 h-16 text-red-500" />
             </div>
             <h1 className="text-4xl font-bold text-red-600 mb-4">
               Erreur
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
+            <p className="text-xl text-gray-500 mb-8 max-w-md mx-auto">
               {error}
             </p>
             <button 
               onClick={() => window.location.reload()}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              className="px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white text-lg font-semibold rounded-xl shadow-glow-primary hover:-translate-y-0.5 transition-all duration-300"
             >
-              🔄 Réessayer
+              <RefreshCw className="w-5 h-5 inline mr-1" /> Réessayer
             </button>
           </div>
         </div>
@@ -151,30 +152,30 @@ const WishlistPage = () => {
 
   if (wishlistItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="min-h-screen bg-mesh">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
-            <div className="w-32 h-32 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center text-6xl mx-auto mb-8">
-              💝
+            <div className="w-32 h-32 bg-gradient-to-r from-primary-500/20 to-secondary-500/20 rounded-full flex items-center justify-center mx-auto mb-8">
+              <Heart className="w-16 h-16 text-primary-600" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl font-bold text-gradient mb-4">
               Votre wishlist est vide
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
+            <p className="text-xl text-gray-500 mb-8 max-w-md mx-auto">
               Commencez à ajouter vos produits préférés à votre wishlist pour les retrouver facilement !
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
                 to="/products" 
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white text-lg font-semibold rounded-xl shadow-glow-primary hover:-translate-y-0.5 transition-all duration-300"
               >
-                🛍️ Découvrir nos produits
+                <ShoppingBag className="w-5 h-5 inline mr-1" /> Découvrir nos produits
               </Link>
               <Link 
                 to="/categories" 
-                className="px-8 py-4 bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 hover:text-blue-600 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white hover:shadow-lg"
+                className="px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 hover:text-primary-600 hover:border-primary-300 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white hover:shadow-lg"
               >
-                📂 Parcourir les catégories
+                <FolderOpen className="w-5 h-5 inline mr-1" /> Parcourir les catégories
               </Link>
             </div>
           </div>
@@ -184,14 +185,14 @@ const WishlistPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-mesh">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold text-gradient mb-2">
             Ma Wishlist
           </h1>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-500 text-lg">
             {wishlistItems.length} produit{wishlistItems.length > 1 ? 's' : ''} dans votre wishlist
           </p>
         </div>
@@ -203,14 +204,14 @@ const WishlistPage = () => {
               onClick={handleMoveAllToCart}
               className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center space-x-2"
             >
-              <span>🛒</span>
+              <ShoppingCart className="w-5 h-5" />
               <span>Ajouter tout au panier</span>
             </button>
             <button
               onClick={handleClearWishlist}
               className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center space-x-2"
             >
-              <span>🗑️</span>
+              <Trash2 className="w-5 h-5" />
               <span>Vider la wishlist</span>
             </button>
           </div>
@@ -219,10 +220,10 @@ const WishlistPage = () => {
         {/* Wishlist Items */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {wishlistItems.map((product) => (
-            <div key={product.id} className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 overflow-hidden hover:shadow-xl transition-all duration-300 group">
+            <div key={product.id} className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 overflow-hidden hover:shadow-lg transition-all duration-300 group card-3d">
               {/* Product Image */}
               <div className="relative">
-                <div className="w-full h-48 bg-gradient-to-r from-blue-500/10 to-purple-500/10 overflow-hidden">
+                <div className="w-full h-48 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 overflow-hidden">
                   {product.mainImage ? (
                     <img
                       src={product.mainImage}
@@ -230,8 +231,8 @@ const WishlistPage = () => {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-4xl text-gray-400">
-                      📦
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <Package className="w-10 h-10" />
                     </div>
                   )}
                 </div>
@@ -266,7 +267,7 @@ const WishlistPage = () => {
 
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
-                    <span className="text-2xl font-bold text-blue-600">
+                    <span className="text-2xl font-bold text-primary-600">
                       {formatPrice(product.price)}
                     </span>
                     {product.originalPrice && product.originalPrice > product.price && (
@@ -290,16 +291,16 @@ const WishlistPage = () => {
                   <button
                     onClick={() => handleAddToCart(product)}
                     disabled={!product.inStock}
-                    className="w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold rounded-lg transition-all duration-300 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold rounded-lg transition-all duration-300 disabled:cursor-not-allowed"
                   >
-                    {product.inStock ? '🛒 Ajouter au panier' : 'Rupture de stock'}
+                    {product.inStock ? <><ShoppingCart className="w-4 h-4 inline mr-1" /> Ajouter au panier</> : 'Rupture de stock'}
                   </button>
                   
                   <Link
                     to={`/products/${product.id}`}
                     className="block w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-center font-semibold rounded-lg transition-all duration-300"
                   >
-                    👁️ Voir détails
+                    <Eye className="w-4 h-4 inline mr-1" /> Voir détails
                   </Link>
                 </div>
               </div>
@@ -311,9 +312,9 @@ const WishlistPage = () => {
         <div className="mt-16 text-center">
           <Link
             to="/products"
-            className="inline-flex items-center space-x-2 px-8 py-4 bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 hover:text-blue-600 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white hover:shadow-lg"
+            className="inline-flex items-center space-x-2 px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 hover:text-primary-600 hover:border-primary-300 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white hover:shadow-lg"
           >
-            <span>🛍️</span>
+            <ShoppingBag className="w-5 h-5" />
             <span>Continuer les achats</span>
           </Link>
         </div>

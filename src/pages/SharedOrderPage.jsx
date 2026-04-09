@@ -5,9 +5,9 @@ import { ordersAPI, formatPrice } from '../services/api';
 
 const STATUS_LABELS = {
   pending: { label: 'En attente', icon: Clock, color: 'text-yellow-600 bg-yellow-50' },
-  confirmed: { label: 'Confirmée', icon: CheckCircle, color: 'text-blue-600 bg-blue-50' },
+  confirmed: { label: 'Confirmée', icon: CheckCircle, color: 'text-primary-600 bg-primary-50' },
   processing: { label: 'En préparation', icon: Package, color: 'text-indigo-600 bg-indigo-50' },
-  shipped: { label: 'Expédiée', icon: Truck, color: 'text-purple-600 bg-purple-50' },
+  shipped: { label: 'Expédiée', icon: Truck, color: 'text-secondary-600 bg-secondary-50' },
   delivered: { label: 'Livrée', icon: Home, color: 'text-green-600 bg-green-50' },
   cancelled: { label: 'Annulée', icon: AlertCircle, color: 'text-red-600 bg-red-50' },
 };
@@ -41,7 +41,7 @@ const SharedOrderPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-mesh">
         <div className="h-8 w-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
       </div>
     );
@@ -49,7 +49,7 @@ const SharedOrderPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-mesh px-4">
         <div className="text-center max-w-sm">
           <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
           <h1 className="text-lg font-semibold text-gray-900 mb-2">Lien non disponible</h1>
@@ -64,13 +64,13 @@ const SharedOrderPage = () => {
   const isGift = order.shareType === 'gift';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-12 px-4">
+    <div className="min-h-screen bg-mesh py-12 px-4">
       <div className="max-w-lg mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           {isGift ? (
             <>
-              <Gift className="h-12 w-12 text-purple-500 mx-auto mb-3" />
+              <Gift className="h-12 w-12 text-secondary-500 mx-auto mb-3" />
               <h1 className="text-2xl font-bold text-gray-900">{order.message}</h1>
             </>
           ) : (

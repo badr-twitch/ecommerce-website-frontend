@@ -208,7 +208,7 @@ const ReviewDisplay = ({ productId, productName, productImage }) => {
           <div className="flex flex-col items-end gap-3">
             <button
               onClick={() => setShowReviewForm(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
               Laisser un avis
@@ -249,7 +249,7 @@ const ReviewDisplay = ({ productId, productName, productImage }) => {
                   onClick={() => handleRatingFilter(rating.toString())}
                   className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                     filterRating === rating.toString()
-                      ? 'bg-blue-100 text-blue-700'
+                      ? 'bg-primary-100 text-primary-700'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -264,7 +264,7 @@ const ReviewDisplay = ({ productId, productName, productImage }) => {
             <select
               value={sortBy}
               onChange={(e) => handleSortChange(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="newest">Plus récents</option>
               <option value="oldest">Plus anciens</option>
@@ -281,7 +281,7 @@ const ReviewDisplay = ({ productId, productName, productImage }) => {
               <div key={review.id} className="border-b border-gray-100 pb-6 last:border-b-0">
                 <div className="flex items-start gap-4">
                   {/* User Avatar */}
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold text-sm">
+                  <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-semibold text-sm">
                     {review.user.initials || 'U'}
                   </div>
 
@@ -343,7 +343,7 @@ const ReviewDisplay = ({ productId, productName, productImage }) => {
                       <div className="flex items-center gap-4">
                         <button
                           onClick={() => handleVote(review.id, 'helpful')}
-                          className="flex items-center gap-1 text-gray-600 hover:text-blue-600 transition-colors"
+                          className="flex items-center gap-1 text-gray-600 hover:text-primary-600 transition-colors"
                         >
                           <ThumbsUp className="w-4 h-4" />
                           <span className="text-sm">Utile ({review.helpfulVotes})</span>
@@ -382,7 +382,7 @@ const ReviewDisplay = ({ productId, productName, productImage }) => {
             </p>
             <button
               onClick={() => setShowReviewForm(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
               Laisser un avis

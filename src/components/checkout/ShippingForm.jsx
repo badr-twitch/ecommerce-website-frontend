@@ -120,7 +120,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               value={formData.firstName}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
+              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
                 errors.firstName && touched.firstName 
                   ? 'border-red-300 focus:ring-red-500' 
                   : 'border-gray-300'
@@ -143,7 +143,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               value={formData.lastName}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
+              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
                 errors.lastName && touched.lastName 
                   ? 'border-red-300 focus:ring-red-500' 
                   : 'border-gray-300'
@@ -169,7 +169,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               value={formData.email}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
+              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
                 errors.email && touched.email 
                   ? 'border-red-300 focus:ring-red-500' 
                   : 'border-gray-300'
@@ -192,7 +192,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               value={formData.phone}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
+              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
                 errors.phone && touched.phone 
                   ? 'border-red-300 focus:ring-red-500' 
                   : 'border-gray-300'
@@ -216,7 +216,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
             name="company"
             value={formData.company}
             onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300"
             placeholder="Nom de votre entreprise"
           />
         </div>
@@ -233,7 +233,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
             value={formData.address}
             onChange={handleChange}
             onBlur={handleBlur}
-            className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 resize-none ${
+            className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 resize-none ${
               errors.address && touched.address 
                 ? 'border-red-300 focus:ring-red-500' 
                 : 'border-gray-300'
@@ -258,7 +258,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               value={formData.city}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
+              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
                 errors.city && touched.city 
                   ? 'border-red-300 focus:ring-red-500' 
                   : 'border-gray-300'
@@ -281,7 +281,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               value={formData.postalCode}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
+              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
                 errors.postalCode && touched.postalCode 
                   ? 'border-red-300 focus:ring-red-500' 
                   : 'border-gray-300'
@@ -304,7 +304,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
             name="country"
             value={formData.country}
             onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300"
           >
             <option value="France">France</option>
             <option value="Belgique">Belgique</option>
@@ -326,7 +326,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
             rows="3"
             value={formData.notes}
             onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 resize-none"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 resize-none"
             placeholder="Instructions spéciales pour la livraison..."
           />
         </div>
@@ -335,7 +335,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
         <div className="pt-6">
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            className="w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
           >
             Continuer vers l'expédition
           </button>

@@ -59,8 +59,8 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod, is
         {/* Member discount */}
         {isMember && memberDiscount > 0 && (
           <div className="flex justify-between text-sm">
-            <span className="text-purple-600 font-medium">Remise UMOD Prime -5%</span>
-            <span className="text-purple-600 font-medium">-{memberDiscount.toFixed(2)} DH</span>
+            <span className="text-secondary-600 font-medium">Remise UMOD Prime -5%</span>
+            <span className="text-secondary-600 font-medium">-{memberDiscount.toFixed(2)} DH</span>
           </div>
         )}
 
@@ -81,14 +81,14 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod, is
 
         {/* Prime member benefits summary */}
         {isMember && (
-          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-3 border border-purple-200">
+          <div className="bg-gradient-to-r from-indigo-50 to-secondary-50 rounded-lg p-3 border border-secondary-200">
             <div className="flex items-center space-x-2">
-              <span className="text-purple-600">👑</span>
-              <span className="text-sm text-purple-800 font-medium">
+              <span className="text-secondary-600">👑</span>
+              <span className="text-sm text-secondary-800 font-medium">
                 Avantages UMOD Prime appliqués
               </span>
             </div>
-            <p className="text-xs text-purple-600 mt-1">
+            <p className="text-xs text-secondary-600 mt-1">
               Livraison gratuite + 5% de remise sur votre commande
             </p>
           </div>
@@ -107,7 +107,7 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod, is
 
       {/* Shipping Method Summary */}
       {shippingMethod && (
-        <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+        <div className="mt-6 p-4 bg-primary-50 rounded-xl border border-primary-200">
           <div className="flex items-center space-x-3">
             <div className="text-xl">{shippingMethod.icon}</div>
             <div>

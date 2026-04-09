@@ -59,12 +59,12 @@ const EmailVerificationPage = () => {
   const email = user?.email || getAuth().currentUser?.email || '';
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+    <div className="min-h-screen bg-mesh flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-8">
         <div className="text-center">
           {/* Envelope icon */}
-          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
-            <svg className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-primary-100 mb-4">
+            <svg className="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
@@ -87,7 +87,7 @@ const EmailVerificationPage = () => {
           <button
             onClick={handleResend}
             disabled={cooldown > 0 || sending}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-semibold mb-3"
+            className="w-full px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:from-primary-700 hover:to-primary-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-semibold mb-3 shadow-glow-primary"
           >
             {sending
               ? 'Envoi en cours…'
@@ -102,7 +102,7 @@ const EmailVerificationPage = () => {
 
           {/* Live polling indicator */}
           <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
-            <span className="inline-block h-2 w-2 rounded-full bg-blue-400 animate-pulse" />
+            <span className="inline-block h-2 w-2 rounded-full bg-primary-400 animate-pulse" />
             En attente de vérification…
           </div>
         </div>

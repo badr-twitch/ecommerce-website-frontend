@@ -16,9 +16,9 @@ import { ordersAPI } from '../../services/api';
 
 const STATUS_META = {
   pending:    { label: 'Commande reçue',      icon: Clock,        color: 'bg-yellow-500' },
-  confirmed:  { label: 'Confirmée',           icon: CheckCircle,  color: 'bg-blue-500' },
+  confirmed:  { label: 'Confirmée',           icon: CheckCircle,  color: 'bg-primary-500' },
   processing: { label: 'En préparation',      icon: Package,      color: 'bg-indigo-500' },
-  shipped:    { label: 'Expédiée',            icon: Truck,        color: 'bg-purple-500' },
+  shipped:    { label: 'Expédiée',            icon: Truck,        color: 'bg-secondary-500' },
   delivered:  { label: 'Livrée',              icon: Home,         color: 'bg-green-500' },
   cancelled:  { label: 'Annulée',             icon: XCircle,      color: 'bg-red-500' },
   refunded:   { label: 'Remboursée',          icon: RefreshCw,    color: 'bg-orange-500' },

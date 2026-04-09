@@ -1,21 +1,39 @@
-import React, { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useContext, useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { CartContext } from '../../contexts/CartContext';
 import { WishlistContext } from '../../contexts/WishlistContext';
 import NotificationBell from '../notifications/NotificationBell';
+import { Search, Heart, ShoppingBag, Menu, X, User, Package, Settings, LogOut, Crown } from 'lucide-react';
 
 const Header = () => {
   const { user, logout } = useContext(AuthContext);
   const { cartItems } = useContext(CartContext);
   const { getWishlistCount } = useContext(WishlistContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   const wishlistCount = getWishlistCount();
+
+  // Scroll-aware header
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setUserMenuOpen(false);
+  }, [location.pathname]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -27,213 +45,257 @@ const Header = () => {
     }
   };
 
+  const navItems = [
+    { to: "/", label: "Accueil" },
+    { to: "/products", label: "Produits" },
+    { to: "/membership", label: "UMOD Prime" },
+    { to: "/categories", label: "Categories" },
+    { to: "/about", label: "A propos" },
+    { to: "/contact", label: "Contact" },
+  ];
+
+  const isActive = (path) => {
+    if (path === '/') return location.pathname === '/';
+    return location.pathname.startsWith(path);
+  };
+
   return (
-    <header className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-200/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-24">
-          {/* Logo - moved to far left */}
-          <Link to="/" className="flex items-center group">
-            <div className="relative">
-              <img 
-                src="/LOGO.png" 
-                alt="UMOD Logo" 
-                className="h-16 w-auto transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-          </Link>
-
-          {/* Navigation - centered */}
-          <nav className="hidden lg:flex space-x-1">
-            {[
-              { to: "/", label: "Accueil" },
-              { to: "/products", label: "Produits" },
-              { to: "/membership", label: "UMOD Prime" },
-              { to: "/categories", label: "Catégories" },
-              { to: "/about", label: "À propos" },
-              { to: "/contact", label: "Contact" }
-            ].map((item) => (
-              <Link 
-                key={item.to}
-                to={item.to} 
-                className="relative px-4 py-2 text-gray-700 hover:text-blue-600 font-medium transition-all duration-300 group"
-              >
-                {item.label}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            ))}
-          </nav>
-
-          {/* Right side actions */}
-          <div className="flex items-center space-x-3">
-            {/* Search Bar - Desktop */}
-            <form onSubmit={handleSearch} className="hidden md:flex items-center relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Rechercher..."
-                className="w-48 lg:w-64 px-4 py-2 pl-10 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 transition-all duration-300"
-              />
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </form>
-
-            {/* Search Toggle - Mobile */}
-            <button
-              onClick={() => setSearchOpen(!searchOpen)}
-              className="md:hidden p-3 text-gray-700 hover:text-blue-600 transition-all duration-300"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </button>
-
-            {/* Wishlist */}
-            <Link 
-              to="/wishlist" 
-              className="relative p-3 text-gray-700 hover:text-blue-600 transition-all duration-300 group"
-            >
+    <>
+      <header
+        className={`sticky top-0 z-50 transition-all duration-500 ${
+          scrolled
+            ? 'bg-white/85 backdrop-blur-2xl shadow-3d border-b border-gray-200/30'
+            : 'bg-white/60 backdrop-blur-xl border-b border-transparent'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            {/* Logo */}
+            <Link to="/" className="flex items-center group shrink-0">
               <div className="relative">
-                <span className="text-xl group-hover:scale-110 transition-transform duration-300">💝</span>
+                <img
+                  src="/LOGO.png"
+                  alt="UMOD Logo"
+                  className="h-12 w-auto transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute -inset-2 bg-gradient-to-r from-primary-500/20 to-secondary-500/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
+              </div>
+            </Link>
+
+            {/* Desktop Nav */}
+            <nav className="hidden lg:flex items-center gap-1">
+              {navItems.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 ${
+                    isActive(item.to)
+                      ? 'text-primary-700 bg-primary-50'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  {item.label}
+                  {isActive(item.to) && (
+                    <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-primary-600 rounded-full" />
+                  )}
+                </Link>
+              ))}
+            </nav>
+
+            {/* Right Actions */}
+            <div className="flex items-center gap-1.5">
+              {/* Desktop Search */}
+              <form onSubmit={handleSearch} className="hidden md:flex items-center relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Rechercher..."
+                  className="w-44 lg:w-56 px-4 py-2 pl-10 text-sm border-2 border-gray-200 rounded-xl bg-gray-50/80 focus:bg-white focus:outline-none focus:border-primary-400 transition-all duration-300"
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              </form>
+
+              {/* Mobile Search Toggle */}
+              <button
+                onClick={() => setSearchOpen(!searchOpen)}
+                className="md:hidden p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+
+              {/* Wishlist */}
+              <Link
+                to="/wishlist"
+                className="relative p-2.5 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+              >
+                <Heart className="w-5 h-5" />
                 {wishlistCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-lg">
+                  <span className="absolute -top-0.5 -right-0.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg animate-scale-in">
                     {wishlistCount}
                   </span>
                 )}
-              </div>
-            </Link>
+              </Link>
 
-            {/* Cart */}
-            <Link 
-              to="/cart" 
-              className="relative p-3 text-gray-700 hover:text-blue-600 transition-all duration-300 group"
-            >
-              <div className="relative">
-                <span className="text-xl group-hover:scale-110 transition-transform duration-300">🛒</span>
+              {/* Cart */}
+              <Link
+                to="/cart"
+                className="relative p-2.5 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+              >
+                <ShoppingBag className="w-5 h-5" />
                 {cartItemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-lg">
+                  <span className="absolute -top-0.5 -right-0.5 bg-gradient-to-r from-primary-600 to-secondary-600 text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg animate-scale-in">
                     {cartItemCount}
                   </span>
                 )}
-              </div>
-            </Link>
+              </Link>
 
-            {/* Notifications - Only show for authenticated users */}
-            {user && <NotificationBell />}
+              {/* Notifications */}
+              {user && <NotificationBell />}
 
-            {/* User menu */}
-            {user ? (
-              <div className="relative group">
-                <button className="flex items-center space-x-3 p-2 text-gray-700 hover:text-blue-600 transition-all duration-300 rounded-xl hover:bg-gray-50">
-                  {user.photoURL ? (
-                    <div className="relative">
-                      <img 
-                        src={user.photoURL} 
-                        alt="Profile" 
-                        className="w-8 h-8 rounded-full object-cover ring-2 ring-gray-200 group-hover:ring-blue-500/50 transition-all duration-300"
+              {/* User Menu */}
+              {user ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-2.5 p-1.5 pr-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200"
+                  >
+                    {user.photoURL ? (
+                      <img
+                        src={user.photoURL}
+                        alt=""
+                        className="w-8 h-8 rounded-lg object-cover ring-2 ring-gray-200"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </div>
-                  ) : (
-                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm ring-2 ring-gray-200 group-hover:ring-blue-500/50 transition-all duration-300">
-                      {user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
-                    </div>
-                  )}
-                  <span className="hidden sm:block text-sm font-medium">
-                    {user.displayName || user.email}
-                  </span>
-                  {user.membershipStatus === 'active' && (
-                    <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-sm">
-                      Prime
-                    </span>
-                  )}
-                  <span className="text-xs opacity-60 group-hover:opacity-100 transition-opacity duration-300">▼</span>
-                </button>
-                
-                {/* Dropdown menu */}
-                <div className="absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-md rounded-xl shadow-xl border border-gray-200/50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                  <div className="p-2">
-                    <Link 
-                      to="/profile" 
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 rounded-lg transition-all duration-200"
-                    >
-                      <span className="text-lg">👤</span>
-                      <span>Mon profil</span>
-                    </Link>
-                    <Link 
-                      to="/orders" 
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 rounded-lg transition-all duration-200"
-                    >
-                      <span className="text-lg">📦</span>
-                      <span>Mes commandes</span>
-                    </Link>
-                    {user.role === 'admin' && (
-                      <Link 
-                        to="/admin" 
-                        className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 rounded-lg transition-all duration-200"
-                      >
-                        <span className="text-lg">⚙️</span>
-                        <span>Administration</span>
-                      </Link>
+                    ) : (
+                      <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                        {user.firstName?.charAt(0) || user.email?.charAt(0) || 'U'}
+                      </div>
                     )}
-                    <div className="border-t border-gray-200 my-2"></div>
-                    <button 
-                      onClick={logout}
-                      className="flex items-center space-x-3 w-full px-4 py-3 text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 rounded-lg transition-all duration-200"
-                    >
-                      <span className="text-lg">🚪</span>
-                      <span>Se déconnecter</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-3">
-                <Link 
-                  to="/login" 
-                  className="px-4 py-2 text-gray-700 hover:text-blue-600 font-medium transition-all duration-300 hover:bg-gray-50 rounded-lg"
-                >
-                  Connexion
-                </Link>
-                <Link 
-                  to="/register" 
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                >
-                  Inscription
-                </Link>
-              </div>
-            )}
+                    <span className="hidden sm:block text-sm font-medium max-w-[120px] truncate">
+                      {user.firstName || user.displayName || user.email}
+                    </span>
+                    {user.membershipStatus === 'active' && (
+                      <Crown className="w-4 h-4 text-amber-500" />
+                    )}
+                  </button>
 
-            {/* Mobile menu button */}
-            <button className="lg:hidden p-3 text-gray-700 hover:text-blue-600 transition-all duration-300 rounded-xl hover:bg-gray-50">
-              <span className="text-xl">☰</span>
-            </button>
+                  {/* Dropdown */}
+                  {userMenuOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 animate-fade-in-down overflow-hidden">
+                        <div className="p-1.5">
+                          <Link to="/profile" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors">
+                            <User className="w-4 h-4 text-gray-400" />
+                            <span className="text-sm font-medium">Mon profil</span>
+                          </Link>
+                          <Link to="/orders" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors">
+                            <Package className="w-4 h-4 text-gray-400" />
+                            <span className="text-sm font-medium">Mes commandes</span>
+                          </Link>
+                          {user.role === 'admin' && (
+                            <Link to="/admin" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors">
+                              <Settings className="w-4 h-4 text-gray-400" />
+                              <span className="text-sm font-medium">Administration</span>
+                            </Link>
+                          )}
+                          <div className="my-1.5 border-t border-gray-100" />
+                          <button
+                            onClick={() => { setUserMenuOpen(false); logout(); }}
+                            className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                          >
+                            <LogOut className="w-4 h-4" />
+                            <span className="text-sm font-medium">Se deconnecter</span>
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="hidden sm:flex items-center gap-2">
+                  <Link
+                    to="/login"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all duration-200"
+                  >
+                    Connexion
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 rounded-xl shadow-glow-primary hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]"
+                  >
+                    Inscription
+                  </Link>
+                </div>
+              )}
+
+              {/* Mobile Menu Toggle */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Search (expandable) */}
+          {searchOpen && (
+            <div className="md:hidden pb-4 animate-slide-down">
+              <form onSubmit={handleSearch} className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Rechercher des produits..."
+                  autoFocus
+                  className="w-full px-4 py-3 pl-10 text-sm border-2 border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:border-primary-400 transition-all duration-300"
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              </form>
+            </div>
+          )}
+        </div>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-40">
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
+          <div className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-2xl animate-slide-in-right overflow-y-auto">
+            <div className="p-6 pt-24">
+              <nav className="space-y-1">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                      isActive(item.to)
+                        ? 'bg-primary-50 text-primary-700'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+
+              {!user && (
+                <div className="mt-8 space-y-3">
+                  <Link to="/login" className="block w-full text-center px-4 py-3 text-sm font-medium text-gray-700 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                    Connexion
+                  </Link>
+                  <Link to="/register" className="block w-full text-center px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-glow-primary">
+                    Inscription
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-
-        {/* Mobile Search Bar (expandable) */}
-        {searchOpen && (
-          <div className="md:hidden pb-4">
-            <form onSubmit={handleSearch} className="flex items-center relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Rechercher des produits..."
-                autoFocus
-                className="w-full px-4 py-3 pl-10 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 transition-all duration-300"
-              />
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </form>
-          </div>
-        )}
-      </div>
-    </header>
+      )}
+    </>
   );
 };
 
-export default Header; 
+export default Header;

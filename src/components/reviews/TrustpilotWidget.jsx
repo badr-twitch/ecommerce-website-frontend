@@ -30,7 +30,7 @@ const TrustpilotWidget = ({
   const themeClasses = {
     light: 'bg-white text-gray-900 border-gray-200',
     dark: 'bg-gray-900 text-white border-gray-700',
-    blue: 'bg-blue-600 text-white border-blue-700'
+    blue: 'bg-primary-600 text-white border-primary-700'
   };
 
   // Load Trustpilot data
@@ -108,7 +108,7 @@ const TrustpilotWidget = ({
   // Get rating color
   const getRatingColor = (rating) => {
     if (rating >= 4.5) return 'text-green-600';
-    if (rating >= 4.0) return 'text-blue-600';
+    if (rating >= 4.0) return 'text-primary-600';
     if (rating >= 3.5) return 'text-yellow-600';
     if (rating >= 3.0) return 'text-orange-600';
     return 'text-red-600';
@@ -117,7 +117,7 @@ const TrustpilotWidget = ({
   // Get trust score color
   const getTrustScoreColor = (score) => {
     if (score >= 9.0) return 'text-green-600';
-    if (score >= 8.0) return 'text-blue-600';
+    if (score >= 8.0) return 'text-primary-600';
     if (score >= 7.0) return 'text-yellow-600';
     return 'text-orange-600';
   };
@@ -188,7 +188,7 @@ const TrustpilotWidget = ({
           <div className="space-y-2">
             {[
               { label: 'Excellent', count: trustpilotData.reviewCount.excellent, color: 'bg-green-500' },
-              { label: 'Très bien', count: trustpilotData.reviewCount.great, color: 'bg-blue-500' },
+              { label: 'Très bien', count: trustpilotData.reviewCount.great, color: 'bg-primary-500' },
               { label: 'Bien', count: trustpilotData.reviewCount.average, color: 'bg-yellow-500' },
               { label: 'Passable', count: trustpilotData.reviewCount.poor, color: 'bg-orange-500' },
               { label: 'Insuffisant', count: trustpilotData.reviewCount.bad, color: 'bg-red-500' }
@@ -220,7 +220,7 @@ const TrustpilotWidget = ({
       <div className="mb-4 p-3 bg-gray-50 rounded-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-blue-600" />
+            <TrendingUp className="w-4 h-4 text-primary-600" />
             <span className="text-sm font-medium">Score de confiance</span>
           </div>
           <div className={`text-lg font-bold ${getTrustScoreColor(trustpilotData.trustScore)}`}>
@@ -251,7 +251,7 @@ const TrustpilotWidget = ({
           href={`https://www.trustpilot.com/review/${trustpilotData.businessUnitId}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+          className="inline-flex items-center gap-1 text-sm text-primary-600 hover:text-primary-800 transition-colors"
         >
           <span>Voir sur Trustpilot</span>
           <ExternalLink className="w-3 h-3" />

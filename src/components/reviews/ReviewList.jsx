@@ -271,17 +271,17 @@ const ReviewList = ({ productId = null, showProductInfo = true }) => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">{stats.totalReviews}</div>
-            <div className="text-sm text-blue-700">Total des avis</div>
+          <div className="bg-primary-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-primary-600">{stats.totalReviews}</div>
+            <div className="text-sm text-primary-700">Total des avis</div>
           </div>
           <div className="bg-green-50 p-4 rounded-lg">
             <div className="text-2xl font-bold text-green-600">{stats.verifiedPurchaseCount}</div>
             <div className="text-sm text-green-700">Achats vérifiés</div>
           </div>
-          <div className="bg-purple-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-purple-600">{stats.mediaCount}</div>
-            <div className="text-sm text-purple-700">Avec médias</div>
+          <div className="bg-secondary-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-secondary-600">{stats.mediaCount}</div>
+            <div className="text-sm text-secondary-700">Avec médias</div>
           </div>
           <div className="bg-yellow-50 p-4 rounded-lg">
             <div className="text-2xl font-bold text-yellow-600">{stats.averageRating.toFixed(1)}</div>
@@ -308,7 +308,7 @@ const ReviewList = ({ productId = null, showProductInfo = true }) => {
                 placeholder="Rechercher dans les avis..."
                 value={filters.searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -318,7 +318,7 @@ const ReviewList = ({ productId = null, showProductInfo = true }) => {
             <select
               value={filters.rating}
               onChange={(e) => handleFilterChange('rating', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">Toutes les notes</option>
               <option value="5">5 étoiles</option>
@@ -334,7 +334,7 @@ const ReviewList = ({ productId = null, showProductInfo = true }) => {
             <select
               value={filters.verifiedPurchase}
               onChange={(e) => handleFilterChange('verifiedPurchase', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">Tous les avis</option>
               <option value="true">Achats vérifiés</option>
@@ -347,7 +347,7 @@ const ReviewList = ({ productId = null, showProductInfo = true }) => {
             <select
               value={filters.hasMedia}
               onChange={(e) => handleFilterChange('hasMedia', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">Tous les avis</option>
               <option value="true">Avec médias</option>
@@ -361,7 +361,7 @@ const ReviewList = ({ productId = null, showProductInfo = true }) => {
           <div className="flex items-center gap-2">
             <button
               onClick={applyFilters}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
             >
               <Filter className="w-4 h-4" />
               Appliquer les filtres
@@ -379,7 +379,7 @@ const ReviewList = ({ productId = null, showProductInfo = true }) => {
             <select
               value={pageSize}
               onChange={(e) => setPageSize(parseInt(e.target.value))}
-              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value={10}>10</option>
               <option value={20}>20</option>
@@ -451,7 +451,7 @@ const ReviewList = ({ productId = null, showProductInfo = true }) => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold text-sm">
+                    <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-semibold text-sm">
                       {review.user.initials || 'U'}
                     </div>
                     <div>
@@ -503,7 +503,7 @@ const ReviewList = ({ productId = null, showProductInfo = true }) => {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleVote(review.id, 'helpful')}
-                      className="flex items-center gap-1 text-gray-600 hover:text-blue-600 transition-colors"
+                      className="flex items-center gap-1 text-gray-600 hover:text-primary-600 transition-colors"
                       title="Marquer comme utile"
                     >
                       <ThumbsUp className="w-4 h-4" />
@@ -562,7 +562,7 @@ const ReviewList = ({ productId = null, showProductInfo = true }) => {
                       onClick={() => fetchReviews(pageNum)}
                       className={`px-3 py-2 text-sm font-medium rounded-md ${
                         currentPage === pageNum
-                          ? 'bg-blue-600 text-white'
+                          ? 'bg-primary-600 text-white'
                           : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
                       }`}
                     >

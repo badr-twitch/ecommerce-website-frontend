@@ -77,7 +77,7 @@ const OrdersPage = () => {
           <p className="mt-2 text-red-500">{ordersData.error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            className="mt-4 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl shadow-glow-primary hover:-translate-y-0.5 transition-all duration-300"
           >
             Recharger la page
           </button>
@@ -120,7 +120,7 @@ const OrdersPage = () => {
           <div className="mt-6">
             <Link
               to="/login"
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-xl text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 shadow-glow-primary hover:-translate-y-0.5 transition-all duration-300"
             >
               Se connecter
             </Link>
@@ -131,12 +131,13 @@ const OrdersPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-mesh">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Mes Commandes</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-gray-900 text-gradient">Mes Commandes</h1>
+          <div className="section-divider"></div>
+          <p className="mt-2 text-gray-500">
             Suivez l'état de vos commandes et consultez votre historique d'achats
           </p>
         </div>
@@ -144,10 +145,10 @@ const OrdersPage = () => {
         {/* Order Statistics */}
         {orders.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-4">
               <div className="flex items-center">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Package className="h-6 w-6 text-blue-600" />
+                <div className="p-2 bg-primary-100 rounded-lg">
+                  <Package className="h-6 w-6 text-primary-600" />
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-500">Total commandes</p>
@@ -156,7 +157,7 @@ const OrdersPage = () => {
               </div>
             </div>
             
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-4">
               <div className="flex items-center">
                 <div className="p-2 bg-green-100 rounded-lg">
                   <CheckCircle className="h-6 w-6 text-green-600" />
@@ -170,7 +171,7 @@ const OrdersPage = () => {
               </div>
             </div>
             
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-4">
               <div className="flex items-center">
                 <div className="p-2 bg-yellow-100 rounded-lg">
                   <Clock className="h-6 w-6 text-yellow-600" />
@@ -184,10 +185,10 @@ const OrdersPage = () => {
               </div>
             </div>
             
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-4">
               <div className="flex items-center">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <CreditCard className="h-6 w-6 text-purple-600" />
+                <div className="p-2 bg-secondary-100 rounded-lg">
+                  <CreditCard className="h-6 w-6 text-secondary-600" />
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-500">Dépensé total</p>
@@ -204,7 +205,7 @@ const OrdersPage = () => {
         )}
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-6 mb-6">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             {/* Search */}
             <div className="relative flex-1 max-w-md">
@@ -214,14 +215,14 @@ const OrdersPage = () => {
                 placeholder="Rechercher par numéro de commande..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               />
             </div>
 
             {/* Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
             >
               <Filter className="h-4 w-4 mr-2" />
               Filtres
@@ -237,7 +238,7 @@ const OrdersPage = () => {
                   setSortOrder(order);
                   updateFilters({ sortBy: field, sortOrder: order });
                 }}
-                className="appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 pr-8 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="appearance-none bg-white border border-gray-300 rounded-xl px-3 py-2 pr-8 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="createdAt-desc">Plus récent</option>
                 <option value="createdAt-asc">Plus ancien</option>
@@ -253,7 +254,7 @@ const OrdersPage = () => {
             <button
               onClick={refreshOrders}
               disabled={loading}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Actualiser
@@ -262,7 +263,7 @@ const OrdersPage = () => {
 
           {/* Expanded Filters */}
           {showFilters && (
-            <div className="mt-6 pt-6 border-t border-gray-200">
+            <div className="mt-6 pt-6 border-t border-gray-100">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Status Filter */}
                 <div>
@@ -272,7 +273,7 @@ const OrdersPage = () => {
                   <select
                     value={filters.status}
                     onChange={(e) => handleFilterChange('status', e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   >
                     <option value="">Tous les statuts</option>
                     <option value="pending">En attente</option>
@@ -294,7 +295,7 @@ const OrdersPage = () => {
                     type="date"
                     value={filters.dateFrom}
                     onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
 
@@ -307,7 +308,7 @@ const OrdersPage = () => {
                     type="date"
                     value={filters.dateTo}
                     onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
 
@@ -315,7 +316,7 @@ const OrdersPage = () => {
                 <div className="flex items-end">
                   <button
                     onClick={clearFilters}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                   >
                     Effacer les filtres
                   </button>
@@ -338,7 +339,7 @@ const OrdersPage = () => {
               <p className="mt-2 text-red-500">{error}</p>
               <button
                 onClick={refreshOrders}
-                className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                className="mt-4 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl shadow-glow-primary hover:-translate-y-0.5 transition-all duration-300"
               >
                 Réessayer
               </button>
@@ -354,7 +355,7 @@ const OrdersPage = () => {
             <div className="mt-6">
               <Link
                 to="/products"
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-xl text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 shadow-glow-primary hover:-translate-y-0.5 transition-all duration-300"
               >
                 Découvrir nos produits
               </Link>
@@ -380,7 +381,7 @@ const OrdersPage = () => {
               <button
                 onClick={() => handlePageChange(pagination.currentPage - 1)}
                 disabled={pagination.currentPage === 1}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-2 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Précédent
               </button>
@@ -389,9 +390,9 @@ const OrdersPage = () => {
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`px-3 py-2 border rounded-md text-sm font-medium ${
+                  className={`px-3 py-2 border rounded-xl text-sm font-medium ${
                     page === pagination.currentPage
-                      ? 'border-indigo-500 bg-indigo-600 text-white'
+                      ? 'border-primary-500 bg-primary-600 text-white'
                       : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
                   }`}
                 >
@@ -402,7 +403,7 @@ const OrdersPage = () => {
               <button
                 onClick={() => handlePageChange(pagination.currentPage + 1)}
                 disabled={pagination.currentPage === pagination.totalPages}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-2 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Suivant
               </button>

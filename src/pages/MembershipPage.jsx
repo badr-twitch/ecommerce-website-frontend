@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { membershipAPI, formatPrice } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { Unlock, Zap, ShieldCheck, Gift, Sparkles, PartyPopper } from 'lucide-react';
 import { paymentService } from '../services/paymentService';
 import LoyaltyDashboard from '../components/membership/LoyaltyDashboard';
 import SeasonalBanner from '../components/membership/SeasonalBanner';
@@ -178,7 +179,7 @@ const MembershipPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="w-20 h-20 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+        <div className="w-20 h-20 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -205,8 +206,8 @@ const MembershipPage = () => {
       <div className="relative overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-32 -right-40 w-96 h-96 bg-blue-500/20 blur-3xl rounded-full"></div>
-          <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/20 blur-3xl rounded-full"></div>
+          <div className="absolute -top-32 -right-40 w-96 h-96 bg-primary-500/20 blur-3xl rounded-full"></div>
+          <div className="absolute top-20 left-10 w-72 h-72 bg-secondary-500/20 blur-3xl rounded-full"></div>
           <div className="absolute bottom-10 right-20 w-80 h-80 bg-indigo-500/10 blur-3xl rounded-full"></div>
         </div>
 
@@ -220,7 +221,7 @@ const MembershipPage = () => {
                 </span>
                 <h1 className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
                   UMOD Prime
-                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-secondary-400">
                     L’abonnement qui révolutionne votre shopping au Maroc
                   </span>
                 </h1>
@@ -276,7 +277,7 @@ const MembershipPage = () => {
                         </p>
                       )}
                     </div>
-                    <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/10 backdrop-blur">
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-primary-500/20 to-secondary-500/20 border border-white/10 backdrop-blur">
                       <p className="text-sm text-white/70">Essai satisfait ou remboursé</p>
                       <p className="mt-2 text-lg font-semibold">Remboursement garanti sous 30 jours</p>
                     </div>
@@ -287,7 +288,7 @@ const MembershipPage = () => {
                   {status?.membershipStatus === 'active' ? (
                     <button
                       onClick={handleManageMembership}
-                      className="px-8 py-3 rounded-full bg-white text-slate-900 font-semibold shadow-xl shadow-blue-500/30 hover:-translate-y-1 transition transform"
+                      className="px-8 py-3 rounded-full bg-white text-slate-900 font-semibold shadow-xl shadow-primary-500/30 hover:-translate-y-1 transition transform"
                     >
                       Gestion de mon abonnement
                     </button>
@@ -295,7 +296,7 @@ const MembershipPage = () => {
                     <button
                       onClick={handleSubscribe}
                       disabled={subscribing}
-                      className="px-8 py-3 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 font-semibold shadow-xl shadow-blue-500/40 hover:-translate-y-1 transition transform disabled:opacity-60"
+                      className="px-8 py-3 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 font-semibold shadow-xl shadow-primary-500/40 hover:-translate-y-1 transition transform disabled:opacity-60"
                     >
                       {subscribing ? 'Activation en cours...' : 'Rejoindre UMOD Prime'}
                     </button>
@@ -325,7 +326,7 @@ const MembershipPage = () => {
 
               <div className="flex-1 w-full">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/40 to-purple-500/40 blur-3xl"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary-500/40 to-secondary-500/40 blur-3xl"></div>
                   <div className="relative bg-white/10 border border-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl">
                     <h2 className="text-2xl font-semibold mb-6 text-white">Avantages exclusifs inclus :</h2>
 
@@ -344,7 +345,7 @@ const MembershipPage = () => {
                       ))}
                     </div>
 
-                    <div className="mt-6 p-4 rounded-2xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/10">
+                    <div className="mt-6 p-4 rounded-2xl bg-gradient-to-r from-primary-500/20 to-secondary-500/20 border border-white/10">
                       <p className="text-sm text-white/70">
                         + {plan?.perks?.length || 6} avantages premium pensés pour vos achats au Maroc
                       </p>
@@ -361,10 +362,10 @@ const MembershipPage = () => {
               {plan?.perks?.map((perk) => (
                 <div
                   key={perk.title}
-                  className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-lg p-6 transition hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-500/20"
+                  className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-lg p-6 transition hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary-500/20"
                 >
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition">
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-2xl"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-secondary-500/20 blur-2xl"></div>
                   </div>
                   <div className="relative z-10">
                     <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 border border-white/10 text-2xl">
@@ -427,7 +428,7 @@ const MembershipPage = () => {
                 </div>
                 <button
                   onClick={() => setGiftModalOpen(true)}
-                  className="mt-4 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold hover:opacity-90 transition w-full"
+                  className="mt-4 px-6 py-3 rounded-xl bg-gradient-to-r from-secondary-500 to-pink-500 text-white font-semibold hover:opacity-90 transition w-full"
                 >
                   🎁 Offrir un abonnement
                 </button>
@@ -450,7 +451,7 @@ const MembershipPage = () => {
                   className="group rounded-2xl border border-white/10 bg-white/5 backdrop-blur transition"
                 >
                   <summary className="cursor-pointer list-none px-6 py-5 flex items-center justify-between">
-                    <span className="text-lg font-medium text-white group-open:text-blue-200">{faq.question}</span>
+                    <span className="text-lg font-medium text-white group-open:text-primary-200">{faq.question}</span>
                     <span className="text-2xl text-white/40 group-open:rotate-45 transition">+</span>
                   </summary>
                   <div className="px-6 pb-5 text-white/60 leading-relaxed">{faq.answer}</div>
@@ -461,7 +462,7 @@ const MembershipPage = () => {
 
           {/* Final CTA */}
           <section className="mt-24 mb-12">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8 rounded-3xl border border-white/10 bg-gradient-to-r from-blue-600/30 to-purple-500/30 backdrop-blur px-8 py-12 shadow-2xl shadow-blue-500/10">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8 rounded-3xl border border-white/10 bg-gradient-to-r from-primary-600/30 to-secondary-500/30 backdrop-blur px-8 py-12 shadow-2xl shadow-primary-500/10">
               <div>
                 <h2 className="text-3xl font-semibold">Prêt à vivre une expérience UMOD sans limites ?</h2>
                 <p className="mt-3 text-white/70 max-w-2xl">
@@ -529,7 +530,7 @@ const MembershipPage = () => {
 
               {paymentMethodsLoading ? (
                 <div className="flex items-center gap-3 text-sm text-slate-600">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
                   Chargement des méthodes de paiement…
                 </div>
               ) : paymentMethods.length ? (
@@ -539,8 +540,8 @@ const MembershipPage = () => {
                       key={method.id}
                       className={`flex items-center justify-between rounded-2xl border px-4 py-3 transition ${
                         selectedPaymentMethodId === method.id
-                          ? 'border-blue-500 bg-blue-50/70'
-                          : 'border-slate-200 hover:border-blue-300'
+                          ? 'border-primary-500 bg-primary-50/70'
+                          : 'border-slate-200 hover:border-primary-300'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -551,7 +552,7 @@ const MembershipPage = () => {
                           checked={selectedPaymentMethodId === method.id}
                           onChange={() => setSelectedPaymentMethodId(method.id)}
                           disabled={subscribing}
-                          className="text-blue-500 focus:ring-blue-500"
+                          className="text-primary-500 focus:ring-primary-500"
                         />
                         <div>
                           <p className="text-sm font-semibold text-slate-900">
@@ -563,7 +564,7 @@ const MembershipPage = () => {
                         </div>
                       </div>
                       {method.isDefault && (
-                        <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-600">
+                        <span className="rounded-full bg-primary-100 px-2 py-1 text-xs font-semibold text-primary-600">
                           Par défaut
                         </span>
                       )}
@@ -582,7 +583,7 @@ const MembershipPage = () => {
                   checked={autoRenewPreference}
                   onChange={(event) => setAutoRenewPreference(event.target.checked)}
                   disabled={subscribing}
-                  className="mt-1 text-blue-500 focus:ring-blue-500"
+                  className="mt-1 text-primary-500 focus:ring-primary-500"
                 />
                 <span>
                   Activer le renouvellement automatique chaque mois. Vous pourrez modifier ce réglage à tout
@@ -607,7 +608,7 @@ const MembershipPage = () => {
                   navigate('/profile', { state: { openPaymentTab: true } });
                 }}
                 disabled={subscribing}
-                className="text-sm font-semibold text-blue-600 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="text-sm font-semibold text-primary-600 hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Gérer mes méthodes de paiement
               </button>
@@ -622,7 +623,7 @@ const MembershipPage = () => {
                 <button
                   onClick={handleConfirmSubscription}
                   disabled={subscribing || !selectedPaymentMethodId || !paymentMethods.length}
-                  className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/40 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/40 transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {subscribing ? (
                     <>

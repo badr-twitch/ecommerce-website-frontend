@@ -159,12 +159,12 @@ const MembershipManageModal = ({
           <div className="space-y-4">
             <div className="rounded-2xl border border-slate-200/60 bg-slate-50/80 p-5">
               <div className="flex flex-wrap items-center gap-3">
-                <span className="rounded-full bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-600">
+                <span className="rounded-full bg-primary-500/10 px-3 py-1 text-xs font-semibold text-primary-600">
                   {statusLabel}
                 </span>
                 {statusLoading && (
                   <span className="flex items-center gap-2 text-xs text-slate-500">
-                    <span className="h-2 w-2 animate-ping rounded-full bg-blue-500/80" />
+                    <span className="h-2 w-2 animate-ping rounded-full bg-primary-500/80" />
                     Actualisation…
                   </span>
                 )}
@@ -234,7 +234,7 @@ const MembershipManageModal = ({
                   <button
                     onClick={onRefresh}
                     disabled={statusLoading || loading}
-                    className="text-xs font-semibold text-blue-600 underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:text-slate-400"
+                    className="text-xs font-semibold text-primary-600 underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:text-slate-400"
                   >
                     Actualiser
                   </button>
@@ -287,7 +287,7 @@ const MembershipManageModal = ({
                     Rejoignez UMOD Prime et profitez immédiatement de la livraison express, d’un concierge shopping dédié
                     et d’offres exclusives pour le marché marocain.
                   </p>
-                  <p className="rounded-xl border border-blue-200 bg-blue-50 p-3 text-blue-700">
+                  <p className="rounded-xl border border-primary-200 bg-primary-50 p-3 text-primary-700">
                     Activation instantanée, sans engagement. Satisfait ou remboursé sous 30 jours.
                   </p>
                 </>
@@ -302,7 +302,7 @@ const MembershipManageModal = ({
                   onClick={handleToggleAutoRenew}
                   disabled={autoRenewToggling}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    membershipAutoRenew ? 'bg-blue-600' : 'bg-slate-300'
+                    membershipAutoRenew ? 'bg-primary-600' : 'bg-slate-300'
                   }`}
                 >
                   <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -328,7 +328,7 @@ const MembershipManageModal = ({
                     <button
                       onClick={onSubscribe}
                       disabled={loading || !onSubscribe}
-                      className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/40 transition hover:shadow-blue-500/50 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary-600 via-secondary-600 to-pink-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/40 transition hover:shadow-primary-500/50 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {loading ? 'Activation…' : 'Réactiver UMOD Prime'}
                     </button>
@@ -354,7 +354,7 @@ const MembershipManageModal = ({
                   <button
                     onClick={onSubscribe}
                     disabled={loading || !onSubscribe}
-                    className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/40 transition hover:shadow-blue-500/50 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary-600 via-secondary-600 to-pink-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/40 transition hover:shadow-primary-500/50 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {loading ? 'Activation…' : 'Réactiver UMOD Prime'}
                   </button>
@@ -370,7 +370,7 @@ const MembershipManageModal = ({
                   <button
                     onClick={onSubscribe}
                     disabled={loading || !onSubscribe}
-                    className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/40 transition hover:shadow-blue-500/50 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary-600 via-secondary-600 to-pink-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/40 transition hover:shadow-primary-500/50 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {loading ? 'Activation…' : 'Activer UMOD Prime'}
                   </button>

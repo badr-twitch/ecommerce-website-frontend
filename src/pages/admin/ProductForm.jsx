@@ -185,7 +185,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
               value={formData.name}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none transition-colors"
               placeholder="Nom du produit"
             />
           </div>
@@ -201,7 +201,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
               value={formData.sku}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none transition-colors"
               placeholder="Ex: PROD-001"
             />
           </div>
@@ -217,7 +217,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
               onChange={handleInputChange}
               required
               rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none transition-colors"
               placeholder="Description détaillée du produit"
             />
           </div>
@@ -236,7 +236,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
                 required
                 min="0"
                 step="0.01"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none transition-colors"
                 placeholder="0.00"
               />
             </div>
@@ -252,7 +252,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
                 onChange={handleInputChange}
                 required
                 min="0"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none transition-colors"
                 placeholder="0"
               />
             </div>
@@ -415,10 +415,10 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
           </div>
 
           {/* Product Status */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+          <div className="bg-gradient-to-r from-primary-50 to-indigo-50 border border-primary-200 rounded-xl p-6">
             <div className="flex items-center mb-4">
               <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                <span className="text-blue-600 text-lg">⭐</span>
+                <span className="text-primary-600 text-lg">⭐</span>
               </div>
               <h3 className="text-lg font-semibold text-gray-900">Statut du Produit</h3>
             </div>
@@ -430,7 +430,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
                   name="isFeatured"
                   checked={formData.isFeatured}
                   onChange={handleInputChange}
-                  className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  className="w-5 h-5 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2"
                 />
                 <span className="text-sm font-medium text-gray-700">
                   Produit en vedette (affiché sur la page d'accueil)
@@ -450,7 +450,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
               onChange={handleInputChange}
               required
               disabled={categoriesLoading}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
               <option value="">
                 {categoriesLoading ? 'Chargement des catégories...' : 'Sélectionner une catégorie'}
@@ -497,7 +497,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center space-x-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

@@ -641,7 +641,7 @@ const AdminDashboard = () => {
                 {pending.confirmedOrders > 0 && (
                   <button
                     onClick={() => { setActiveTab('orders'); setOrderFilters(f => ({ ...f, status: 'confirmed' })); }}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100 text-blue-800 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-100 text-primary-800 rounded-lg text-sm font-medium hover:bg-primary-200 transition-colors"
                   >
                     <Package className="w-4 h-4" />
                     {pending.confirmedOrders} a preparer
@@ -668,7 +668,7 @@ const AdminDashboard = () => {
                   <p className="text-gray-600 text-sm">Total Produits</p>
                   <p className="text-2xl font-bold text-gray-900">{adminData.statistics?.totalProducts || 0}</p>
                 </div>
-                <Package className="w-8 h-8 text-blue-600" />
+                <Package className="w-8 h-8 text-primary-600" />
               </div>
             </div>
 
@@ -747,7 +747,7 @@ const AdminDashboard = () => {
             <div className="bg-white rounded-xl shadow-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Inscriptions Utilisateurs</h3>
-                <UserPlus className="w-5 h-5 text-blue-600" />
+                <UserPlus className="w-5 h-5 text-primary-600" />
               </div>
               <ResponsiveContainer width="100%" height={300}>
                 <AreaChart data={adminData.charts?.userRegistrations || []}>
@@ -889,7 +889,7 @@ const AdminDashboard = () => {
                     <div key={index} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50">
                       <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                         event.type === 'new_order' ? 'bg-green-100 text-green-600' :
-                        event.type === 'new_user' ? 'bg-blue-100 text-blue-600' :
+                        event.type === 'new_user' ? 'bg-primary-100 text-primary-600' :
                         event.type === 'low_stock' ? 'bg-red-100 text-red-600' :
                         'bg-gray-100 text-gray-600'
                       }`}>
@@ -916,7 +916,7 @@ const AdminDashboard = () => {
         </>
       ) : (
         <div className="text-center py-8">
-          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Chargement des données...</p>
         </div>
       )}
@@ -952,7 +952,7 @@ const AdminDashboard = () => {
   const getStatusBadgeColor = useCallback((status) => {
     const colors = {
       'pending': 'bg-yellow-100 text-yellow-800',
-      'processing': 'bg-blue-100 text-blue-800',
+      'processing': 'bg-primary-100 text-primary-800',
       'shipped': 'bg-purple-100 text-purple-800',
       'delivered': 'bg-green-100 text-green-800',
       'cancelled': 'bg-red-100 text-red-800',
@@ -967,7 +967,7 @@ const AdminDashboard = () => {
         <h2 className="text-2xl font-bold">Gestion des Produits</h2>
         <button 
           onClick={handleAddProduct}
-          className="admin-button bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
+          className="admin-button bg-primary-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-primary-700 transition-colors"
         >
           <Plus className="w-4 h-4 admin-icon" />
           Ajouter un produit
@@ -1049,7 +1049,7 @@ const AdminDashboard = () => {
                       <div className="admin-flex-container flex space-x-2">
                         <button 
                           onClick={() => handleViewProduct(product)}
-                          className="admin-button p-1 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded transition-colors"
+                          className="admin-button p-1 text-primary-600 hover:text-primary-900 hover:bg-primary-50 rounded transition-colors"
                           title="Voir les détails"
                         >
                           <Eye className="w-4 h-4 admin-icon" />
@@ -1086,7 +1086,7 @@ const AdminDashboard = () => {
         <h2 className="text-2xl font-bold">Gestion des Catégories</h2>
         <button 
           onClick={handleAddCategory}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
+          className="bg-primary-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-primary-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Ajouter une catégorie
@@ -1148,10 +1148,10 @@ const AdminDashboard = () => {
 
       {/* Bulk Actions Bar */}
       {selectedOrders.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <span className="text-sm font-medium text-blue-900">
+              <span className="text-sm font-medium text-primary-900">
                 {selectedOrders.length} commande(s) sélectionnée(s)
               </span>
             </div>
@@ -1159,7 +1159,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => setShowBulkStatusModal(true)}
                 disabled={bulkActionLoading}
-                className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
+                className="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700 disabled:opacity-50"
               >
                 {bulkActionLoading ? 'Mise à jour...' : 'Mettre à jour le statut'}
               </button>
@@ -1200,7 +1200,7 @@ const AdminDashboard = () => {
             <select
               value={orderFilters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
             >
               <option value="all">Tous les statuts</option>
               <option value="pending">En attente</option>
@@ -1219,7 +1219,7 @@ const AdminDashboard = () => {
               value={orderFilters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
               placeholder="Nom, email du client..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
             />
           </div>
 
@@ -1230,7 +1230,7 @@ const AdminDashboard = () => {
               value={orderFilters.minAmount}
               onChange={(e) => handleFilterChange('minAmount', e.target.value)}
               placeholder="0"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
             />
           </div>
 
@@ -1241,7 +1241,7 @@ const AdminDashboard = () => {
               value={orderFilters.maxAmount}
               onChange={(e) => handleFilterChange('maxAmount', e.target.value)}
               placeholder="1000"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
             />
           </div>
 
@@ -1251,7 +1251,7 @@ const AdminDashboard = () => {
               type="date"
               value={orderFilters.startDate}
               onChange={(e) => handleFilterChange('startDate', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
             />
           </div>
 
@@ -1261,7 +1261,7 @@ const AdminDashboard = () => {
               type="date"
               value={orderFilters.endDate}
               onChange={(e) => handleFilterChange('endDate', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
             />
           </div>
         </div>
@@ -1269,7 +1269,7 @@ const AdminDashboard = () => {
         <div className="flex space-x-4 mt-4">
           <button
             onClick={handleFilterSubmit}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
           >
             Appliquer les filtres
           </button>
@@ -1295,7 +1295,7 @@ const AdminDashboard = () => {
                       type="checkbox"
                       checked={selectAllOrders}
                       onChange={(e) => handleSelectAllOrders(e.target.checked)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                     />
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -1326,7 +1326,7 @@ const AdminDashboard = () => {
                         type="checkbox"
                         checked={selectedOrders.includes(order.id)}
                         onChange={(e) => handleOrderSelection(order.id, e.target.checked)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -1345,7 +1345,7 @@ const AdminDashboard = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                        order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
+                        order.status === 'processing' ? 'bg-primary-100 text-primary-800' :
                         order.status === 'shipped' ? 'bg-purple-100 text-purple-800' :
                         order.status === 'delivered' ? 'bg-green-100 text-green-800' :
                         order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
@@ -1365,7 +1365,7 @@ const AdminDashboard = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button 
                         onClick={() => handleViewOrder(order)}
-                        className="text-blue-600 hover:text-blue-900 p-1 rounded transition-colors"
+                        className="text-primary-600 hover:text-primary-900 p-1 rounded transition-colors"
                         title="Voir les détails"
                       >
                         <Eye className="w-4 h-4" />
@@ -1429,7 +1429,7 @@ const AdminDashboard = () => {
                       <span className={`px-2 py-1 rounded-full text-xs ${
                         user.role === 'admin' 
                           ? 'bg-purple-100 text-purple-800' 
-                          : 'bg-blue-100 text-blue-800'
+                          : 'bg-primary-100 text-primary-800'
                       }`}>
                         {user.role === 'admin' ? 'Administrateur' : 'Client'}
                       </span>
@@ -1448,7 +1448,7 @@ const AdminDashboard = () => {
                           onClick={() => changeUserRole(user.id, user.role)}
                           className={`px-3 py-1 rounded text-xs ${
                             user.role === 'admin'
-                              ? 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                              ? 'bg-primary-100 text-primary-800 hover:bg-primary-200'
                               : 'bg-purple-100 text-purple-800 hover:bg-purple-200'
                           }`}
                         >
@@ -1523,7 +1523,7 @@ const AdminDashboard = () => {
             <select
               value={bulkStatusForm.status}
               onChange={(e) => setBulkStatusForm(prev => ({ ...prev, status: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
             >
               <option value="pending">En attente</option>
               <option value="processing">En cours de traitement</option>
@@ -1539,7 +1539,7 @@ const AdminDashboard = () => {
               value={bulkStatusForm.comment}
               onChange={(e) => setBulkStatusForm(prev => ({ ...prev, comment: e.target.value }))}
               rows="3"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
             ></textarea>
           </div>
           <div className="flex justify-end space-x-2">
@@ -1552,7 +1552,7 @@ const AdminDashboard = () => {
             <button
               onClick={handleBulkStatusUpdate}
               disabled={bulkActionLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
             >
               {bulkActionLoading ? 'Mise à jour...' : 'Mettre à jour le statut'}
             </button>
@@ -1572,7 +1572,7 @@ const AdminDashboard = () => {
             <select
               value={bulkNotifyForm.notificationType}
               onChange={(e) => setBulkNotifyForm(prev => ({ ...prev, notificationType: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
             >
               <option value="status_update">Mise à jour du statut</option>
               <option value="shipping_update">Mise à jour de l'expédition</option>
@@ -1585,7 +1585,7 @@ const AdminDashboard = () => {
               value={bulkNotifyForm.customMessage}
               onChange={(e) => setBulkNotifyForm(prev => ({ ...prev, customMessage: e.target.value }))}
               rows="3"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
             ></textarea>
           </div>
           <div className="flex justify-end space-x-2">
@@ -1671,7 +1671,7 @@ const AdminDashboard = () => {
                 onClick={() => handleTabChange(tab.id)}
                 className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   activeTab === tab.id
-                    ? 'bg-blue-100 text-blue-700'
+                    ? 'bg-primary-100 text-primary-700'
                     : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                 }`}
               >
@@ -1732,7 +1732,7 @@ const AdminDashboard = () => {
                   <select
                     value={bulkStatusForm.status}
                     onChange={(e) => setBulkStatusForm(prev => ({ ...prev, status: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
                   >
                     <option value="pending">En attente</option>
                     <option value="processing">En cours de traitement</option>
@@ -1748,7 +1748,7 @@ const AdminDashboard = () => {
                     value={bulkStatusForm.comment}
                     onChange={(e) => setBulkStatusForm(prev => ({ ...prev, comment: e.target.value }))}
                     rows="3"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
                   ></textarea>
                 </div>
                 <div className="flex justify-end space-x-2">
@@ -1761,7 +1761,7 @@ const AdminDashboard = () => {
                   <button
                     onClick={handleBulkStatusUpdate}
                     disabled={bulkActionLoading}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
                   >
                     {bulkActionLoading ? 'Mise à jour...' : 'Mettre à jour le statut'}
                   </button>
@@ -1781,7 +1781,7 @@ const AdminDashboard = () => {
                   <select
                     value={bulkNotifyForm.notificationType}
                     onChange={(e) => setBulkNotifyForm(prev => ({ ...prev, notificationType: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
                   >
                     <option value="status_update">Mise à jour du statut</option>
                     <option value="shipping_update">Mise à jour de l'expédition</option>
@@ -1794,7 +1794,7 @@ const AdminDashboard = () => {
                     value={bulkNotifyForm.customMessage}
                     onChange={(e) => setBulkNotifyForm(prev => ({ ...prev, customMessage: e.target.value }))}
                     rows="3"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
                   ></textarea>
                 </div>
                 <div className="flex justify-end space-x-2">

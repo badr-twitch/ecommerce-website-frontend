@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { membershipAPI } from '../../services/api';
 
 const THEME_STYLES = {
-  ramadan: 'from-indigo-900 via-purple-900 to-indigo-800 border-purple-400/30',
+  ramadan: 'from-indigo-900 via-secondary-900 to-indigo-800 border-secondary-400/30',
   eid: 'from-emerald-800 via-teal-800 to-emerald-900 border-emerald-400/30',
-  school: 'from-blue-800 via-sky-800 to-blue-900 border-blue-400/30',
+  school: 'from-primary-800 via-sky-800 to-primary-900 border-primary-400/30',
   blackfriday: 'from-gray-900 via-black to-gray-900 border-yellow-400/30',
-  newyear: 'from-purple-900 via-pink-900 to-purple-900 border-pink-400/30'
+  newyear: 'from-secondary-900 via-pink-900 to-secondary-900 border-pink-400/30'
 };
 
 const SeasonalBanner = () => {

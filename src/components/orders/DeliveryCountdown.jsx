@@ -39,7 +39,7 @@ const DeliveryCountdown = ({ estimatedDeliveryDate, shippedAt }) => {
     if (isOverdue) return { stroke: '#ef4444', bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' };
     if (isToday) return { stroke: '#22c55e', bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200' };
     if (progress > 75) return { stroke: '#6366f1', bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' };
-    return { stroke: '#3b82f6', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' };
+    return { stroke: '#3b82f6', bg: 'bg-primary-50', text: 'text-primary-700', border: 'border-primary-200' };
   };
 
   const colors = getStatusColor();

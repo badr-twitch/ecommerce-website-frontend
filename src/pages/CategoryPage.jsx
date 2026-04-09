@@ -91,7 +91,7 @@ const CategoryPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     );
   }
@@ -100,7 +100,7 @@ const CategoryPage = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">{error || 'Catégorie non trouvée'}</h1>
-        <Link to="/categories" className="text-blue-600 hover:text-blue-700">
+        <Link to="/categories" className="text-primary-600 hover:text-primary-700">
           Voir toutes les catégories
         </Link>
       </div>
@@ -108,17 +108,17 @@ const CategoryPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-mesh">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="mb-6 text-sm text-gray-500">
-          <Link to="/" className="hover:text-blue-600">Accueil</Link>
+          <Link to="/" className="hover:text-primary-600">Accueil</Link>
           <span className="mx-2">/</span>
-          <Link to="/categories" className="hover:text-blue-600">Catégories</Link>
+          <Link to="/categories" className="hover:text-primary-600">Catégories</Link>
           <span className="mx-2">/</span>
           {category.parent && (
             <>
-              <Link to={`/categories/${category.parent.slug}`} className="hover:text-blue-600">
+              <Link to={`/categories/${category.parent.slug}`} className="hover:text-primary-600">
                 {category.parent.name}
               </Link>
               <span className="mx-2">/</span>
@@ -145,7 +145,7 @@ const CategoryPage = () => {
                 <Link
                   key={sub.id}
                   to={`/categories/${sub.slug}`}
-                  className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 shadow-sm"
+                  className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:border-primary-400 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200 shadow-sm"
                 >
                   {sub.name}
                 </Link>
@@ -163,7 +163,7 @@ const CategoryPage = () => {
               <select
                 value={sort}
                 onChange={(e) => handleSortChange(e.target.value)}
-                className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50"
               >
                 <option value="createdAt">Plus récents</option>
                 <option value="name">Nom</option>
@@ -177,7 +177,7 @@ const CategoryPage = () => {
               <select
                 value={order}
                 onChange={(e) => handleOrderChange(e.target.value)}
-                className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50"
               >
                 <option value="desc">Décroissant</option>
                 <option value="asc">Croissant</option>
@@ -191,7 +191,7 @@ const CategoryPage = () => {
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
                 placeholder="Min DH"
-                className="w-24 px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                className="w-24 px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50"
               />
               <span className="text-gray-400">-</span>
               <input
@@ -199,11 +199,11 @@ const CategoryPage = () => {
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
                 placeholder="Max DH"
-                className="w-24 px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                className="w-24 px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50"
               />
               <button
                 onClick={handlePriceFilter}
-                className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
                 Filtrer
               </button>
@@ -215,7 +215,7 @@ const CategoryPage = () => {
         {products.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-gray-500 text-lg">Aucun produit trouvé dans cette catégorie</p>
-            <Link to="/products" className="mt-4 inline-block text-blue-600 hover:text-blue-700">
+            <Link to="/products" className="mt-4 inline-block text-primary-600 hover:text-primary-700">
               Voir tous les produits
             </Link>
           </div>
@@ -253,7 +253,7 @@ const CategoryPage = () => {
 
                   {/* Info */}
                   <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2 mb-2">
                       {product.name}
                     </h3>
                     {product.brand && (
@@ -303,7 +303,7 @@ const CategoryPage = () => {
                     onClick={() => handlePageChange(p)}
                     className={`px-4 py-2 text-sm rounded-lg transition-colors ${
                       p === page
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-primary-600 text-white'
                         : 'border border-gray-200 hover:bg-gray-50'
                     }`}
                   >

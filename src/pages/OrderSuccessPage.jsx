@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const OrderSuccessPage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-primary-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto text-center">
         <div className="mb-8">
           <div className="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-green-100">
@@ -23,8 +23,8 @@ const OrderSuccessPage = () => {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Prochaines étapes</h2>
           <div className="space-y-4 text-left">
             <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 font-bold">1</span>
+              <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                <span className="text-primary-600 font-bold">1</span>
               </div>
               <div>
                 <h3 className="font-medium text-gray-900">Email de confirmation</h3>
@@ -33,8 +33,8 @@ const OrderSuccessPage = () => {
             </div>
             
             <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 font-bold">2</span>
+              <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                <span className="text-primary-600 font-bold">2</span>
               </div>
               <div>
                 <h3 className="font-medium text-gray-900">Préparation de la commande</h3>
@@ -43,8 +43,8 @@ const OrderSuccessPage = () => {
             </div>
             
             <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 font-bold">3</span>
+              <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                <span className="text-primary-600 font-bold">3</span>
               </div>
               <div>
                 <h3 className="font-medium text-gray-900">Suivi de livraison</h3>
@@ -57,7 +57,7 @@ const OrderSuccessPage = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             to="/"
-            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
           >
             Continuer les achats
           </Link>

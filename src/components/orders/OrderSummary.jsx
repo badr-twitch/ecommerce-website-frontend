@@ -43,12 +43,12 @@ const OrderSummary = ({ orders = [], className = '' }) => {
       },
       confirmed: { 
         label: 'Confirmée', 
-        color: 'bg-blue-100 text-blue-800', 
+        color: 'bg-primary-100 text-primary-800', 
         icon: CheckCircle 
       },
       processing: { 
         label: 'En traitement', 
-        color: 'bg-purple-100 text-purple-800', 
+        color: 'bg-secondary-100 text-secondary-800', 
         icon: Package 
       },
       shipped: { 
@@ -153,7 +153,7 @@ const OrderSummary = ({ orders = [], className = '' }) => {
 
         <div className="bg-gray-50 rounded-lg p-4">
           <div className="flex items-center">
-            <Package className="h-5 w-5 text-purple-600" />
+            <Package className="h-5 w-5 text-secondary-600" />
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-900">
                 {getStatusCount('processing')}

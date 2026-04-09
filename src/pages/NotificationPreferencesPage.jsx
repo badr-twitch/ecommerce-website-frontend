@@ -81,7 +81,7 @@ const NotificationPreferencesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-mesh">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
@@ -109,7 +109,7 @@ const NotificationPreferencesPage = () => {
                   type="checkbox"
                   checked={getGlobalSoundsValue()}
                   onChange={handleGlobalSoundsToggle}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                 />
                 <span className="text-sm text-gray-600">Sons globaux</span>
               </label>
@@ -137,7 +137,7 @@ const NotificationPreferencesPage = () => {
                         className="sr-only peer"
                       />
                       <div className={`w-11 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all ${
-                        isEnabled ? 'bg-blue-600' : 'bg-gray-200'
+                        isEnabled ? 'bg-primary-600' : 'bg-gray-200'
                       }`}></div>
                     </label>
                   </div>
@@ -149,7 +149,7 @@ const NotificationPreferencesPage = () => {
                           type="checkbox"
                           checked={toastEnabled}
                           onChange={() => handleToggle(type, 'toastEnabled')}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                         />
                         <span className="text-sm text-gray-600">Notifications toast</span>
                       </label>
@@ -159,7 +159,7 @@ const NotificationPreferencesPage = () => {
                           type="checkbox"
                           checked={soundEnabled}
                           onChange={() => handleToggle(type, 'soundEnabled')}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                         />
                         <span className="text-sm text-gray-600">Sons</span>
                       </label>
@@ -169,7 +169,7 @@ const NotificationPreferencesPage = () => {
                           type="checkbox"
                           checked={getPreferenceValue(type, 'emailEnabled') === true}
                           onChange={() => handleToggle(type, 'emailEnabled')}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                         />
                         <span className="text-sm text-gray-600">Notifications par email</span>
                       </label>

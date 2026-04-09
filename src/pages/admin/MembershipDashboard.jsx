@@ -110,7 +110,7 @@ const MembershipDashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
       </div>
     );
   }
@@ -125,7 +125,7 @@ const MembershipDashboard = () => {
           <StatCard label="Actifs" value={stats.active} color="text-green-600" />
           <StatCard label="Annulés" value={stats.cancelled} color="text-yellow-600" />
           <StatCard label="Expirés" value={stats.expired} color="text-red-600" />
-          <StatCard label="Nouveaux (30j)" value={stats.newThisMonth} color="text-blue-600" />
+          <StatCard label="Nouveaux (30j)" value={stats.newThisMonth} color="text-primary-600" />
           <StatCard label="Revenu (30j)" value={`${stats.monthlyRevenue?.toFixed(0)} DH`} color="text-purple-600" />
           <StatCard label="Taux de churn" value={`${stats.churnRate}%`} color="text-orange-600" />
         </div>
@@ -136,7 +136,7 @@ const MembershipDashboard = () => {
         <button
           onClick={() => setActiveTab('members')}
           className={`pb-3 px-1 text-sm font-medium border-b-2 transition ${
-            activeTab === 'members' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+            activeTab === 'members' ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
           Membres ({memberTotal})
@@ -144,7 +144,7 @@ const MembershipDashboard = () => {
         <button
           onClick={() => setActiveTab('transactions')}
           className={`pb-3 px-1 text-sm font-medium border-b-2 transition ${
-            activeTab === 'transactions' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+            activeTab === 'transactions' ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
           Transactions
@@ -161,12 +161,12 @@ const MembershipDashboard = () => {
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setMemberPage(1); }}
               placeholder="Rechercher par nom ou email..."
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 outline-none w-64"
+              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400 outline-none w-64"
             />
             <select
               value={statusFilter}
               onChange={(e) => { setStatusFilter(e.target.value); setMemberPage(1); }}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/50 outline-none"
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500/50 outline-none"
             >
               <option value="all">Tous les statuts</option>
               <option value="active">Actif</option>
@@ -223,7 +223,7 @@ const MembershipDashboard = () => {
                       <td className="px-4 py-3 text-right">
                         <button
                           onClick={() => setSelectedMember(member)}
-                          className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+                          className="text-primary-600 hover:text-primary-800 text-xs font-medium"
                         >
                           Gérer
                         </button>
@@ -365,7 +365,7 @@ const MembershipDashboard = () => {
                   <button
                     onClick={() => handleAction(selectedMember.id, 'extend', { daysToExtend: extendDays })}
                     disabled={actionLoading}
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
+                    className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition disabled:opacity-50"
                   >
                     Prolonger de {extendDays} jours
                   </button>

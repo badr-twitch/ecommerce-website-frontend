@@ -1,19 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Lock, Mail, Phone, MapPin } from 'lucide-react';
 
 const PrivacyPage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50">
       {/* Header Section */}
-      <section className="relative overflow-hidden py-16 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-pink-600/90"></div>
+      <section className="relative overflow-hidden py-16 bg-gradient-to-r from-primary-600 to-secondary-600">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/90 via-secondary-600/90 to-pink-600/90"></div>
         
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              🔒 Politique de Confidentialité
+              <Lock className="w-8 h-8 inline mr-2" /> Politique de Confidentialité
             </h1>
-            <p className="text-xl text-blue-100">
+            <p className="text-xl text-primary-100">
               Dernière mise à jour : {new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
@@ -37,7 +38,7 @@ const PrivacyPage = () => {
             {/* Section 1 */}
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3">1️⃣</span>
+                <span className="mr-3 w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center text-white text-sm font-bold inline-flex">1</span>
                 Informations que nous collectons
               </h2>
               <div className="pl-10 space-y-3 text-gray-700">
@@ -66,7 +67,7 @@ const PrivacyPage = () => {
             {/* Section 2 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3">2️⃣</span>
+                <span className="mr-3 w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center text-white text-sm font-bold inline-flex">2</span>
                 Comment nous utilisons vos informations
               </h2>
               <div className="pl-10 space-y-3 text-gray-700">
@@ -85,7 +86,7 @@ const PrivacyPage = () => {
             {/* Section 3 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3">3️⃣</span>
+                <span className="mr-3 w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center text-white text-sm font-bold inline-flex">3</span>
                 Partage de vos informations
               </h2>
               <div className="pl-10 space-y-3 text-gray-700">
@@ -95,7 +96,7 @@ const PrivacyPage = () => {
                   <li><strong>Obligations légales :</strong> Lorsque requis par la loi ou pour protéger nos droits</li>
                   <li><strong>Avec votre consentement :</strong> Dans tous les autres cas, uniquement avec votre autorisation explicite</li>
                 </ul>
-                <p className="mt-4 text-sm text-gray-600 bg-blue-50 p-4 rounded-lg">
+                <p className="mt-4 text-sm text-gray-600 bg-primary-50 p-4 rounded-lg">
                   <strong>Note importante :</strong> Tous nos partenaires sont tenus de respecter des normes strictes de confidentialité 
                   et de sécurité des données.
                 </p>
@@ -105,7 +106,7 @@ const PrivacyPage = () => {
             {/* Section 4 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3">4️⃣</span>
+                <span className="mr-3 w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center text-white text-sm font-bold inline-flex">4</span>
                 Sécurité de vos données
               </h2>
               <div className="pl-10 space-y-3 text-gray-700">
@@ -123,7 +124,7 @@ const PrivacyPage = () => {
             {/* Section 5 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3">5️⃣</span>
+                <span className="mr-3 w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center text-white text-sm font-bold inline-flex">5</span>
                 Vos droits
               </h2>
               <div className="pl-10 space-y-3 text-gray-700">
@@ -138,7 +139,7 @@ const PrivacyPage = () => {
                 </ul>
                 <p className="mt-4">
                   Pour exercer ces droits, contactez-nous à :{' '}
-                  <a href="mailto:privacy@umod.fr" className="text-blue-600 hover:text-blue-700 font-semibold">
+                  <a href="mailto:privacy@umod.fr" className="text-primary-600 hover:text-primary-700 font-semibold">
                     privacy@umod.fr
                   </a>
                 </p>
@@ -148,7 +149,7 @@ const PrivacyPage = () => {
             {/* Section 6 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3">6️⃣</span>
+                <span className="mr-3 w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center text-white text-sm font-bold inline-flex">6</span>
                 Cookies et technologies similaires
               </h2>
               <div className="pl-10 space-y-3 text-gray-700">
@@ -168,7 +169,7 @@ const PrivacyPage = () => {
             {/* Section 7 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3">7️⃣</span>
+                <span className="mr-3 w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center text-white text-sm font-bold inline-flex">7</span>
                 Conservation des données
               </h2>
               <div className="pl-10 space-y-3 text-gray-700">
@@ -187,7 +188,7 @@ const PrivacyPage = () => {
             {/* Section 8 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3">8️⃣</span>
+                <span className="mr-3 w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center text-white text-sm font-bold inline-flex">8</span>
                 Modifications de cette politique
               </h2>
               <div className="pl-10 space-y-3 text-gray-700">
@@ -202,27 +203,27 @@ const PrivacyPage = () => {
             {/* Section 9 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3">9️⃣</span>
+                <span className="mr-3 w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center text-white text-sm font-bold inline-flex">9</span>
                 Contact
               </h2>
               <div className="pl-10 space-y-3 text-gray-700">
                 <p>Pour toute question concernant cette politique de confidentialité ou le traitement de vos données, contactez-nous :</p>
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg mt-4">
+                <div className="bg-gradient-to-r from-primary-50 to-secondary-50 p-6 rounded-lg mt-4">
                   <ul className="space-y-2">
                     <li className="flex items-center">
-                      <span className="mr-3">📧</span>
+                      <Mail className="w-5 h-5 mr-3 flex-shrink-0 text-primary-600" />
                       <strong>Email :</strong>{' '}
-                      <a href="mailto:privacy@umod.fr" className="text-blue-600 hover:text-blue-700 font-semibold ml-2">
+                      <a href="mailto:privacy@umod.fr" className="text-primary-600 hover:text-primary-700 font-semibold ml-2">
                         privacy@umod.fr
                       </a>
                     </li>
                     <li className="flex items-center">
-                      <span className="mr-3">📞</span>
+                      <Phone className="w-5 h-5 mr-3 flex-shrink-0 text-primary-600" />
                       <strong>Téléphone :</strong>{' '}
                       <span className="ml-2">+33 1 23 45 67 89</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="mr-3">📍</span>
+                      <MapPin className="w-5 h-5 mr-3 flex-shrink-0 text-primary-600" />
                       <div>
                         <strong>Adresse :</strong>
                         <p className="ml-2">UMOD<br />Paris, France</p>
@@ -237,7 +238,7 @@ const PrivacyPage = () => {
             <div className="pt-8 border-t border-gray-200 flex flex-col sm:flex-row gap-4 justify-between items-center">
               <Link 
                 to="/" 
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="px-6 py-3 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 ← Retour à l'accueil
               </Link>

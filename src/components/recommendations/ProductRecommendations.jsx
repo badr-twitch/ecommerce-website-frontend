@@ -191,7 +191,7 @@ const ProductRecommendations = ({
         </div>
         <button
           onClick={fetchRecommendations}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
           Réessayer
         </button>
@@ -286,7 +286,7 @@ const ProductRecommendations = ({
                 </span>
                 
                 {product.relevanceScore && (
-                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                  <span className="text-xs bg-primary-100 text-primary-800 px-2 py-1 rounded">
                     Score: {product.relevanceScore}
                   </span>
                 )}
@@ -299,7 +299,7 @@ const ProductRecommendations = ({
                   disabled={product.stockQuantity <= 0}
                   className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     product.stockQuantity > 0
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      ? 'bg-primary-600 text-white hover:bg-primary-700'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >

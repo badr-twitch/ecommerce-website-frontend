@@ -96,7 +96,7 @@ const InventoryTable = React.memo(({ alerts, onPlusClick, onSettingsClick, getSt
         <div className="admin-flex-container flex space-x-2">
           <button
             onClick={() => onPlusClick(product)}
-            className="admin-button text-blue-600 hover:text-blue-900 p-1 rounded transition-colors"
+            className="admin-button text-primary-600 hover:text-primary-900 p-1 rounded transition-colors"
             title="Mettre à jour le stock"
           >
             <Plus className="w-4 h-4 admin-icon" />
@@ -332,7 +332,7 @@ const InventoryAlerts = React.memo(() => {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
         <p className="text-gray-600">Chargement des alertes...</p>
       </div>
     );
@@ -356,7 +356,7 @@ const InventoryAlerts = React.memo(() => {
               <p className="text-gray-600 text-sm">Total Produits</p>
               <p className="text-2xl font-bold text-gray-900">{stableStats.totalProducts || 0}</p>
             </div>
-            <Package className="w-8 h-8 text-blue-600" />
+            <Package className="w-8 h-8 text-primary-600" />
           </div>
         </div>
 
@@ -443,7 +443,7 @@ const InventoryAlerts = React.memo(() => {
                   <select
                     value={stockUpdateForm.changeType}
                     onChange={(e) => setStockUpdateForm(prev => ({ ...prev, changeType: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
                   >
                     <option value="in">Réception (Ajouter)</option>
                     <option value="out">Vente/Utilisation (Retirer)</option>
@@ -461,7 +461,7 @@ const InventoryAlerts = React.memo(() => {
                     onChange={(e) => setStockUpdateForm(prev => ({ ...prev, quantity: e.target.value }))}
                     required
                     min="1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
                     placeholder="Quantité"
                   />
                 </div>
@@ -475,7 +475,7 @@ const InventoryAlerts = React.memo(() => {
                     value={stockUpdateForm.reason}
                     onChange={(e) => setStockUpdateForm(prev => ({ ...prev, reason: e.target.value }))}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
                     placeholder="Raison du changement"
                   />
                 </div>
@@ -488,7 +488,7 @@ const InventoryAlerts = React.memo(() => {
                     value={stockUpdateForm.notes}
                     onChange={(e) => setStockUpdateForm(prev => ({ ...prev, notes: e.target.value }))}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
                     placeholder="Notes supplémentaires..."
                   />
                 </div>
@@ -503,7 +503,7 @@ const InventoryAlerts = React.memo(() => {
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                   >
                     Mettre à Jour
                   </button>

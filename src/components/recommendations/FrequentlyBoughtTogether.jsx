@@ -147,7 +147,7 @@ const FrequentlyBoughtTogether = ({
         </div>
         <button
           onClick={fetchRecommendations}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
           Réessayer
         </button>
@@ -163,7 +163,7 @@ const FrequentlyBoughtTogether = ({
     <div className={className}>
       {showTitle && (
         <div className="flex items-center gap-2 mb-6">
-          <ShoppingCart className="w-5 h-5 text-blue-600" />
+          <ShoppingCart className="w-5 h-5 text-primary-600" />
           <h2 className="text-xl font-semibold text-gray-800">
             Fréquemment achetés ensemble
           </h2>
@@ -172,22 +172,22 @@ const FrequentlyBoughtTogether = ({
 
       {/* Bulk Add Section */}
       {selectedProducts.size > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="bg-primary-50 border border-primary-200 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-sm text-blue-800">
+              <span className="text-sm text-primary-800">
                 {selectedProducts.size} produit(s) sélectionné(s)
               </span>
               <button
                 onClick={() => setSelectedProducts(new Set())}
-                className="text-sm text-blue-600 hover:text-blue-800 underline"
+                className="text-sm text-primary-600 hover:text-primary-800 underline"
               >
                 Désélectionner tout
               </button>
             </div>
             <button
               onClick={handleAddSelectedToCart}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
               Ajouter {selectedProducts.size} au panier
@@ -207,7 +207,7 @@ const FrequentlyBoughtTogether = ({
               key={product.id} 
               className={`bg-white rounded-lg shadow-sm border transition-all cursor-pointer ${
                 isSelected 
-                  ? 'ring-2 ring-blue-500 border-blue-500' 
+                  ? 'ring-2 ring-primary-500 border-primary-500' 
                   : 'hover:shadow-md'
               }`}
               onClick={() => handleProductSelect(product.id)}
@@ -216,7 +216,7 @@ const FrequentlyBoughtTogether = ({
               <div className="absolute top-2 left-2 z-10">
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                   isSelected 
-                    ? 'bg-blue-500 border-blue-500' 
+                    ? 'bg-primary-500 border-primary-500' 
                     : 'bg-white border-gray-300'
                 }`}>
                   {isSelected && (
@@ -307,7 +307,7 @@ const FrequentlyBoughtTogether = ({
                     disabled={product.stockQuantity <= 0 || inCart}
                     className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       product.stockQuantity > 0 && !inCart
-                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        ? 'bg-primary-600 text-white hover:bg-primary-700'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >

@@ -94,7 +94,7 @@ const NotificationBell = () => {
     switch (priority) {
       case 'critical': return 'bg-red-500';
       case 'high': return 'bg-orange-500';
-      case 'medium': return 'bg-blue-500';
+      case 'medium': return 'bg-primary-500';
       case 'low': return 'bg-green-500';
       default: return 'bg-gray-500';
     }
@@ -176,7 +176,7 @@ const NotificationBell = () => {
               {unreadCount > 0 && (
                 <button
                   onClick={handleMarkAllAsRead}
-                  className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                  className="text-xs text-primary-600 hover:text-primary-800 font-medium"
                 >
                   Tout marquer comme lu
                 </button>
@@ -204,7 +204,7 @@ const NotificationBell = () => {
                       <div
                         key={notification.id}
                         className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-50 ${
-                          !notification.isRead ? 'bg-blue-50' : ''
+                          !notification.isRead ? 'bg-primary-50' : ''
                         }`}
                         onClick={() => handleNotificationClick(notification)}
                       >
@@ -268,7 +268,7 @@ const NotificationBell = () => {
             <div className="p-3 border-t border-gray-200 bg-gray-50">
               <button
                 onClick={loadMoreNotifications}
-                className="w-full text-sm text-blue-600 hover:text-blue-800 font-medium"
+                className="w-full text-sm text-primary-600 hover:text-primary-800 font-medium"
               >
                 Charger plus
               </button>

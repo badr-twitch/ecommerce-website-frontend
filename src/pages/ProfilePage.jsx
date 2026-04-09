@@ -13,7 +13,7 @@ import { useOrders } from '../hooks/useOrders';
 import toast from 'react-hot-toast';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import { Package } from 'lucide-react';
+import { Package, ShieldCheck, Gift, Gem } from 'lucide-react';
 import api, { membershipAPI } from '../services/api';
 import MembershipManageModal from '../components/membership/MembershipManageModal';
 
@@ -153,7 +153,7 @@ const membershipBadgeClasses = {
   active: 'bg-emerald-400/10 text-emerald-200 border border-emerald-300/30',
   cancelled: 'bg-amber-400/10 text-amber-200 border border-amber-300/30',
   expired: 'bg-rose-500/10 text-rose-100 border border-rose-400/40',
-  pending: 'bg-blue-500/10 text-blue-100 border border-blue-400/30',
+  pending: 'bg-primary-500/10 text-primary-100 border border-primary-400/30',
   none: 'bg-white/10 text-white/60 border border-white/10',
 };
 const membershipStatusLabel = membershipStatusLabelMap[membershipStatus] || membershipStatusLabelMap.none;
@@ -1116,7 +1116,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
           <p className="text-gray-600 mb-6">Veuillez vous connecter pour accéder à votre profil.</p>
           <Link
             to="/login"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
           >
             Se connecter
           </Link>
@@ -1142,7 +1142,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                 onClick={() => setActiveTab('profile')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'profile'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-primary-500 text-primary-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -1152,7 +1152,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                 onClick={() => setActiveTab('orders')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'orders'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-primary-500 text-primary-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -1162,7 +1162,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                 onClick={() => setActiveTab('security')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'security'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-primary-500 text-primary-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -1172,7 +1172,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                 onClick={() => setActiveTab('payment')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'payment'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-primary-500 text-primary-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -1182,7 +1182,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                 onClick={() => setActiveTab('shipping')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'shipping'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-primary-500 text-primary-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -1192,7 +1192,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                 onClick={() => setActiveTab('settings')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'settings'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-primary-500 text-primary-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -1241,13 +1241,13 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               id="displayName"
                               value={tempDisplayName}
                               onChange={(e) => setTempDisplayName(e.target.value)}
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
                             />
                             <button
                               type="button"
                               onClick={handleSaveName}
                               disabled={isLoading}
-                              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
                             >
                               Sauvegarder
                             </button>
@@ -1267,7 +1267,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                             <button
                               type="button"
                               onClick={handleEditName}
-                              className="text-blue-600 hover:text-blue-700 text-sm"
+                              className="text-primary-600 hover:text-primary-700 text-sm"
                             >
                               Modifier
                             </button>
@@ -1307,7 +1307,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               <button
                                 type="button"
                                 onClick={handleSendPhoneVerification}
-                                className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                                className="px-3 py-1 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm"
                               >
                                 Changer
                               </button>
@@ -1331,7 +1331,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               defaultCountry="FR"
                               value={profileData.phone}
                               onChange={(value) => setProfileData({...profileData, phone: value || ''})}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
                               placeholder="Entrez votre numéro de téléphone"
                             />
                             <p className="text-xs text-gray-500">
@@ -1356,11 +1356,11 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                             {!user?.phone ? (
                               // First-time phone addition flow
                               <div className="space-y-4">
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                  <p className="text-sm text-blue-800">
+                                <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
+                                  <p className="text-sm text-primary-800">
                                     <strong>Vérification SMS requise</strong>
                                   </p>
-                                  <p className="text-sm text-blue-700 mt-1">
+                                  <p className="text-sm text-primary-700 mt-1">
                                     Un code de vérification sera envoyé au numéro que vous entrez pour confirmer que vous êtes bien le propriétaire
                                   </p>
                                 </div>
@@ -1374,7 +1374,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                     defaultCountry="FR"
                                     value={newPhoneNumber}
                                     onChange={(value) => setNewPhoneNumber(value || '')}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
                                     placeholder="+33 6 12 34 56 78"
                                   />
                                 </div>
@@ -1389,7 +1389,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                       type="text"
                                       value={verificationCode}
                                       onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center text-lg font-mono"
+                                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none text-center text-lg font-mono"
                                       placeholder="000000"
                                       maxLength={6}
                                     />
@@ -1422,7 +1422,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                       type="button"
                                       onClick={handleSendNewPhoneVerification}
                                       disabled={isSendingVerification || !newPhoneNumber || newPhoneNumber.length < 10}
-                                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                                      className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
                                     >
                                       {isSendingVerification ? 'Envoi...' : 'Envoyer le code SMS'}
                                     </button>
@@ -1442,11 +1442,11 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                             ) : !currentPhoneVerified ? (
                               // Step 1: Verify current phone number (for change/remove)
                               <div className="space-y-4">
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                  <p className="text-sm text-blue-800">
+                                <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
+                                  <p className="text-sm text-primary-800">
                                     <strong>Étape 1 :</strong> Vérification de votre numéro de téléphone actuel
                                   </p>
-                                  <p className="text-sm text-blue-700 mt-1">
+                                  <p className="text-sm text-primary-700 mt-1">
                                     Un code de vérification a été envoyé par SMS à votre numéro <strong>{profileData.phone}</strong> pour confirmer que vous êtes bien le propriétaire
                                   </p>
                                 </div>
@@ -1459,7 +1459,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                     type="text"
                                     value={verificationCode}
                                     onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center text-lg font-mono"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none text-center text-lg font-mono"
                                     placeholder="000000"
                                     maxLength={6}
                                   />
@@ -1473,7 +1473,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                     type="button"
                                     onClick={handleVerifyCurrentPhone}
                                     disabled={isVerifyingCode || verificationCode.length !== 6}
-                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                                    className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
                                   >
                                     {isVerifyingCode ? 'Vérification...' : 'Vérifier le numéro actuel'}
                                   </button>
@@ -1545,7 +1545,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                         defaultCountry="FR"
                                         value={newPhoneNumber}
                                         onChange={setNewPhoneNumber}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
                                         placeholder="Entrez le nouveau numéro"
                                       />
                                     </div>
@@ -1586,7 +1586,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                             value={newPhoneVerificationCode}
                                             onChange={(e) => setNewPhoneVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                                             placeholder="Entrez le code à 6 chiffres"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                                             maxLength={6}
                                           />
                                         </div>
@@ -1632,7 +1632,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                         <div className="grid grid-cols-2 gap-4">
                           <label className={`relative flex cursor-pointer rounded-xl border-2 p-4 transition-all duration-300 ${
                             profileData.clientType === 'particulier'
-                              ? 'border-blue-500 bg-blue-50'
+                              ? 'border-primary-500 bg-primary-50'
                               : 'border-gray-200 hover:border-gray-300'
                           }`}>
                             <input
@@ -1664,7 +1664,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                           </label>
                           <label className={`relative flex cursor-pointer rounded-xl border-2 p-4 transition-all duration-300 ${
                             profileData.clientType === 'professionnel'
-                              ? 'border-blue-500 bg-blue-50'
+                              ? 'border-primary-500 bg-primary-50'
                               : 'border-gray-200 hover:border-gray-300'
                           }`}>
                             <input
@@ -1687,12 +1687,12 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       {/* Business Fields (only for professionnel) */}
                       {profileData.clientType === 'professionnel' && (
                         <div className="pt-4 border-t border-gray-200 space-y-4">
-                          <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                            <h3 className="text-sm font-semibold text-blue-900 mb-2 flex items-center">
+                          <div className="bg-primary-50 rounded-xl p-4 border border-primary-200">
+                            <h3 className="text-sm font-semibold text-primary-900 mb-2 flex items-center">
                               <span className="mr-2">🏢</span>
                               Informations professionnelles
                             </h3>
-                            <p className="text-xs text-blue-700">
+                            <p className="text-xs text-primary-700">
                               Les champs marqués d'un astérisque (*) sont obligatoires pour les comptes professionnels.
                             </p>
                           </div>
@@ -1708,7 +1708,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               name="companyName"
                               value={profileData.companyName}
                               onChange={(e) => setProfileData({...profileData, companyName: e.target.value})}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
                               placeholder="Nom de votre entreprise"
                               required={profileData.clientType === 'professionnel'}
                             />
@@ -1728,7 +1728,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                 const value = e.target.value.replace(/\D/g, '').slice(0, 14);
                                 setProfileData({...profileData, siret: value});
                               }}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
                               placeholder="12345678901234"
                               maxLength={14}
                               required={profileData.clientType === 'professionnel'}
@@ -1747,7 +1747,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               name="vatNumber"
                               value={profileData.vatNumber}
                               onChange={(e) => setProfileData({...profileData, vatNumber: e.target.value})}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
                               placeholder="FR12345678901"
                             />
                           </div>
@@ -1763,7 +1763,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               name="billingAddress"
                               value={profileData.billingAddress}
                               onChange={(e) => setProfileData({...profileData, billingAddress: e.target.value})}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
                               placeholder="Numéro et nom de rue"
                               required={profileData.clientType === 'professionnel'}
                             />
@@ -1781,7 +1781,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                 name="billingCity"
                                 value={profileData.billingCity}
                                 onChange={(e) => setProfileData({...profileData, billingCity: e.target.value})}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
                                 placeholder="Ville"
                                 required={profileData.clientType === 'professionnel'}
                               />
@@ -1800,7 +1800,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                   const value = e.target.value.replace(/\D/g, '').slice(0, 5);
                                   setProfileData({...profileData, billingPostalCode: value});
                                 }}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
                                 placeholder="75001"
                                 maxLength={5}
                                 required={profileData.clientType === 'professionnel'}
@@ -1818,7 +1818,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               name="billingCountry"
                               value={profileData.billingCountry}
                               onChange={(e) => setProfileData({...profileData, billingCountry: e.target.value})}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
                             >
                               <option value="France">France</option>
                               <option value="Belgique">Belgique</option>
@@ -1833,7 +1833,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                        className="w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
                       >
                         {isLoading ? 'Mise à jour...' : 'Mettre à jour le profil'}
                       </button>
@@ -1844,10 +1844,10 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-900 to-blue-900 text-white shadow-xl">
+                  <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-900 to-primary-900 text-white shadow-xl">
                     <div className="absolute inset-0">
-                      <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/40 blur-3xl rounded-full"></div>
-                      <div className="absolute bottom-0 left-8 w-48 h-48 bg-purple-500/30 blur-3xl rounded-full"></div>
+                      <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary-500/40 blur-3xl rounded-full"></div>
+                      <div className="absolute bottom-0 left-8 w-48 h-48 bg-secondary-500/30 blur-3xl rounded-full"></div>
                     </div>
                     <div className="relative p-8 space-y-6">
                       <div className="flex items-center justify-between">
@@ -1942,7 +1942,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                           <button
                             type="button"
                             onClick={() => navigate('/membership')}
-                            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 font-semibold shadow-lg shadow-blue-500/40 hover:-translate-y-0.5 transition-transform"
+                            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-primary-600 to-secondary-600 font-semibold shadow-lg shadow-primary-500/40 hover:-translate-y-0.5 transition-transform"
                           >
                             Découvrir UMOD Prime
                             <span>→</span>
@@ -1959,21 +1959,21 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                     </p>
                     <div className="space-y-3 text-sm text-gray-700">
                       <div className="flex items-start space-x-3">
-                        <span className="text-xl">🛡️</span>
+                        <ShieldCheck className="w-5 h-5 text-primary-600" />
                         <div>
                           <p className="font-medium text-gray-900">Protection colis premium</p>
                           <p className="text-gray-600">Assurance incluse et échanges gratuits pendant 60 jours.</p>
                         </div>
                       </div>
                       <div className="flex items-start space-x-3">
-                        <span className="text-xl">🎁</span>
+                        <Gift className="w-5 h-5 text-primary-600" />
                         <div>
                           <p className="font-medium text-gray-900">Cadeaux de bienvenue</p>
                           <p className="text-gray-600">Carte cadeau de 50 DH et accès aux masterclass UMOD.</p>
                         </div>
                       </div>
                       <div className="flex items-start space-x-3">
-                        <span className="text-xl">💎</span>
+                        <Gem className="w-5 h-5 text-primary-600" />
                         <div>
                           <p className="font-medium text-gray-900">Points fidélité boostés</p>
                           <p className="text-gray-600">Cumulez 2x plus de points pour débloquer des chèques cadeaux.</p>
@@ -2000,7 +2000,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                   <h2 className="text-xl font-semibold text-gray-900">Mes Commandes</h2>
                   <Link
                     to="/orders"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
                   >
                     Voir toutes les commandes
                   </Link>
@@ -2008,7 +2008,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                 
                 {ordersLoading ? (
                   <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
                     <p className="text-gray-600 mt-2">Chargement des commandes...</p>
                   </div>
                 ) : userOrders && userOrders.length > 0 ? (
@@ -2049,7 +2049,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       value={passwordData.currentPassword}
                       onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
                     />
                   </div>
 
@@ -2064,7 +2064,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
                       required
                       minLength="6"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
                     />
                   </div>
 
@@ -2079,14 +2079,14 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
                       required
                       minLength="6"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                    className="w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
                   >
                     {isLoading ? 'Modification...' : 'Modifier le mot de passe'}
                   </button>
@@ -2101,7 +2101,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                   <h2 className="text-xl font-semibold text-gray-900">Méthodes de paiement</h2>
                   <button
                     onClick={() => setShowAddPayment(true)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
                   >
                     Ajouter une méthode
                   </button>
@@ -2109,7 +2109,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
                 {loadingPaymentMethods ? (
                   <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
                     <p className="text-gray-600 mt-2">Chargement des méthodes de paiement...</p>
                   </div>
                 ) : paymentMethods.length === 0 ? (
@@ -2117,7 +2117,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                     <p className="text-gray-600">Aucune méthode de paiement enregistrée</p>
                     <button
                       onClick={() => setShowAddPayment(true)}
-                      className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
                     >
                       Ajouter votre première méthode
                     </button>
@@ -2150,7 +2150,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                           {!method.isDefault && (
                             <button
                               onClick={() => handleSetDefaultPayment(method.id)}
-                              className="text-blue-600 hover:text-blue-700 text-sm"
+                              className="text-primary-600 hover:text-primary-700 text-sm"
                             >
                               Définir par défaut
                             </button>
@@ -2176,7 +2176,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                   <h2 className="text-xl font-semibold text-gray-900">Adresses de livraison</h2>
                   <button
                     onClick={() => setShowAddAddress(true)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
                   >
                     Ajouter une adresse
                   </button>
@@ -2184,7 +2184,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
                 {loadingShippingAddresses ? (
                   <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
                     <p className="text-gray-600 mt-2">Chargement des adresses...</p>
                   </div>
                 ) : shippingAddresses.length === 0 ? (
@@ -2192,7 +2192,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                     <p className="text-gray-600">Aucune adresse de livraison enregistrée</p>
                     <button
                       onClick={() => setShowAddAddress(true)}
-                      className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
                     >
                       Ajouter votre première adresse
                     </button>
@@ -2232,14 +2232,14 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                             {!address.isDefault && (
                               <button
                                 onClick={() => handleSetDefaultAddress(address.id)}
-                                className="text-blue-600 hover:text-blue-700 text-sm"
+                                className="text-primary-600 hover:text-primary-700 text-sm"
                               >
                                 Définir par défaut
                               </button>
                             )}
                             <button
                               onClick={() => handleEditShippingAddress(address)}
-                              className="text-blue-600 hover:text-blue-700 text-sm"
+                              className="text-primary-600 hover:text-primary-700 text-sm"
                             >
                               Modifier
                             </button>
@@ -2273,7 +2273,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       type="checkbox"
                       checked={accountSettings.emailNotifications}
                       onChange={(e) => setAccountSettings({...accountSettings, emailNotifications: e.target.checked})}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
                   </div>
                   <div className="flex items-center justify-between">
@@ -2285,7 +2285,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       type="checkbox"
                       checked={accountSettings.marketingEmails}
                       onChange={(e) => setAccountSettings({...accountSettings, marketingEmails: e.target.checked})}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
                   </div>
                   <div className="flex items-center justify-between">
@@ -2297,7 +2297,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       type="checkbox"
                       checked={accountSettings.orderUpdates}
                       onChange={(e) => setAccountSettings({...accountSettings, orderUpdates: e.target.checked})}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
                   </div>
                   <div className="flex items-center justify-between">
@@ -2309,7 +2309,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       type="checkbox"
                       checked={accountSettings.newsletter}
                       onChange={(e) => setAccountSettings({...accountSettings, newsletter: e.target.checked})}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
                   </div>
                 </div>
@@ -2318,7 +2318,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                   <button
                     onClick={handleSaveNotificationPreferences}
                     disabled={savingSettings}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors duration-300"
+                    className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors duration-300"
                   >
                     {savingSettings ? 'Sauvegarde...' : 'Sauvegarder les préférences'}
                   </button>

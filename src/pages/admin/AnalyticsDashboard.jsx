@@ -268,7 +268,7 @@ const AnalyticsDashboard = () => {
                 onClick={() => handlePresetClick(value)}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   applied.period === value && !applied.startDate
-                    ? 'bg-blue-600 text-white shadow-sm'
+                    ? 'bg-primary-600 text-white shadow-sm'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -285,7 +285,7 @@ const AnalyticsDashboard = () => {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
             <span className="text-gray-400 pb-2">→</span>
@@ -295,7 +295,7 @@ const AnalyticsDashboard = () => {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
             <button
@@ -303,8 +303,8 @@ const AnalyticsDashboard = () => {
               disabled={!startDate || !endDate}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 hasPendingCustomRange
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm ring-2 ring-blue-300'
-                  : 'bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed'
+                  ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm ring-2 ring-primary-300'
+                  : 'bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
               }`}
             >
               Appliquer
@@ -334,7 +334,7 @@ const AnalyticsDashboard = () => {
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500">Affichage :</span>
             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
-              applied.startDate ? 'bg-indigo-100 text-indigo-700' : 'bg-blue-50 text-blue-700'
+              applied.startDate ? 'bg-indigo-100 text-indigo-700' : 'bg-primary-50 text-primary-700'
             }`}>
               <span className="w-1.5 h-1.5 rounded-full bg-current inline-block"></span>
               {activeFilterLabel}
@@ -356,7 +356,7 @@ const AnalyticsDashboard = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
+                      ? 'border-primary-500 text-primary-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >

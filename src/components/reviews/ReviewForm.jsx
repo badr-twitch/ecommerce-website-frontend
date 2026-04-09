@@ -262,7 +262,7 @@ const ReviewForm = ({ productId, productName, onSubmit, onCancel, existingReview
             value={formData.title}
             onChange={handleInputChange}
             maxLength={200}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="Résumez votre expérience en quelques mots"
             required
           />
@@ -283,7 +283,7 @@ const ReviewForm = ({ productId, productName, onSubmit, onCancel, existingReview
             onChange={handleInputChange}
             rows={6}
             maxLength={2000}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
             placeholder="Décrivez votre expérience avec ce produit. Qu'avez-vous aimé ? Qu'auriez-vous amélioré ?"
             required
           />
@@ -305,7 +305,7 @@ const ReviewForm = ({ productId, productName, onSubmit, onCancel, existingReview
                 onClick={() => handleTagToggle(tag)}
                 className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                   formData.tags.includes(tag)
-                    ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                    ? 'bg-primary-100 text-primary-800 border border-primary-200'
                     : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
                 }`}
               >
@@ -414,7 +414,7 @@ const ReviewForm = ({ productId, productName, onSubmit, onCancel, existingReview
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+            className="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
           >
             {loading ? (
               <>

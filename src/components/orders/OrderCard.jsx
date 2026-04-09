@@ -37,16 +37,16 @@ const OrderCard = ({ order, showDetails = false, onToggleDetails }) => {
       },
       confirmed: { 
         label: 'Confirmée', 
-        color: 'bg-blue-100 text-blue-800 border-blue-200', 
+        color: 'bg-primary-100 text-primary-800 border-primary-200', 
         icon: CheckCircle,
-        bgColor: 'bg-blue-50',
+        bgColor: 'bg-primary-50',
         progress: 40
       },
       processing: { 
         label: 'En traitement', 
-        color: 'bg-purple-100 text-purple-800 border-purple-200', 
+        color: 'bg-secondary-100 text-secondary-800 border-secondary-200', 
         icon: Package,
-        bgColor: 'bg-purple-50',
+        bgColor: 'bg-secondary-50',
         progress: 60
       },
       shipped: { 
@@ -160,8 +160,8 @@ const OrderCard = ({ order, showDetails = false, onToggleDetails }) => {
                 className={`h-2 rounded-full transition-all duration-300 ${
                   statusInfo.progress === 100 ? 'bg-green-500' : 
                   statusInfo.progress >= 80 ? 'bg-indigo-500' : 
-                  statusInfo.progress >= 60 ? 'bg-purple-500' : 
-                  statusInfo.progress >= 40 ? 'bg-blue-500' : 'bg-yellow-500'
+                  statusInfo.progress >= 60 ? 'bg-secondary-500' : 
+                  statusInfo.progress >= 40 ? 'bg-primary-500' : 'bg-yellow-500'
                 }`}
                 style={{ width: `${statusInfo.progress}%` }}
               ></div>

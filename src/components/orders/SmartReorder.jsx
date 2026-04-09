@@ -65,7 +65,7 @@ const SmartReorder = () => {
   if (loading || suggestions.length === 0) return null;
 
   return (
-    <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-6 mb-6">
+    <div className="bg-gradient-to-r from-indigo-50 to-secondary-50 border border-indigo-200 rounded-xl p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-indigo-100 rounded-lg">

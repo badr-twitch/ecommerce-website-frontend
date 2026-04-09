@@ -70,7 +70,7 @@ const ShippingOptions = ({ shippingData, onSelect, onBack, isMember = false }) =
         </div>
         <button
           onClick={onBack}
-          className="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2"
+          className="text-primary-600 hover:text-primary-700 text-sm font-medium mt-2"
         >
           Modifier l'adresse
         </button>
@@ -78,7 +78,7 @@ const ShippingOptions = ({ shippingData, onSelect, onBack, isMember = false }) =
 
       {/* Prime Member Banner */}
       {isMember && (
-        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 text-white mb-4">
+        <div className="bg-gradient-to-r from-indigo-500 to-secondary-600 rounded-xl p-4 text-white mb-4">
           <div className="flex items-center gap-3">
             <span className="text-2xl">👑</span>
             <div>
@@ -98,7 +98,7 @@ const ShippingOptions = ({ shippingData, onSelect, onBack, isMember = false }) =
             key={method.id}
             className={`border-2 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:shadow-md ${
               selectedMethod?.id === method.id
-                ? 'border-blue-500 bg-blue-50'
+                ? 'border-primary-500 bg-primary-50'
                 : 'border-gray-200 hover:border-gray-300'
             }`}
             onClick={() => handleMethodSelect(method)}
@@ -110,7 +110,7 @@ const ShippingOptions = ({ shippingData, onSelect, onBack, isMember = false }) =
                   <div className="flex items-center space-x-2">
                     <h3 className="text-lg font-medium text-gray-900">{method.name}</h3>
                     {selectedMethod?.id === method.id && (
-                      <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                      <span className="bg-primary-500 text-white text-xs px-2 py-1 rounded-full">
                         Sélectionné
                       </span>
                     )}
@@ -160,7 +160,7 @@ const ShippingOptions = ({ shippingData, onSelect, onBack, isMember = false }) =
       </div>
 
       {/* Special Offers */}
-      <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-4 border border-green-200">
+      <div className="bg-gradient-to-r from-green-50 to-primary-50 rounded-xl p-4 border border-green-200">
         <div className="flex items-center space-x-3">
           <div className="text-2xl">🎁</div>
           <div>
@@ -183,7 +183,7 @@ const ShippingOptions = ({ shippingData, onSelect, onBack, isMember = false }) =
         <button
           onClick={handleContinue}
           disabled={!selectedMethod}
-          className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          className="flex-1 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         >
           Continuer vers le paiement
         </button>

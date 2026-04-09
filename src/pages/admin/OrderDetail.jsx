@@ -209,7 +209,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
               </button>
             </div>
             <div className="text-center py-8">
-              <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-gray-600">Chargement des détails...</p>
             </div>
           </div>
@@ -341,7 +341,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
           </div>
 
           {/* Status Update */}
-          <div className="mt-6 bg-blue-50 rounded-lg p-6">
+          <div className="mt-6 bg-primary-50 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Mettre à Jour le Statut</h3>
             <div className="space-y-4">
               <div>
@@ -352,7 +352,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
                   value={statusComment}
                   onChange={(e) => setStatusComment(e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="Ajouter un commentaire sur la mise à jour du statut..."
                 />
               </div>
@@ -365,7 +365,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                       status === orderDetails.status
                         ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-primary-600 text-white hover:bg-primary-700'
                     }`}
                   >
                     {getStatusText(status)}
@@ -470,7 +470,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
                 onChange={(e) => setNewNote(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddNote()}
                 placeholder="Ajouter une note..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 text-sm"
               />
               <button
                 onClick={handleAddNote}

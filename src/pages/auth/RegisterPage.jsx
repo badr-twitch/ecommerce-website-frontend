@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
+import { Mail, Lock, User as UserIcon, Building2, ArrowRight, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -290,30 +291,57 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-            <span className="text-white font-bold text-xl">U</span>
+    <div className="min-h-screen flex">
+      {/* Left Panel — Decorative */}
+      <div className="hidden lg:flex lg:w-5/12 relative overflow-hidden bg-gradient-to-br from-secondary-700 via-primary-800 to-primary-900">
+        <div className="gradient-orb w-[400px] h-[400px] bg-secondary-400/30 top-20 -left-20 animate-float" />
+        <div className="gradient-orb w-[300px] h-[300px] bg-primary-400/25 bottom-32 right-10 animate-float-slow" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+        <div className="relative z-10 flex flex-col justify-center px-16 xl:px-20">
+          <div className="mb-8">
+            <img src="/LOGO.png" alt="UMOD" className="h-14 w-auto brightness-0 invert opacity-90" />
+          </div>
+          <h2 className="text-4xl xl:text-5xl font-bold text-white leading-tight mb-6">
+            Rejoignez <br />
+            <span className="text-secondary-200">la communaute</span>
+          </h2>
+          <p className="text-primary-200/80 text-lg leading-relaxed max-w-md">
+            Creez votre compte pour profiter d'une experience d'achat personnalisee et d'offres exclusives.
+          </p>
+          <div className="mt-12 space-y-4">
+            {[
+              { icon: ShieldCheck, text: "Donnees 100% protegees" },
+              { icon: UserIcon, text: "Compte personnel ou professionnel" },
+              { icon: ArrowRight, text: "Inscription en 2 minutes" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 text-white/70">
+                <div className="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center">
+                  <item.icon className="w-4 h-4 text-white/80" />
+                </div>
+                <span className="text-sm font-medium">{item.text}</span>
+              </div>
+            ))}
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Créer votre compte
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Ou{' '}
-          <Link
-            to="/login"
-            className="font-medium text-blue-600 hover:text-blue-500"
-          >
-            connectez-vous à votre compte existant
-          </Link>
-        </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white/80 backdrop-blur-sm py-8 px-4 shadow-xl rounded-2xl sm:px-10 border border-gray-200/50">
-          <form className="space-y-6" onSubmit={handleSubmit} noValidate>
+      {/* Right Panel — Form */}
+      <div className="w-full lg:w-7/12 flex flex-col justify-center px-6 sm:px-12 lg:px-16 xl:px-20 py-12 bg-white overflow-y-auto">
+        <div className="max-w-lg w-full mx-auto">
+          <div className="lg:hidden flex justify-center mb-8">
+            <img src="/LOGO.png" alt="UMOD" className="h-12 w-auto" />
+          </div>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Creer votre compte</h1>
+            <p className="text-gray-500">
+              Deja inscrit ?{' '}
+              <Link to="/login" className="text-primary-600 font-medium hover:text-primary-700 transition-colors">
+                Se connecter
+              </Link>
+            </p>
+          </div>
+
+          <form className="space-y-5" onSubmit={handleSubmit} noValidate>
             {/* Client Type Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -322,7 +350,7 @@ const RegisterPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <label className={`relative flex cursor-pointer rounded-xl border-2 p-4 transition-all duration-300 ${
                   formData.clientType === 'particulier'
-                    ? 'border-blue-500 bg-blue-50'
+                    ? 'border-primary-500 bg-primary-50'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}>
                   <input
@@ -341,7 +369,7 @@ const RegisterPage = () => {
                 </label>
                 <label className={`relative flex cursor-pointer rounded-xl border-2 p-4 transition-all duration-300 ${
                   formData.clientType === 'professionnel'
-                    ? 'border-blue-500 bg-blue-50'
+                    ? 'border-primary-500 bg-primary-50'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}>
                   <input
@@ -376,9 +404,9 @@ const RegisterPage = () => {
                     value={formData.firstName}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                    className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
                       errors.firstName && touched.firstName 
-                        ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                        ? 'border-red-300 focus:border-red-500' 
                         : 'border-gray-300'
                     }`}
                     placeholder="Votre prénom"
@@ -402,9 +430,9 @@ const RegisterPage = () => {
                     value={formData.lastName}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                    className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
                       errors.lastName && touched.lastName 
-                        ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                        ? 'border-red-300 focus:border-red-500' 
                         : 'border-gray-300'
                     }`}
                     placeholder="Votre nom"
@@ -430,9 +458,9 @@ const RegisterPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                  className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
                     errors.email && touched.email 
-                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                      ? 'border-red-300 focus:border-red-500' 
                       : 'border-gray-300'
                   }`}
                   placeholder="votre@email.com"
@@ -457,9 +485,9 @@ const RegisterPage = () => {
                   value={formData.password}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                  className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
                     errors.password && touched.password 
-                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                      ? 'border-red-300 focus:border-red-500' 
                       : 'border-gray-300'
                   }`}
                   placeholder="Votre mot de passe"
@@ -507,9 +535,9 @@ const RegisterPage = () => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                  className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
                     errors.confirmPassword && touched.confirmPassword 
-                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                      ? 'border-red-300 focus:border-red-500' 
                       : 'border-gray-300'
                   }`}
                   placeholder="Confirmez votre mot de passe"
@@ -523,12 +551,12 @@ const RegisterPage = () => {
             {/* Business Fields (only for professionnel) */}
             {formData.clientType === 'professionnel' && (
               <div className="space-y-6 pt-4 border-t border-gray-200">
-                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                  <h3 className="text-sm font-semibold text-blue-900 mb-2 flex items-center">
+                <div className="bg-primary-50 rounded-xl p-4 border border-primary-200">
+                  <h3 className="text-sm font-semibold text-primary-900 mb-2 flex items-center">
                     <span className="mr-2">🏢</span>
                     Informations professionnelles
                   </h3>
-                  <p className="text-xs text-blue-700">
+                  <p className="text-xs text-primary-700">
                     Les champs marqués d'un astérisque (*) sont obligatoires pour les comptes professionnels.
                   </p>
                 </div>
@@ -546,9 +574,9 @@ const RegisterPage = () => {
                       value={formData.companyName}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                      className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
                         errors.companyName && touched.companyName
-                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                          ? 'border-red-300 focus:border-red-500'
                           : 'border-gray-300'
                       }`}
                       placeholder="Nom de votre entreprise"
@@ -575,9 +603,9 @@ const RegisterPage = () => {
                         handleChange({ ...e, target: { ...e.target, value } });
                       }}
                       onBlur={handleBlur}
-                      className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                      className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
                         errors.siret && touched.siret
-                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                          ? 'border-red-300 focus:border-red-500'
                           : 'border-gray-300'
                       }`}
                       placeholder="12345678901234"
@@ -603,7 +631,7 @@ const RegisterPage = () => {
                       value={formData.vatNumber}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300"
+                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300"
                       placeholder="FR12345678901"
                     />
                   </div>
@@ -622,9 +650,9 @@ const RegisterPage = () => {
                       value={formData.billingAddress}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                      className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
                         errors.billingAddress && touched.billingAddress
-                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                          ? 'border-red-300 focus:border-red-500'
                           : 'border-gray-300'
                       }`}
                       placeholder="Numéro et nom de rue"
@@ -649,9 +677,9 @@ const RegisterPage = () => {
                         value={formData.billingCity}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                        className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
                           errors.billingCity && touched.billingCity
-                            ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                            ? 'border-red-300 focus:border-red-500'
                             : 'border-gray-300'
                         }`}
                         placeholder="Ville"
@@ -677,9 +705,9 @@ const RegisterPage = () => {
                           handleChange({ ...e, target: { ...e.target, value } });
                         }}
                         onBlur={handleBlur}
-                        className={`appearance-none block w-full px-3 py-2 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300 ${
+                        className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
                           errors.billingPostalCode && touched.billingPostalCode
-                            ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                            ? 'border-red-300 focus:border-red-500'
                             : 'border-gray-300'
                         }`}
                         placeholder="75001"
@@ -703,7 +731,7 @@ const RegisterPage = () => {
                       name="billingCountry"
                       value={formData.billingCountry}
                       onChange={handleChange}
-                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-300"
+                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300"
                     >
                       <option value="France">France</option>
                       <option value="Belgique">Belgique</option>
@@ -724,11 +752,11 @@ const RegisterPage = () => {
                 type="checkbox"
                 checked={formData.acceptTerms}
                 onChange={handleChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               />
               <label htmlFor="acceptTerms" className="ml-2 block text-sm text-gray-900">
                 J'accepte les{' '}
-                <Link to="/terms" className="text-blue-600 hover:text-blue-500">
+                <Link to="/terms" className="text-primary-600 hover:text-primary-700">
                   conditions d'utilisation
                 </Link>
               </label>
@@ -755,75 +783,60 @@ const RegisterPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 rounded-xl shadow-glow-primary hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]"
               >
                 {isLoading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Inscription en cours...
-                  </div>
+                  </>
                 ) : (
-                  'Créer mon compte'
+                  <>
+                    Creer mon compte
+                    <ArrowRight className="w-4 h-4" />
+                  </>
                 )}
               </button>
             </div>
           </form>
 
           {/* Social Login */}
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Ou continuer avec</span>
-              </div>
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200" />
             </div>
-
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={isLoading}
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-              >
-                <span className="sr-only">S'inscrire avec Google</span>
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path
-                    fill="currentColor"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="currentColor"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="currentColor"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  />
-                  <path
-                    fill="currentColor"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  />
-                </svg>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleFacebookSignIn}
-                disabled={isLoading}
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-              >
-                <span className="sr-only">S'inscrire avec Facebook</span>
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M20 10C20 4.477 15.523 0 10 0S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
+            <div className="relative flex justify-center">
+              <span className="px-4 bg-white text-sm text-gray-400">Ou continuer avec</span>
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={isLoading}
+              className="flex items-center justify-center gap-2 py-3 px-4 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 transition-all duration-200 active:scale-[0.97]"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              </svg>
+              Google
+            </button>
+
+            <button
+              type="button"
+              onClick={handleFacebookSignIn}
+              disabled={isLoading}
+              className="flex items-center justify-center gap-2 py-3 px-4 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 transition-all duration-200 active:scale-[0.97]"
+            >
+              <svg className="w-4 h-4" fill="#1877F2" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M20 10C20 4.477 15.523 0 10 0S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" clipRule="evenodd" />
+              </svg>
+              Facebook
+            </button>
           </div>
         </div>
       </div>

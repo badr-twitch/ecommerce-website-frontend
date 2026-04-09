@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../contexts/CartContext';
 import { AuthContext } from '../contexts/AuthContext';
+import { ShoppingCart, Trash2, Minus, Plus, ShieldCheck, ArrowRight, LogIn, UserPlus, ShoppingBag, FolderOpen, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const CartPage = () => {
@@ -65,30 +66,32 @@ const CartPage = () => {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="min-h-screen bg-mesh">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
-            <div className="w-32 h-32 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center text-6xl mx-auto mb-8">
-              🛒
+            <div className="w-28 h-28 bg-gradient-to-br from-primary-500/15 to-secondary-500/15 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-glow-primary/20">
+              <ShoppingCart className="w-14 h-14 text-primary-400" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl font-bold text-gradient mb-4">
               Votre panier est vide
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
+            <p className="text-xl text-gray-500 mb-10 max-w-md mx-auto leading-relaxed">
               Découvrez nos produits exceptionnels et commencez votre shopping dès maintenant !
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link 
-                to="/products" 
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              <Link
+                to="/products"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white text-lg font-semibold rounded-xl transition-all duration-300 shadow-glow-primary hover:shadow-lg hover:-translate-y-0.5"
               >
-                🛍️ Découvrir nos produits
+                <ShoppingBag className="w-5 h-5" />
+                Découvrir nos produits
               </Link>
-              <Link 
-                to="/categories" 
-                className="px-8 py-4 bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 hover:text-blue-600 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white hover:shadow-lg"
+              <Link
+                to="/categories"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 hover:text-primary-600 hover:border-primary-300 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white hover:shadow-lg"
               >
-                📂 Parcourir les catégories
+                <FolderOpen className="w-5 h-5" />
+                Parcourir les catégories
               </Link>
             </div>
           </div>
@@ -98,14 +101,15 @@ const CartPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-mesh">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+        <div className="mb-10">
+          <h1 className="text-4xl font-bold text-gradient mb-2">
             Votre Panier
           </h1>
-          <p className="text-gray-600 text-lg">
+          <div className="section-divider mb-0"></div>
+          <p className="text-gray-500 text-lg mt-3">
             {itemCount} article{itemCount > 1 ? 's' : ''} dans votre panier
           </p>
         </div>
@@ -113,26 +117,27 @@ const CartPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
-              <div className="p-6 border-b border-gray-200/50">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 overflow-hidden">
+              <div className="p-6 border-b border-gray-100">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-2xl font-bold text-gray-800">Articles</h2>
+                  <h2 className="text-xl font-bold text-gray-800">Articles</h2>
                   <button
                     onClick={handleClearCart}
-                    className="text-red-600 hover:text-red-700 font-medium text-sm transition-colors duration-200"
+                    className="inline-flex items-center gap-1.5 text-red-500 hover:text-red-600 font-medium text-sm transition-colors duration-200"
                   >
+                    <Trash2 className="w-3.5 h-3.5" />
                     Vider le panier
                   </button>
                 </div>
               </div>
-              
-              <div className="divide-y divide-gray-200/50">
+
+              <div className="divide-y divide-gray-100">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="p-6 hover:bg-gray-50/50 transition-colors duration-200">
+                  <div key={item.id} className="p-6 hover:bg-primary-50/30 transition-colors duration-200">
                     <div className="flex items-center space-x-4">
                       {/* Product Image */}
                       <div className="flex-shrink-0">
-                        <div className="w-20 h-20 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl overflow-hidden">
+                        <div className="w-20 h-20 bg-gradient-to-br from-primary-50 to-secondary-50 rounded-xl overflow-hidden shadow-sm">
                           {item.image ? (
                             <img
                               src={item.image}
@@ -140,8 +145,8 @@ const CartPage = () => {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-2xl text-gray-400">
-                              📦
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Package className="w-8 h-8 text-gray-300" />
                             </div>
                           )}
                         </div>
@@ -152,34 +157,34 @@ const CartPage = () => {
                         <h3 className="text-lg font-semibold text-gray-800 mb-1 truncate">
                           {item.name}
                         </h3>
-                        <p className="text-2xl font-bold text-blue-600">
+                        <p className="text-xl font-bold text-primary-600">
                           {formatPrice(item.price)}
                         </p>
                       </div>
 
                       {/* Quantity Controls */}
-                      <div className="flex items-center space-x-3">
-                        <div className="flex items-center bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
+                      <div className="flex items-center">
+                        <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
                           <button
                             onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                            className="px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-all duration-200"
+                            className="p-2.5 text-gray-500 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200"
                           >
-                            -
+                            <Minus className="w-4 h-4" />
                           </button>
                           <span className="px-4 py-2 text-lg font-semibold text-gray-800 min-w-[3rem] text-center">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                            className="px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-all duration-200"
+                            className="p-2.5 text-gray-500 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200"
                           >
-                            +
+                            <Plus className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
 
                       {/* Item Total */}
-                      <div className="text-right">
+                      <div className="text-right hidden sm:block">
                         <p className="text-xl font-bold text-gray-800">
                           {formatPrice(item.price * item.quantity)}
                         </p>
@@ -188,9 +193,9 @@ const CartPage = () => {
                       {/* Remove Button */}
                       <button
                         onClick={() => handleRemoveItem(item.id)}
-                        className="flex-shrink-0 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                        className="flex-shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200"
                       >
-                        <span className="text-xl">🗑️</span>
+                        <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
@@ -201,22 +206,22 @@ const CartPage = () => {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6 sticky top-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Résumé de la commande</h2>
-              
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-6 sticky top-24">
+              <h2 className="text-xl font-bold text-gray-800 mb-6">Résumé de la commande</h2>
+
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Sous-total ({itemCount} article{itemCount > 1 ? 's' : ''})</span>
+                  <span className="text-gray-500">Sous-total ({itemCount} article{itemCount > 1 ? 's' : ''})</span>
                   <span className="font-semibold text-gray-800">{formatPrice(total)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Livraison</span>
+                  <span className="text-gray-500">Livraison</span>
                   <span className="text-green-600 font-semibold">Gratuite</span>
                 </div>
-                <div className="border-t border-gray-200 pt-4">
+                <div className="border-t border-gray-100 pt-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-xl font-bold text-gray-800">Total</span>
-                    <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <span className="text-lg font-bold text-gray-800">Total</span>
+                    <span className="text-2xl font-bold text-gradient">
                       {formatPrice(total)}
                     </span>
                   </div>
@@ -224,50 +229,50 @@ const CartPage = () => {
               </div>
 
               {/* Checkout Button */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {user ? (
                   <Link
                     to="/checkout"
-                    className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center space-x-2"
+                    className="w-full px-6 py-3.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white text-base font-semibold rounded-xl transition-all duration-300 shadow-glow-primary hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2"
                   >
-                    <span>🚀</span>
-                    <span>Passer la commande</span>
+                    Passer la commande
+                    <ArrowRight className="w-5 h-5" />
                   </Link>
                 ) : (
                   <div className="space-y-3">
                     <Link
                       to="/login"
-                      className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center space-x-2"
+                      className="w-full px-6 py-3.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white text-base font-semibold rounded-xl transition-all duration-300 shadow-glow-primary hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2"
                     >
-                      <span>🔐</span>
-                      <span>Se connecter pour commander</span>
+                      <LogIn className="w-5 h-5" />
+                      Se connecter pour commander
                     </Link>
                     <Link
                       to="/register"
-                      className="w-full px-6 py-4 bg-white border-2 border-gray-200 text-gray-700 hover:text-blue-600 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-gray-50 flex items-center justify-center space-x-2"
+                      className="w-full px-6 py-3.5 bg-white border-2 border-gray-200 text-gray-700 hover:text-primary-600 hover:border-primary-300 text-base font-semibold rounded-xl transition-all duration-300 hover:bg-primary-50/30 flex items-center justify-center gap-2"
                     >
-                      <span>📝</span>
-                      <span>Créer un compte</span>
+                      <UserPlus className="w-5 h-5" />
+                      Créer un compte
                     </Link>
                   </div>
                 )}
-                
+
                 <Link
                   to="/products"
-                  className="w-full px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-center rounded-xl transition-all duration-300 flex items-center justify-center space-x-2"
+                  className="w-full px-6 py-3 bg-gray-50 hover:bg-gray-100 text-gray-600 text-center rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
                 >
-                  <span>🛍️</span>
-                  <span>Continuer les achats</span>
+                  <ShoppingBag className="w-4 h-4" />
+                  Continuer les achats
                 </Link>
               </div>
 
               {/* Security Info */}
-              <div className="mt-6 p-4 bg-green-50 rounded-xl border border-green-200">
-                <div className="flex items-center space-x-2 mb-2">
-                  <span className="text-green-600">🛡️</span>
+              <div className="mt-6 p-4 bg-green-50/80 rounded-xl border border-green-100">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <ShieldCheck className="w-4 h-4 text-green-600" />
                   <span className="text-sm font-semibold text-green-800">Paiement sécurisé</span>
                 </div>
-                <p className="text-xs text-green-700">
+                <p className="text-xs text-green-600">
                   Vos données sont protégées par un cryptage SSL 256-bit
                 </p>
               </div>
@@ -277,18 +282,18 @@ const CartPage = () => {
 
         {/* Recommended Products */}
         <div className="mt-16">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-8 text-center">
+          <h2 className="text-3xl font-bold text-gradient mb-8 text-center">
             Vous pourriez aussi aimer
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50 hover:shadow-xl transition-all duration-300 group">
-                <div className="w-full h-48 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl mb-4 flex items-center justify-center text-4xl text-gray-400 group-hover:scale-105 transition-transform duration-300">
-                  📦
+              <div key={item} className="card-3d bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-soft border border-white/60 group">
+                <div className="w-full h-48 bg-gradient-to-br from-primary-50 to-secondary-50 rounded-xl mb-4 flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-300">
+                  <Package className="w-12 h-12 text-gray-300" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Produit Recommandé</h3>
-                <p className="text-2xl font-bold text-blue-600 mb-4">1 061 DH</p>
-                <button className="w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-300">
+                <p className="text-xl font-bold text-primary-600 mb-4">1 061 DH</p>
+                <button className="w-full px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl transition-all duration-300 hover:-translate-y-0.5">
                   Ajouter au panier
                 </button>
               </div>

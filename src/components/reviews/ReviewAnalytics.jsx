@@ -127,7 +127,7 @@ const ReviewAnalytics = ({ productId = null, timeRange = '30' }) => {
             <select
               value={currentTimeRange}
               onChange={(e) => handleTimeRangeChange(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="7">7 jours</option>
               <option value="30">30 jours</option>
@@ -142,18 +142,18 @@ const ReviewAnalytics = ({ productId = null, timeRange = '30' }) => {
                   type="date"
                   value={customDates.startDate}
                   onChange={(e) => handleCustomDateChange('startDate', e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
                 <span className="text-gray-500">à</span>
                 <input
                   type="date"
                   value={customDates.endDate}
                   onChange={(e) => handleCustomDateChange('endDate', e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
                 <button
                   onClick={applyCustomDates}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
                 >
                   <Filter className="w-4 h-4" />
                 </button>
@@ -164,16 +164,16 @@ const ReviewAnalytics = ({ productId = null, timeRange = '30' }) => {
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-blue-50 p-4 rounded-lg">
+          <div className="bg-primary-50 p-4 rounded-lg">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center">
                 <MessageSquare className="w-5 h-5 text-white" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold text-primary-600">
                   {analytics.totalReviews?.toLocaleString() || 0}
                 </div>
-                <div className="text-sm text-blue-700">Total des avis</div>
+                <div className="text-sm text-primary-700">Total des avis</div>
               </div>
             </div>
             {analytics.reviewsGrowth && (
@@ -208,16 +208,16 @@ const ReviewAnalytics = ({ productId = null, timeRange = '30' }) => {
             )}
           </div>
 
-          <div className="bg-purple-50 p-4 rounded-lg">
+          <div className="bg-secondary-50 p-4 rounded-lg">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-secondary-600 rounded-full flex items-center justify-center">
                 <Users className="w-5 h-5 text-white" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-purple-600">
+                <div className="text-2xl font-bold text-secondary-600">
                   {analytics.uniqueReviewers?.toLocaleString() || 0}
                 </div>
-                <div className="text-sm text-purple-700">Rédacteurs uniques</div>
+                <div className="text-sm text-secondary-700">Rédacteurs uniques</div>
               </div>
             </div>
             {analytics.reviewersGrowth && (

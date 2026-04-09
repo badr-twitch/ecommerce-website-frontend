@@ -361,7 +361,7 @@ const ReviewModeration = () => {
             <button
               onClick={syncToTrustpilot}
               disabled={syncingTrustpilot}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${syncingTrustpilot ? 'animate-spin' : ''}`} />
               Sync Trustpilot
@@ -371,11 +371,11 @@ const ReviewModeration = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">
+          <div className="bg-primary-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-primary-600">
               {reviews.filter(r => r.status === 'pending').length}
             </div>
-            <div className="text-sm text-blue-700">En attente</div>
+            <div className="text-sm text-primary-700">En attente</div>
           </div>
           <div className="bg-green-50 p-4 rounded-lg">
             <div className="text-2xl font-bold text-green-600">
@@ -406,7 +406,7 @@ const ReviewModeration = () => {
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">Tous les statuts</option>
               <option value="pending">En attente</option>
@@ -421,7 +421,7 @@ const ReviewModeration = () => {
             <select
               value={filters.rating}
               onChange={(e) => handleFilterChange('rating', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">Toutes les notes</option>
               <option value="5">5 étoiles</option>
@@ -437,7 +437,7 @@ const ReviewModeration = () => {
             <select
               value={filters.verifiedPurchase}
               onChange={(e) => handleFilterChange('verifiedPurchase', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">Tous</option>
               <option value="true">Vérifiés</option>
@@ -450,7 +450,7 @@ const ReviewModeration = () => {
             <select
               value={filters.hasMedia}
               onChange={(e) => handleFilterChange('hasMedia', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">Tous</option>
               <option value="true">Avec médias</option>
@@ -462,7 +462,7 @@ const ReviewModeration = () => {
             <div className="flex gap-2">
               <button
                 onClick={applyFilters}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
               >
                 Appliquer
               </button>
@@ -479,9 +479,9 @@ const ReviewModeration = () => {
 
       {/* Bulk Actions */}
       {selectedReviews.size > 0 && (
-        <div className="px-6 py-3 bg-blue-50 border-b border-blue-200">
+        <div className="px-6 py-3 bg-primary-50 border-b border-primary-200">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-blue-700">
+            <span className="text-sm text-primary-700">
               {selectedReviews.size} avis sélectionné(s)
             </span>
             <div className="flex items-center gap-2">
@@ -521,7 +521,7 @@ const ReviewModeration = () => {
                   type="checkbox"
                   checked={selectAll}
                   onChange={(e) => handleSelectAll(e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                 />
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -574,7 +574,7 @@ const ReviewModeration = () => {
                     type="checkbox"
                     checked={selectedReviews.has(review.id)}
                     onChange={(e) => handleReviewSelection(review.id, e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                   />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -592,7 +592,7 @@ const ReviewModeration = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold text-sm">
+                    <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-semibold text-sm">
                       {review.user.initials || 'U'}
                     </div>
                     <div>
@@ -652,7 +652,7 @@ const ReviewModeration = () => {
                         href={`https://www.trustpilot.com/review/${review.trustpilotId}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
+                        className="inline-flex items-center gap-1 text-xs text-primary-600 hover:text-primary-800"
                       >
                         <ExternalLink className="w-3 h-3" />
                         Voir
@@ -732,7 +732,7 @@ const ReviewModeration = () => {
                       onClick={() => fetchReviews(pageNum)}
                       className={`px-3 py-2 text-sm font-medium rounded-md ${
                         currentPage === pageNum
-                          ? 'bg-blue-600 text-white'
+                          ? 'bg-primary-600 text-white'
                           : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
                       }`}
                     >
@@ -789,7 +789,7 @@ const ReviewModeration = () => {
                 value={moderationModal.notes}
                 onChange={(e) => setModerationModal(prev => ({ ...prev, notes: e.target.value }))}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="Ajoutez des notes sur la décision..."
               />
             </div>

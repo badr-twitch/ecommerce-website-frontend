@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
+import { ShoppingBag, Truck, CreditCard, Check } from 'lucide-react';
 import { CartContext } from '../contexts/CartContext';
 import { AuthContext } from '../contexts/AuthContext';
 import { paymentService } from '../services/paymentService';
@@ -129,9 +130,9 @@ const CheckoutPage = () => {
   };
 
   const steps = [
-    { id: 1, name: 'Livraison', status: currentStep >= 1 ? 'current' : 'upcoming' },
-    { id: 2, name: 'Expédition', status: currentStep >= 2 ? 'current' : 'upcoming' },
-    { id: 3, name: 'Paiement', status: currentStep >= 3 ? 'current' : 'upcoming' }
+    { id: 1, name: 'Livraison', icon: ShoppingBag, status: currentStep >= 1 ? 'current' : 'upcoming' },
+    { id: 2, name: 'Expédition', icon: Truck, status: currentStep >= 2 ? 'current' : 'upcoming' },
+    { id: 3, name: 'Paiement', icon: CreditCard, status: currentStep >= 3 ? 'current' : 'upcoming' }
   ];
 
   // Stripe Elements options — must include clientSecret
@@ -150,38 +151,48 @@ const CheckoutPage = () => {
   }, [clientSecret]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-mesh">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Finaliser votre commande</h1>
+          <h1 className="text-3xl font-bold text-gradient mb-2">Finaliser votre commande</h1>
+          <div className="section-divider"></div>
 
           {/* Progress Steps */}
           <nav aria-label="Progress" className="mb-8">
             <ol className="flex items-center justify-center space-x-8">
-              {steps.map((step, stepIdx) => (
-                <li key={step.name} className="relative">
-                  {stepIdx !== steps.length - 1 ? (
-                    <div className="absolute top-4 left-8 -ml-px mt-0.5 h-0.5 w-16 bg-gray-300" />
-                  ) : null}
-                  <div className="relative flex items-center">
-                    <div className={`relative flex h-8 w-8 items-center justify-center rounded-full border-2 ${
-                      step.status === 'current'
-                        ? 'border-blue-600 bg-blue-600 text-white'
-                        : step.status === 'complete'
-                        ? 'border-green-600 bg-green-600 text-white'
-                        : 'border-gray-300 bg-white text-gray-500'
-                    }`}>
-                      <span className="text-sm font-medium">{step.id}</span>
+              {steps.map((step, stepIdx) => {
+                const StepIcon = step.icon;
+                return (
+                  <li key={step.name} className="relative">
+                    {stepIdx !== steps.length - 1 ? (
+                      <div className={`absolute top-4 left-8 -ml-px mt-0.5 h-0.5 w-16 ${
+                        currentStep > step.id ? 'bg-primary-400' : 'bg-gray-200'
+                      } transition-colors duration-300`} />
+                    ) : null}
+                    <div className="relative flex items-center">
+                      <div className={`relative flex h-10 w-10 items-center justify-center rounded-xl border-2 transition-all duration-300 ${
+                        currentStep > step.id
+                          ? 'border-primary-600 bg-primary-600 text-white shadow-glow-primary'
+                          : step.status === 'current'
+                          ? 'border-primary-600 bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-glow-primary'
+                          : 'border-gray-200 bg-white text-gray-400'
+                      }`}>
+                        {currentStep > step.id ? (
+                          <Check className="w-5 h-5" />
+                        ) : (
+                          <StepIcon className="w-5 h-5" />
+                        )}
+                      </div>
+                      <span className={`ml-3 text-sm font-semibold ${
+                        step.status === 'current' ? 'text-primary-600' : 'text-gray-500'
+                      }`}>
+                        {step.name}
+                      </span>
                     </div>
-                    <span className={`ml-4 text-sm font-medium ${
-                      step.status === 'current' ? 'text-blue-600' : 'text-gray-500'
-                    }`}>
-                      {step.name}
-                    </span>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ol>
           </nav>
         </div>
@@ -189,7 +200,7 @@ const CheckoutPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-6">
               {currentStep === 1 && (
                 <ShippingForm
                   initialData={shippingData}
@@ -226,8 +237,8 @@ const CheckoutPage = () => {
 
                   {!clientSecret && !paymentError && (
                     <div className="flex items-center justify-center py-12">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                      <span className="ml-3 text-gray-600">Préparation du paiement...</span>
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                      <span className="ml-3 text-gray-500">Préparation du paiement...</span>
                     </div>
                   )}
 

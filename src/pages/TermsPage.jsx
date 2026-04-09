@@ -1,20 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FileText, Mail, Phone, MapPin } from 'lucide-react';
 
 const TermsPage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary-200/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-200/20 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
       {/* Header Section */}
-      <section className="relative overflow-hidden py-20 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
+      <section className="relative overflow-hidden py-20 bg-gradient-to-r from-primary-600 via-secondary-600 to-pink-600">
         {/* Animated gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-pink-600/90"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/90 via-secondary-600/90 to-pink-600/90"></div>
         
         {/* Decorative shapes */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
@@ -26,14 +27,14 @@ const TermsPage = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center">
             <div className="inline-block mb-6">
-              <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-4xl mb-4 mx-auto transform hover:scale-110 transition-transform duration-300 shadow-2xl">
-                📋
+              <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4 mx-auto transform hover:scale-110 transition-transform duration-300 shadow-2xl">
+                <FileText className="w-10 h-10 text-white" />
               </div>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
               Conditions d'Utilisation
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-primary-100 max-w-2xl mx-auto leading-relaxed">
               Dernière mise à jour : {new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
@@ -56,7 +57,7 @@ const TermsPage = () => {
             {/* Section 1 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-lg">1</span>
+                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center text-white text-lg">1</span>
                 Acceptation des conditions
               </h2>
               <div className="pl-16 space-y-3 text-gray-700">
@@ -76,7 +77,7 @@ const TermsPage = () => {
             {/* Section 2 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-lg">2</span>
+                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center text-white text-lg">2</span>
                 Utilisation du site
               </h2>
               <div className="pl-16 space-y-3 text-gray-700">
@@ -106,7 +107,7 @@ const TermsPage = () => {
             {/* Section 3 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-lg">3</span>
+                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center text-white text-lg">3</span>
                 Compte utilisateur
               </h2>
               <div className="pl-16 space-y-3 text-gray-700">
@@ -119,7 +120,7 @@ const TermsPage = () => {
                   <li>Notifier immédiatement toute utilisation non autorisée de votre compte</li>
                   <li>Être responsable de toutes les activités effectuées sous votre compte</li>
                 </ul>
-                <p className="mt-4 bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                <p className="mt-4 bg-primary-50 p-4 rounded-lg border-l-4 border-primary-500">
                   <strong>Note importante :</strong> Nous nous réservons le droit de suspendre ou de fermer votre compte 
                   en cas de violation de ces conditions ou de comportement suspect.
                 </p>
@@ -129,7 +130,7 @@ const TermsPage = () => {
             {/* Section 4 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-lg">4</span>
+                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center text-white text-lg">4</span>
                 Commandes et paiements
               </h2>
               <div className="pl-16 space-y-3 text-gray-700">
@@ -157,7 +158,7 @@ const TermsPage = () => {
             {/* Section 5 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-lg">5</span>
+                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center text-white text-lg">5</span>
                 Livraison et retours
               </h2>
               <div className="pl-16 space-y-3 text-gray-700">
@@ -173,11 +174,11 @@ const TermsPage = () => {
                 </ul>
                 <p className="mt-4">
                   Pour plus d'informations, consultez nos pages{' '}
-                  <Link to="/shipping" className="text-blue-600 hover:text-blue-700 font-semibold underline">
+                  <Link to="/shipping" className="text-primary-600 hover:text-primary-700 font-semibold underline">
                     Livraison
                   </Link>
                   {' '}et{' '}
-                  <Link to="/returns" className="text-blue-600 hover:text-blue-700 font-semibold underline">
+                  <Link to="/returns" className="text-primary-600 hover:text-primary-700 font-semibold underline">
                     Retours
                   </Link>
                   .
@@ -188,7 +189,7 @@ const TermsPage = () => {
             {/* Section 6 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-lg">6</span>
+                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center text-white text-lg">6</span>
                 Propriété intellectuelle
               </h2>
               <div className="pl-16 space-y-3 text-gray-700">
@@ -211,7 +212,7 @@ const TermsPage = () => {
             {/* Section 7 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-lg">7</span>
+                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center text-white text-lg">7</span>
                 Limitation de responsabilité
               </h2>
               <div className="pl-16 space-y-3 text-gray-700">
@@ -235,7 +236,7 @@ const TermsPage = () => {
             {/* Section 8 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-lg">8</span>
+                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center text-white text-lg">8</span>
                 Liens externes
               </h2>
               <div className="pl-16 space-y-3 text-gray-700">
@@ -253,13 +254,13 @@ const TermsPage = () => {
             {/* Section 9 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-lg">9</span>
+                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center text-white text-lg">9</span>
                 Protection des données
               </h2>
               <div className="pl-16 space-y-3 text-gray-700">
                 <p>
                   Le traitement de vos données personnelles est régi par notre{' '}
-                  <Link to="/privacy" className="text-blue-600 hover:text-blue-700 font-semibold underline">
+                  <Link to="/privacy" className="text-primary-600 hover:text-primary-700 font-semibold underline">
                     Politique de Confidentialité
                   </Link>
                   . En utilisant notre site, vous acceptez le traitement de vos données conformément à cette politique.
@@ -270,7 +271,7 @@ const TermsPage = () => {
             {/* Section 10 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-lg">10</span>
+                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center text-white text-lg">10</span>
                 Droit applicable et juridiction
               </h2>
               <div className="pl-16 space-y-3 text-gray-700">
@@ -288,7 +289,7 @@ const TermsPage = () => {
             {/* Section 11 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-lg">11</span>
+                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center text-white text-lg">11</span>
                 Modifications des conditions
               </h2>
               <div className="pl-16 space-y-3 text-gray-700">
@@ -307,27 +308,27 @@ const TermsPage = () => {
             {/* Section 12 */}
             <div className="space-y-4 pt-6 border-t border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-lg">12</span>
+                <span className="mr-3 w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center text-white text-lg">12</span>
                 Contact
               </h2>
               <div className="pl-16 space-y-3 text-gray-700">
                 <p>Pour toute question concernant ces conditions d'utilisation, contactez-nous :</p>
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg mt-4">
+                <div className="bg-gradient-to-r from-primary-50 to-secondary-50 p-6 rounded-lg mt-4">
                   <ul className="space-y-2">
                     <li className="flex items-center">
-                      <span className="mr-3">📧</span>
+                      <Mail className="w-5 h-5 mr-3 flex-shrink-0 text-primary-600" />
                       <strong>Email :</strong>{' '}
-                      <a href="mailto:legal@umod.fr" className="text-blue-600 hover:text-blue-700 font-semibold ml-2">
+                      <a href="mailto:legal@umod.fr" className="text-primary-600 hover:text-primary-700 font-semibold ml-2">
                         legal@umod.fr
                       </a>
                     </li>
                     <li className="flex items-center">
-                      <span className="mr-3">📞</span>
+                      <Phone className="w-5 h-5 mr-3 flex-shrink-0 text-primary-600" />
                       <strong>Téléphone :</strong>{' '}
                       <span className="ml-2">+33 1 23 45 67 89</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="mr-3">📍</span>
+                      <MapPin className="w-5 h-5 mr-3 flex-shrink-0 text-primary-600" />
                       <div>
                         <strong>Adresse :</strong>
                         <p className="ml-2">UMOD<br />Paris, France</p>
@@ -342,13 +343,13 @@ const TermsPage = () => {
             <div className="pt-8 border-t border-gray-200 flex flex-col sm:flex-row gap-4 justify-between items-center">
               <Link 
                 to="/" 
-                className="px-8 py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="px-8 py-3.5 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 ← Retour à l'accueil
               </Link>
               <Link 
                 to="/privacy" 
-                className="px-8 py-3.5 bg-white/80 backdrop-blur-sm border-2 border-gray-200 hover:border-blue-300 text-gray-700 hover:text-blue-600 font-semibold rounded-xl transition-all duration-300 hover:shadow-lg"
+                className="px-8 py-3.5 bg-white/80 backdrop-blur-sm border-2 border-gray-200 hover:border-primary-300 text-gray-700 hover:text-primary-600 font-semibold rounded-xl transition-all duration-300 hover:shadow-lg"
               >
                 Politique de Confidentialité →
               </Link>

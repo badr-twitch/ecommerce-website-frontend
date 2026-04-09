@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { MessageCircle, Phone } from 'lucide-react';
 
 const FAQPage = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -139,17 +140,17 @@ const FAQPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary-200/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-200/20 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
       {/* Header Section */}
-      <section className="relative overflow-hidden py-20 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-pink-600/90"></div>
+      <section className="relative overflow-hidden py-20 bg-gradient-to-r from-primary-600 via-secondary-600 to-pink-600">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/90 via-secondary-600/90 to-pink-600/90"></div>
         
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
           <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
@@ -160,14 +161,14 @@ const FAQPage = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center">
             <div className="inline-block mb-6">
-              <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-4xl mb-4 mx-auto transform hover:scale-110 transition-transform duration-300 shadow-2xl">
-                💬
+              <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4 mx-auto transform hover:scale-110 transition-transform duration-300 shadow-2xl">
+                <MessageCircle className="w-10 h-10 text-white" />
               </div>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
               Questions Fréquentes
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-primary-100 max-w-2xl mx-auto leading-relaxed">
               Trouvez rapidement les réponses à vos questions
             </p>
           </div>
@@ -180,8 +181,8 @@ const FAQPage = () => {
           {faqs.map((category, categoryIndex) => (
             <div key={categoryIndex} className="mb-12">
               <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 border border-gray-200/50">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6 flex items-center">
-                  <span className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white mr-4">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-6 flex items-center">
+                  <span className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center text-white mr-4">
                     {categoryIndex + 1}
                   </span>
                   {category.category}
@@ -195,7 +196,7 @@ const FAQPage = () => {
                     return (
                       <div 
                         key={questionIndex}
-                        className="border-2 border-gray-200 rounded-xl overflow-hidden hover:border-blue-300 transition-colors"
+                        className="border-2 border-gray-200 rounded-xl overflow-hidden hover:border-primary-300 transition-colors"
                       >
                         <button
                           onClick={() => toggleQuestion(categoryIndex, questionIndex)}
@@ -204,7 +205,7 @@ const FAQPage = () => {
                           <span className="font-semibold text-gray-900 pr-4">
                             {faq.q}
                           </span>
-                          <span className={`text-2xl text-blue-600 transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+                          <span className={`text-2xl text-primary-600 transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
                             ▼
                           </span>
                         </button>
@@ -228,16 +229,16 @@ const FAQPage = () => {
       {/* Still have questions */}
       <section className="py-12 relative z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl shadow-2xl p-8 md:p-12 text-white text-center">
+          <div className="bg-gradient-to-r from-primary-600 to-secondary-600 rounded-3xl shadow-2xl p-8 md:p-12 text-white text-center">
             <h2 className="text-3xl font-bold mb-4">Vous avez encore des questions ?</h2>
-            <p className="text-xl text-blue-100 mb-8">
+            <p className="text-xl text-primary-100 mb-8">
               Notre équipe est là pour vous aider. N'hésitez pas à nous contacter !
             </p>
             <Link 
               to="/contact"
-              className="inline-block px-8 py-4 bg-white text-blue-600 hover:bg-blue-50 font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              className="inline-block px-8 py-4 bg-white text-primary-600 hover:bg-primary-50 font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
-              📞 Nous contacter
+              <Phone className="w-5 h-5 inline mr-1" /> Nous contacter
             </Link>
           </div>
         </div>

@@ -104,10 +104,10 @@ const PaymentForm = ({ total, clientSecret, onPaymentSuccess, onBack, isProcessi
         </div>
 
         {/* Security Notice */}
-        <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+        <div className="bg-primary-50 rounded-xl p-4 border border-primary-200">
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
-              <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
               </svg>
             </div>
@@ -127,11 +127,11 @@ const PaymentForm = ({ total, clientSecret, onPaymentSuccess, onBack, isProcessi
             id="terms"
             checked={termsAccepted}
             onChange={(e) => setTermsAccepted(e.target.checked)}
-            className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
           />
           <label htmlFor="terms" className="text-sm text-gray-600">
-            J'accepte les <a href="/terms" className="text-blue-600 hover:text-blue-700">conditions générales</a> et la{' '}
-            <a href="/privacy" className="text-blue-600 hover:text-blue-700">politique de confidentialité</a>
+            J'accepte les <a href="/terms" className="text-primary-600 hover:text-primary-700">conditions générales</a> et la{' '}
+            <a href="/privacy" className="text-primary-600 hover:text-primary-700">politique de confidentialité</a>
           </label>
         </div>
 
@@ -148,7 +148,7 @@ const PaymentForm = ({ total, clientSecret, onPaymentSuccess, onBack, isProcessi
           <button
             type="submit"
             disabled={isProcessing || !stripe || !cardComplete || !termsAccepted}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="flex-1 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             {isProcessing ? (
               <div className="flex items-center justify-center space-x-2">

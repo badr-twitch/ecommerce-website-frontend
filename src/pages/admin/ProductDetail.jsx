@@ -28,7 +28,7 @@ const ProductDetail = ({ product, onClose, onEdit, onDelete }) => {
           <div className="flex items-center space-x-2">
             <button
               onClick={() => onEdit(product)}
-              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
               title="Modifier"
             >
               <Edit className="w-5 h-5" />

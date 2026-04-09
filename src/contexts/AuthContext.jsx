@@ -73,6 +73,24 @@ const authReducer = (state, action) => {
   }
 };
 
+// Only persist non-sensitive fields to localStorage
+const safeUserForStorage = (user) => {
+  if (!user) return null;
+  return {
+    id: user.id,
+    firebaseUid: user.firebaseUid,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    displayName: user.displayName,
+    role: user.role,
+    photoURL: user.photoURL,
+    emailVerified: user.emailVerified,
+    clientType: user.clientType,
+    membershipStatus: user.membershipStatus,
+    loyaltyTier: user.loyaltyTier,
+  };
+};
+
 // API base URL
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -203,7 +221,7 @@ export const AuthProvider = ({ children }) => {
           
           // Sync with database
           const userData = await syncUserWithDatabase(firebaseUser);
-          localStorage.setItem('user', JSON.stringify(userData));
+          localStorage.setItem('user', JSON.stringify(safeUserForStorage(userData)));
           
           dispatch({
             type: 'AUTH_SUCCESS',
@@ -237,7 +255,7 @@ export const AuthProvider = ({ children }) => {
       
       // Sync with database
       const userData = await syncUserWithDatabase(firebaseUser);
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('user', JSON.stringify(safeUserForStorage(userData)));
       
       dispatch({
         type: 'AUTH_SUCCESS',
@@ -312,7 +330,7 @@ export const AuthProvider = ({ children }) => {
       
       // Sync with database
       const updatedUserData = await syncUserWithDatabase(firebaseUser, additionalData);
-      localStorage.setItem('user', JSON.stringify(updatedUserData));
+      localStorage.setItem('user', JSON.stringify(safeUserForStorage(updatedUserData)));
       
       dispatch({
         type: 'AUTH_SUCCESS',
@@ -375,7 +393,7 @@ export const AuthProvider = ({ children }) => {
       
       // Sync with database
       const userData = await syncUserWithDatabase(firebaseUser);
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('user', JSON.stringify(safeUserForStorage(userData)));
       
       dispatch({
         type: 'AUTH_SUCCESS',
@@ -414,7 +432,7 @@ export const AuthProvider = ({ children }) => {
       
       // Sync with database
       const userData = await syncUserWithDatabase(firebaseUser);
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('user', JSON.stringify(safeUserForStorage(userData)));
       
       dispatch({
         type: 'AUTH_SUCCESS',
@@ -440,9 +458,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout function
+  // Logout function — revoke tokens server-side, then sign out locally
   const logout = async () => {
     try {
+      // Revoke refresh tokens on the backend first (while we still have a valid token)
+      try {
+        await apiCall('/auth/logout', { method: 'POST' });
+      } catch (err) {
+        // Continue with local logout even if server call fails
+        console.warn('Server logout failed, proceeding with local logout:', err.message);
+      }
+
       await signOut(auth);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -483,7 +509,7 @@ export const AuthProvider = ({ children }) => {
       
       if (response.success) {
         const updatedUser = { ...state.user, ...response.user };
-        localStorage.setItem('user', JSON.stringify(updatedUser));
+        localStorage.setItem('user', JSON.stringify(safeUserForStorage(updatedUser)));
         dispatch({ type: 'UPDATE_USER', payload: updatedUser });
         
         // Force refresh Firebase token to get updated custom claims
@@ -508,7 +534,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (response.success && response.user) {
-        localStorage.setItem('user', JSON.stringify(response.user));
+        localStorage.setItem('user', JSON.stringify(safeUserForStorage(response.user)));
         dispatch({ type: 'UPDATE_USER', payload: response.user });
         return response.user;
       }
@@ -566,7 +592,7 @@ export const AuthProvider = ({ children }) => {
   const updateEmailVerified = () => {
     if (state.user) {
       const updatedUser = { ...state.user, emailVerified: true };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      localStorage.setItem('user', JSON.stringify(safeUserForStorage(updatedUser)));
       dispatch({ type: 'UPDATE_USER', payload: updatedUser });
     }
   };

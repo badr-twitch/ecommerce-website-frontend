@@ -56,7 +56,7 @@ const GiftMembershipModal = ({ isOpen, onClose, plans }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
       <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
-        <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-secondary-600 to-pink-600 px-6 py-4 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-white">Offrir UMOD Prime</h2>
             <p className="text-sm text-white/80">Faites plaisir avec un abonnement premium</p>
@@ -75,13 +75,13 @@ const GiftMembershipModal = ({ isOpen, onClose, plans }) => {
                 Partagez ce code avec <strong>{recipientEmail}</strong>
               </p>
               <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-4">
-                <p className="text-3xl font-mono font-bold text-purple-600 tracking-widest">
+                <p className="text-3xl font-mono font-bold text-secondary-600 tracking-widest">
                   {giftResult.code}
                 </p>
               </div>
               <button
                 onClick={handleCopyCode}
-                className="px-6 py-2 bg-purple-600 text-white rounded-full font-medium hover:bg-purple-700 transition"
+                className="px-6 py-2 bg-secondary-600 text-white rounded-full font-medium hover:bg-secondary-700 transition"
               >
                 Copier le code
               </button>
@@ -107,12 +107,12 @@ const GiftMembershipModal = ({ isOpen, onClose, plans }) => {
                       onClick={() => setSelectedPlan(plan.id)}
                       className={`p-3 rounded-xl border-2 text-left transition ${
                         selectedPlan === plan.id
-                          ? 'border-purple-500 bg-purple-50'
+                          ? 'border-secondary-500 bg-secondary-50'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
                       <p className="font-semibold text-gray-900">{plan.billingCycle}</p>
-                      <p className="text-lg font-bold text-purple-600">{plan.price} DH</p>
+                      <p className="text-lg font-bold text-secondary-600">{plan.price} DH</p>
                       {plan.badge && (
                         <span className="text-xs text-green-600 font-medium">{plan.badge}</span>
                       )}
@@ -129,7 +129,7 @@ const GiftMembershipModal = ({ isOpen, onClose, plans }) => {
                   value={recipientEmail}
                   onChange={(e) => setRecipientEmail(e.target.value)}
                   placeholder="ami@example.com"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400 outline-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-secondary-500/50 focus:border-secondary-400 outline-none"
                 />
               </div>
 
@@ -140,7 +140,7 @@ const GiftMembershipModal = ({ isOpen, onClose, plans }) => {
                   value={recipientName}
                   onChange={(e) => setRecipientName(e.target.value)}
                   placeholder="Prénom"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400 outline-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-secondary-500/50 focus:border-secondary-400 outline-none"
                 />
               </div>
 
@@ -151,7 +151,7 @@ const GiftMembershipModal = ({ isOpen, onClose, plans }) => {
                   onChange={(e) => setPersonalMessage(e.target.value)}
                   placeholder="Joyeux anniversaire ! Profite bien de UMOD Prime..."
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400 outline-none resize-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-secondary-500/50 focus:border-secondary-400 outline-none resize-none"
                 />
               </div>
 
@@ -165,7 +165,7 @@ const GiftMembershipModal = ({ isOpen, onClose, plans }) => {
                 <button
                   onClick={handleSend}
                   disabled={sending || !recipientEmail.trim()}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-medium hover:opacity-90 transition disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-secondary-600 to-pink-600 text-white rounded-xl font-medium hover:opacity-90 transition disabled:opacity-50"
                 >
                   {sending ? 'Envoi...' : 'Offrir le cadeau'}
                 </button>

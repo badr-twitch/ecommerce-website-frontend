@@ -56,8 +56,8 @@ const ResetPasswordPage = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+      <div className="min-h-screen bg-mesh flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-8">
           <div className="text-center">
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
               <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -70,7 +70,7 @@ const ResetPasswordPage = () => {
             </p>
             <Link
               to="/login"
-              className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+              className="inline-block px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-300 font-semibold shadow-glow-primary"
             >
               Se connecter
             </Link>
@@ -85,8 +85,8 @@ const ResetPasswordPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+    <div className="min-h-screen bg-mesh flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Réinitialiser votre mot de passe</h1>
           <p className="text-gray-600">
@@ -106,7 +106,7 @@ const ResetPasswordPage = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500 transition-colors duration-200"
               placeholder="Minimum 6 caractères"
             />
           </div>
@@ -122,7 +122,7 @@ const ResetPasswordPage = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500 transition-colors duration-200"
               placeholder="Répétez le mot de passe"
             />
           </div>
@@ -130,14 +130,14 @@ const ResetPasswordPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+            className="w-full px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-glow-primary"
           >
             {loading ? 'Réinitialisation...' : 'Réinitialiser le mot de passe'}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <Link to="/login" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+          <Link to="/login" className="text-primary-600 hover:text-primary-700 text-sm font-medium">
             ← Retour à la connexion
           </Link>
         </div>

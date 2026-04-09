@@ -4,18 +4,20 @@ import { CartContext } from '../contexts/CartContext';
 import { WishlistContext } from '../contexts/WishlistContext';
 import { ProductRecommendations } from '../components/recommendations';
 import MembershipHighlight from '../components/membership/MembershipHighlight';
+import useScrollReveal from '../hooks/useScrollReveal';
+import { ArrowRight, Truck, Shield, Headphones, Heart, ShoppingCart, Sparkles, Star, Zap } from 'lucide-react';
 
 const HomePage = () => {
   const { addItem } = useContext(CartContext);
   const { addToWishlist, removeFromWishlist, isInWishlist } = useContext(WishlistContext);
+  const revealRef = useScrollReveal();
 
   const handleAddToCart = useCallback((product) => {
     addItem(product, 1);
   }, [addItem]);
 
   const handleToggleWishlist = useCallback(async (product) => {
-    const isWishlisted = isInWishlist(product.id);
-    if (isWishlisted) {
+    if (isInWishlist(product.id)) {
       await removeFromWishlist(product.id);
     } else {
       await addToWishlist(product);
@@ -28,7 +30,7 @@ const HomePage = () => {
       name: "Produit Premium",
       price: "9 653 DH",
       image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop",
-      category: "Électronique"
+      category: "Electronique"
     },
     {
       id: 2,
@@ -39,7 +41,7 @@ const HomePage = () => {
     },
     {
       id: 3,
-      name: "Édition Limitée",
+      name: "Edition Limitee",
       price: "13 939 DH",
       image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop",
       category: "Lifestyle"
@@ -47,181 +49,277 @@ const HomePage = () => {
   ];
 
   const categories = [
-    { name: "Électronique", icon: "📱", count: "150+ produits" },
-    { name: "Mode", icon: "👕", count: "200+ produits" },
-    { name: "Maison", icon: "🏠", count: "100+ produits" },
-    { name: "Sport", icon: "⚽", count: "80+ produits" }
+    { name: "Electronique", icon: Zap, count: "150+", color: "from-primary-500 to-cyan-400" },
+    { name: "Mode", icon: Sparkles, count: "200+", color: "from-pink-500 to-rose-400" },
+    { name: "Maison", icon: Shield, count: "100+", color: "from-amber-500 to-orange-400" },
+    { name: "Sport", icon: Star, count: "80+", color: "from-emerald-500 to-teal-400" },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-20">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10"></div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div ref={revealRef} className="min-h-screen">
+      {/* ============ HERO SECTION ============ */}
+      <section className="relative overflow-hidden bg-hero-mesh">
+        {/* Animated gradient orbs */}
+        <div className="gradient-orb w-[500px] h-[500px] bg-primary-400/30 -top-40 -left-40 animate-float" />
+        <div className="gradient-orb w-[400px] h-[400px] bg-secondary-400/20 top-20 -right-32 animate-float-slow" />
+        <div className="gradient-orb w-[300px] h-[300px] bg-accent-300/15 bottom-0 left-1/3 animate-float-delayed" />
+
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)',
+            backgroundSize: '24px 24px'
+          }}
+        />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16 pb-24 lg:pt-24 lg:pb-32">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Découvrez</span>
+            {/* Badge */}
+            <div className="animate-fade-in-up inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-primary-200/50 rounded-full text-sm font-medium text-primary-700 mb-8 shadow-soft">
+              <Sparkles className="w-4 h-4" />
+              Nouvelle collection disponible
+            </div>
+
+            {/* Heading */}
+            <h1 className="animate-fade-in-up text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6" style={{ animationDelay: '0.1s' }}>
+              <span className="text-gray-900">Decouvrez</span>
               <br />
-              <span className="text-gray-800">l'Excellence</span>
+              <span className="text-gradient-animate">l'Excellence</span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
-              Votre boutique en ligne française de confiance. Des produits de qualité, 
-              un service exceptionnel et une expérience d'achat moderne.
+
+            <p className="animate-fade-in-up text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed" style={{ animationDelay: '0.2s' }}>
+              Votre boutique en ligne de confiance. Des produits de qualite,
+              un service exceptionnel et une experience d'achat moderne.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/products" className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                🛍️ Découvrir nos produits
+
+            {/* CTA Buttons */}
+            <div className="animate-fade-in-up flex flex-col sm:flex-row gap-4 justify-center" style={{ animationDelay: '0.3s' }}>
+              <Link
+                to="/products"
+                className="group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 rounded-2xl shadow-glow-primary hover:shadow-xl transition-all duration-300 hover:-translate-y-1 active:scale-[0.97]"
+              >
+                Decouvrir nos produits
+                <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
-              <Link to="/about" className="px-8 py-4 bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 hover:text-blue-600 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white hover:shadow-lg">
-                ℹ️ En savoir plus
+              <Link
+                to="/about"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold text-gray-700 bg-white/80 backdrop-blur-sm border-2 border-gray-200 hover:border-primary-300 hover:text-primary-700 rounded-2xl transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+              >
+                En savoir plus
               </Link>
+            </div>
+
+            {/* Stats */}
+            <div className="animate-fade-in-up mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto" style={{ animationDelay: '0.4s' }}>
+              {[
+                { value: "10K+", label: "Clients" },
+                { value: "500+", label: "Produits" },
+                { value: "4.9", label: "Note moyenne" },
+              ].map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <div className="text-2xl sm:text-3xl font-bold text-gray-900">{stat.value}</div>
+                  <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
+
+        {/* Bottom wave */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1440 80" fill="none" className="w-full">
+            <path d="M0 80V40C240 80 480 0 720 40C960 80 1200 0 1440 40V80H0Z" fill="white" />
+          </svg>
+        </div>
       </section>
 
-      {/* Membership Highlight */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 pb-10">
+      {/* ============ MEMBERSHIP HIGHLIGHT ============ */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 pb-8 relative z-10">
         <MembershipHighlight />
       </div>
 
-      {/* Features Section */}
-      <section className="py-20">
+      {/* ============ FEATURES SECTION ============ */}
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">Pourquoi choisir UMOD ?</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Nous nous engageons à vous offrir la meilleure expérience d'achat possible
-            </p>
+          <div className="text-center mb-16 reveal">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Pourquoi choisir <span className="text-gradient">UMOD</span> ?
+            </h2>
+            <div className="section-divider mt-4" />
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             {[
               {
-                icon: "🚚",
+                Icon: Truck,
                 title: "Livraison Rapide",
-                description: "Livraison gratuite en 24h sur toute la France"
+                description: "Livraison gratuite en 24h sur toute la France metropolitaine",
+                gradient: "from-primary-500 to-cyan-400",
+                delay: "stagger-1"
               },
               {
-                icon: "🛡️",
-                title: "Garantie Qualité",
-                description: "Tous nos produits sont garantis 2 ans"
+                Icon: Shield,
+                title: "Garantie Qualite",
+                description: "Tous nos produits sont garantis 2 ans avec retour gratuit",
+                gradient: "from-emerald-500 to-teal-400",
+                delay: "stagger-2"
               },
               {
-                icon: "💬",
-                title: "Service Client",
-                description: "Support 24/7 pour vous accompagner"
+                Icon: Headphones,
+                title: "Support 24/7",
+                description: "Notre equipe est disponible pour vous accompagner a tout moment",
+                gradient: "from-violet-500 to-secondary-400",
+                delay: "stagger-3"
               }
             ].map((feature, index) => (
-              <div key={index} className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 text-center group hover:shadow-xl transition-all duration-300 border border-gray-200/50">
-                <div className="w-20 h-20 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center text-4xl mb-6 mx-auto group-hover:scale-110 transition-transform duration-300">
-                  {feature.icon}
+              <div
+                key={index}
+                className={`reveal ${feature.delay} group card-3d p-8 text-center`}
+              >
+                <div className={`w-16 h-16 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-500`}>
+                  <feature.Icon className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-500 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50/50 to-blue-50/50">
+      {/* ============ CATEGORIES SECTION ============ */}
+      <section className="py-20 bg-mesh">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">Explorez nos catégories</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Trouvez exactement ce que vous cherchez parmi nos nombreuses catégories
+          <div className="text-center mb-16 reveal">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Explorez nos <span className="text-gradient">categories</span>
+            </h2>
+            <p className="text-lg text-gray-500 max-w-xl mx-auto">
+              Trouvez exactement ce que vous cherchez
             </p>
           </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
             {categories.map((category, index) => (
-              <Link 
+              <Link
                 key={index}
                 to={`/categories/${category.name.toLowerCase()}`}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 text-center group hover:scale-105 transition-all duration-300 border border-gray-200/50 hover:shadow-xl"
+                className={`reveal stagger-${index + 1} group relative bg-white rounded-2xl p-6 lg:p-8 text-center border border-gray-100 hover:border-transparent transition-all duration-500 hover:shadow-3d-lg hover:-translate-y-2 overflow-hidden`}
               >
-                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                  {category.icon}
+                {/* Background glow on hover */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500 rounded-2xl`} />
+
+                <div className={`w-14 h-14 bg-gradient-to-br ${category.color} rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-md group-hover:scale-110 group-hover:shadow-lg transition-all duration-500`}>
+                  <category.icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">{category.name}</h3>
-                <p className="text-gray-600 text-sm">{category.count}</p>
+                <h3 className="text-lg font-bold text-gray-900 mb-1">{category.name}</h3>
+                <p className="text-sm text-gray-400">{category.count} produits</p>
+
+                <div className="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                  <span className="text-sm font-medium text-primary-600 flex items-center justify-center gap-1">
+                    Explorer <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="py-20">
+      {/* ============ FEATURED PRODUCTS ============ */}
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">Produits Vedettes</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Découvrez nos produits les plus populaires et tendance
-            </p>
+          <div className="flex items-end justify-between mb-12 reveal">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                Produits <span className="text-gradient">vedettes</span>
+              </h2>
+              <p className="text-gray-500">Decouvrez nos produits les plus populaires</p>
+            </div>
+            <Link
+              to="/products"
+              className="hidden sm:flex items-center gap-2 text-primary-600 font-medium hover:text-primary-700 transition-colors group"
+            >
+              Voir tout
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </Link>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featuredProducts.map((product) => (
-              <div key={product.id} className="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 border border-gray-200/50">
-                <div className="relative overflow-hidden">
-                  <img 
-                    src={product.image} 
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {featuredProducts.map((product, index) => (
+              <div
+                key={product.id}
+                className={`reveal stagger-${index + 1} group bg-white rounded-2xl border border-gray-100 overflow-hidden transition-all duration-500 hover:shadow-3d-lg hover:-translate-y-2`}
+              >
+                {/* Image */}
+                <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                  <img
+                    src={product.image}
                     alt={product.name}
-                    className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  {/* Overlay gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                  {/* Category badge */}
                   <div className="absolute top-4 left-4">
-                    <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    <span className="px-3 py-1.5 bg-white/90 backdrop-blur-sm text-xs font-semibold text-gray-700 rounded-lg shadow-sm">
                       {product.category}
                     </span>
                   </div>
 
                   {/* Wishlist button */}
-                  <div className="absolute top-4 right-4">
+                  <button
+                    onClick={() => handleToggleWishlist(product)}
+                    className={`absolute top-4 right-4 p-2.5 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 ${
+                      isInWishlist(product.id)
+                        ? 'bg-rose-500 text-white'
+                        : 'bg-white/90 backdrop-blur-sm text-gray-400 hover:text-rose-500'
+                    }`}
+                  >
+                    <Heart className="w-4 h-4" fill={isInWishlist(product.id) ? 'currentColor' : 'none'} />
+                  </button>
+
+                  {/* Quick add — appears on hover */}
+                  <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-400">
                     <button
-                      onClick={() => handleToggleWishlist(product)}
-                      className={`p-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 ${
-                        isInWishlist(product.id)
-                          ? 'bg-red-500 hover:bg-red-600 text-white'
-                          : 'bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-600 hover:text-red-500 hover:border-red-300'
-                      }`}
+                      onClick={() => handleAddToCart(product)}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/95 backdrop-blur-sm text-gray-900 font-semibold rounded-xl shadow-lg hover:bg-white transition-colors active:scale-[0.97]"
                     >
-                      {isInWishlist(product.id) ? '💝' : '🤍'}
+                      <ShoppingCart className="w-4 h-4" />
+                      Ajouter au panier
                     </button>
                   </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">{product.name}</h3>
-                  <p className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">{product.price}</p>
-                  <button 
-                    onClick={() => handleAddToCart(product)}
-                    className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                  >
-                    🛒 Ajouter au panier
-                  </button>
+
+                {/* Info */}
+                <div className="p-5">
+                  <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-primary-700 transition-colors">
+                    {product.name}
+                  </h3>
+                  <p className="text-xl font-bold text-primary-600">{product.price}</p>
                 </div>
               </div>
             ))}
           </div>
-          
-          <div className="text-center mt-12">
-            <Link to="/products" className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+
+          {/* Mobile "voir tout" */}
+          <div className="sm:hidden text-center mt-8 reveal">
+            <Link
+              to="/products"
+              className="btn-primary inline-flex items-center gap-2"
+            >
               Voir tous les produits
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Personalized Recommendations */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ProductRecommendations 
+      {/* ============ RECOMMENDATIONS ============ */}
+      <section className="py-20 bg-mesh">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
+          <ProductRecommendations
             type="user"
             limit={8}
             showTitle={true}
@@ -229,25 +327,31 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Newsletter Section */}
-      <section className="py-20 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10">
+      {/* ============ NEWSLETTER ============ */}
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 text-center max-w-2xl mx-auto border border-gray-200/50">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-              Restez informé !
-            </h2>
-            <p className="text-gray-600 mb-8 text-lg">
-              Recevez nos dernières offres et nouveautés en avant-première
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Votre adresse email"
-                className="flex-1 px-4 py-3 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300"
-              />
-              <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 whitespace-nowrap">
-                S'abonner
-              </button>
+          <div className="reveal relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-700 rounded-3xl p-10 sm:p-16 text-center">
+            {/* Background orbs */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary-400/20 rounded-full blur-3xl" />
+
+            <div className="relative z-10 max-w-lg mx-auto">
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+                Restez informe
+              </h2>
+              <p className="text-primary-100 mb-8 text-lg">
+                Recevez nos dernieres offres et nouveautes en avant-premiere
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="email"
+                  placeholder="Votre adresse email"
+                  className="flex-1 px-5 py-3.5 bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:bg-white/25 focus:border-white/40 transition-all duration-300"
+                />
+                <button className="px-6 py-3.5 bg-white text-primary-700 font-semibold rounded-xl hover:bg-white/90 transition-all duration-300 hover:shadow-xl active:scale-[0.97] whitespace-nowrap">
+                  S'abonner
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -256,4 +360,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage; 
+export default HomePage;

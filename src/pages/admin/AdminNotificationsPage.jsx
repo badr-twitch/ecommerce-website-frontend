@@ -251,7 +251,7 @@ const AdminNotificationsPage = () => {
 
           {/* Actions */}
           <div className="flex space-x-3">
-            <button onClick={handleTestAll} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium flex items-center gap-2">
+            <button onClick={handleTestAll} className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium flex items-center gap-2">
               <Bell className="w-4 h-4" />
               Tester toutes les notifications
             </button>
@@ -287,7 +287,7 @@ const AdminNotificationsPage = () => {
               <option value="false">Non lues</option>
               <option value="true">Lues</option>
             </select>
-            <button onClick={() => loadNotifications(0)} className="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
+            <button onClick={() => loadNotifications(0)} className="px-3 py-1.5 bg-primary-600 text-white rounded-md text-sm hover:bg-primary-700">
               Filtrer
             </button>
 
@@ -321,7 +321,7 @@ const AdminNotificationsPage = () => {
                 ) : notifications.length === 0 ? (
                   <tr><td colSpan={7} className="p-8 text-center text-gray-500">Aucune notification</td></tr>
                 ) : notifications.map(n => (
-                  <tr key={n.id} className={`hover:bg-gray-50 ${!n.isRead ? 'bg-blue-50/30' : ''}`}>
+                  <tr key={n.id} className={`hover:bg-gray-50 ${!n.isRead ? 'bg-primary-50/30' : ''}`}>
                     <td className="p-3">
                       <input type="checkbox" checked={selectedIds.has(n.id)} onChange={() => toggleSelect(n.id)} className="rounded" />
                     </td>
@@ -457,7 +457,7 @@ const AdminNotificationsPage = () => {
               />
             </div>
 
-            <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium flex items-center gap-2">
+            <button type="submit" className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium flex items-center gap-2">
               <Send className="w-4 h-4" />
               {sendForm.mode === 'broadcast' ? 'Diffuser' : 'Envoyer'}
             </button>
@@ -470,7 +470,7 @@ const AdminNotificationsPage = () => {
 
 const StatCard = ({ label, value, color }) => {
   const colors = {
-    blue: 'bg-blue-50 text-blue-700 border-blue-200',
+    blue: 'bg-primary-50 text-primary-700 border-primary-200',
     red: 'bg-red-50 text-red-700 border-red-200',
     green: 'bg-green-50 text-green-700 border-green-200',
     orange: 'bg-orange-50 text-orange-700 border-orange-200'

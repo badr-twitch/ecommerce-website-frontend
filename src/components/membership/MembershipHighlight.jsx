@@ -5,8 +5,8 @@ const MembershipHighlight = () => {
   return (
     <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-900 to-indigo-800 text-white shadow-2xl">
       <div className="absolute inset-0">
-        <div className="absolute -top-10 -right-10 w-64 h-64 bg-blue-500/40 blur-3xl rounded-full"></div>
-        <div className="absolute bottom-0 left-6 w-80 h-80 bg-purple-500/30 blur-3xl rounded-full"></div>
+        <div className="absolute -top-10 -right-10 w-64 h-64 bg-primary-500/40 blur-3xl rounded-full"></div>
+        <div className="absolute bottom-0 left-6 w-80 h-80 bg-secondary-500/30 blur-3xl rounded-full"></div>
       </div>
       <div className="relative px-6 py-12 lg:px-12 lg:py-16 flex flex-col lg:flex-row items-center gap-10">
         <div className="flex-1">
@@ -15,7 +15,7 @@ const MembershipHighlight = () => {
           </div>
           <h2 className="mt-6 text-3xl sm:text-4xl font-bold leading-tight">
             Transformez votre shopping au Maroc avec{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-300 to-secondary-300">
               l’abonnement UMOD Prime
             </span>
           </h2>
@@ -38,7 +38,7 @@ const MembershipHighlight = () => {
         </div>
         <div className="flex-1 max-w-md w-full">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 to-purple-500/30 blur-2xl rounded-3xl"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-primary-500/30 to-secondary-500/30 blur-2xl rounded-3xl"></div>
             <div className="relative rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl p-6 shadow-xl">
               <header className="flex items-center justify-between">
                 <div>

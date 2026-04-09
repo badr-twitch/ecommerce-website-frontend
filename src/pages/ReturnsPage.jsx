@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { RotateCcw, CheckCircle, XCircle, RefreshCw, DollarSign, AlertTriangle, Phone } from 'lucide-react';
 
 const ReturnsPage = () => {
   const returnSteps = [
@@ -12,7 +13,7 @@ const ReturnsPage = () => {
 
   const returnConditions = [
     {
-      icon: '✅',
+      icon: CheckCircle,
       title: 'Articles éligibles',
       items: [
         'Articles non utilisés et dans leur emballage d\'origine',
@@ -22,7 +23,7 @@ const ReturnsPage = () => {
       ]
     },
     {
-      icon: '❌',
+      icon: XCircle,
       title: 'Articles non échangeables',
       items: [
         'Articles personnalisés ou sur mesure',
@@ -34,17 +35,17 @@ const ReturnsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
+    <div className="min-h-screen bg-mesh relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary-200/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-200/20 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
       {/* Header Section */}
-      <section className="relative overflow-hidden py-20 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-pink-600/90"></div>
+      <section className="relative overflow-hidden py-20 bg-gradient-to-r from-primary-600 to-primary-700">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/90 to-primary-700/90"></div>
         
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
           <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
@@ -55,14 +56,14 @@ const ReturnsPage = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center">
             <div className="inline-block mb-6">
-              <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-4xl mb-4 mx-auto transform hover:scale-110 transition-transform duration-300 shadow-2xl">
-                ↩️
+              <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4 mx-auto transform hover:scale-110 transition-transform duration-300 shadow-2xl">
+                <RotateCcw className="w-10 h-10 text-white" />
               </div>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
               Retours & Remboursements
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-primary-100 max-w-2xl mx-auto leading-relaxed">
               Politique de retour simple et gratuite
             </p>
           </div>
@@ -74,24 +75,24 @@ const ReturnsPage = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 border border-gray-200/50">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl">
-                <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+              <div className="text-center p-6 bg-gradient-to-br from-primary-50 to-secondary-50 rounded-2xl">
+                <div className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent mb-2">
                   14 jours
                 </div>
                 <div className="text-gray-600 font-medium">
                   Délai de retour
                 </div>
               </div>
-              <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl">
-                <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+              <div className="text-center p-6 bg-gradient-to-br from-primary-50 to-secondary-50 rounded-2xl">
+                <div className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent mb-2">
                   Gratuit
                 </div>
                 <div className="text-gray-600 font-medium">
                   Retour offert
                 </div>
               </div>
-              <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl">
-                <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+              <div className="text-center p-6 bg-gradient-to-br from-primary-50 to-secondary-50 rounded-2xl">
+                <div className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent mb-2">
                   5-10 jours
                 </div>
                 <div className="text-gray-600 font-medium">
@@ -116,10 +117,10 @@ const ReturnsPage = () => {
       </section>
 
       {/* Return Steps */}
-      <section className="py-16 relative z-10 bg-gradient-to-br from-gray-50/50 to-blue-50/50">
+      <section className="py-16 relative z-10 bg-gradient-to-br from-gray-50/50 to-primary-50/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent mb-4">
               Comment Retourner un Article
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -133,7 +134,7 @@ const ReturnsPage = () => {
                 key={index}
                 className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-lg text-center transform hover:-translate-y-1 transition-all duration-300"
               >
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-4 mx-auto">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-4 mx-auto">
                   {item.step}
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -158,7 +159,7 @@ const ReturnsPage = () => {
                 className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-gray-200/50"
               >
                 <div className="flex items-center mb-6">
-                  <span className="text-4xl mr-4">{condition.icon}</span>
+                  <condition.icon className="w-10 h-10 mr-4 flex-shrink-0" />
                   <h3 className="text-2xl font-bold text-gray-900">
                     {condition.title}
                   </h3>
@@ -181,26 +182,26 @@ const ReturnsPage = () => {
       <section className="py-16 relative z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 border border-gray-200/50 space-y-6">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent mb-6">
               Échange & Remboursement
             </h2>
             
             <div className="space-y-6 text-gray-700">
-              <div className="bg-blue-50 p-6 rounded-xl border-l-4 border-blue-500">
+              <div className="bg-primary-50 p-6 rounded-xl border-l-4 border-primary-500">
                 <h3 className="font-bold text-gray-900 mb-2 flex items-center">
-                  <span className="mr-2">🔄</span>
+                  <RefreshCw className="w-5 h-5 mr-2" />
                   Échange
                 </h3>
                 <p>
                   Vous souhaitez échanger un article contre une autre taille ou couleur ? 
-                  Contactez notre service client à <a href="mailto:contact@umod.fr" className="text-blue-600 hover:text-blue-700 font-semibold">contact@umod.fr</a>. 
+                  Contactez notre service client à <a href="mailto:contact@umod.fr" className="text-primary-600 hover:text-primary-700 font-semibold">contact@umod.fr</a>. 
                   Nous organiserons l'échange rapidement.
                 </p>
               </div>
 
               <div className="bg-green-50 p-6 rounded-xl border-l-4 border-green-500">
                 <h3 className="font-bold text-gray-900 mb-2 flex items-center">
-                  <span className="mr-2">💰</span>
+                  <DollarSign className="w-5 h-5 mr-2" />
                   Remboursement
                 </h3>
                 <p>
@@ -212,7 +213,7 @@ const ReturnsPage = () => {
 
               <div className="bg-yellow-50 p-6 rounded-xl border-l-4 border-yellow-500">
                 <h3 className="font-bold text-gray-900 mb-2 flex items-center">
-                  <span className="mr-2">⚠️</span>
+                  <AlertTriangle className="w-5 h-5 mr-2" />
                   Articles défectueux
                 </h3>
                 <p>
@@ -229,16 +230,16 @@ const ReturnsPage = () => {
       {/* CTA */}
       <section className="py-12 relative z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl shadow-2xl p-8 md:p-12 text-white">
+          <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-3xl shadow-2xl p-8 md:p-12 text-white">
             <h2 className="text-3xl font-bold mb-4">Besoin d'aide pour un retour ?</h2>
-            <p className="text-xl text-blue-100 mb-8">
+            <p className="text-xl text-primary-100 mb-8">
               Notre équipe est disponible pour vous accompagner dans votre démarche
             </p>
             <Link 
               to="/contact"
-              className="inline-block px-8 py-4 bg-white text-blue-600 hover:bg-blue-50 font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              className="inline-block px-8 py-4 bg-white text-primary-600 hover:bg-primary-50 font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
-              📞 Nous contacter
+              <Phone className="w-5 h-5 inline mr-1" /> Nous contacter
             </Link>
           </div>
         </div>

@@ -3,7 +3,7 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { productsAPI, categoriesAPI, formatPrice } from '../services/api';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
-import { Star, Search, Filter, Settings } from 'lucide-react';
+import { Star, Search, Filter, Settings, Heart, ShoppingCart, CheckCircle, XCircle, Frown } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Memoized FilterSidebar component - defined outside to prevent recreation
@@ -17,12 +17,12 @@ const FilterSidebar = React.memo(({
   clearFilters,
   isSearching
 }) => (
-  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50">
+  <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-soft sticky top-24">
     <div className="flex items-center justify-between mb-6">
       <h3 className="text-xl font-bold text-gray-800">Filtres</h3>
       <button
         onClick={clearFilters}
-        className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+        className="text-primary-600 hover:text-primary-700 text-sm font-medium"
       >
         Réinitialiser
       </button>
@@ -39,7 +39,7 @@ const FilterSidebar = React.memo(({
               onChange={(e) => handleInputChange('search', e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && applyFilters()}
               placeholder="Rechercher un produit... (Entrée pour appliquer)"
-              className="w-full pl-10 pr-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300"
+              className="w-full pl-10 pr-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-300"
             />
       </div>
     </div>
@@ -50,7 +50,7 @@ const FilterSidebar = React.memo(({
       <select
         value={inputValues.category}
         onChange={(e) => handleFilterChange('category', e.target.value)}
-        className="w-full px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300"
+        className="w-full px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-300"
       >
         <option value="">Toutes les catégories</option>
         {categories.map((category) => (
@@ -68,7 +68,7 @@ const FilterSidebar = React.memo(({
         <select
           value={inputValues.brand}
           onChange={(e) => handleFilterChange('brand', e.target.value)}
-          className="w-full px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300"
+          className="w-full px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-300"
         >
           <option value="">Toutes les marques</option>
           {brands.map((brand) => (
@@ -89,14 +89,14 @@ const FilterSidebar = React.memo(({
               value={inputValues.minPrice}
               onChange={(e) => handleInputChange('minPrice', e.target.value)}
               placeholder="Min"
-              className="px-3 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300"
+              className="px-3 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-300"
             />
                     <input
               type="number"
               value={inputValues.maxPrice}
               onChange={(e) => handleInputChange('maxPrice', e.target.value)}
               placeholder="Max"
-              className="px-3 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300"
+              className="px-3 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-300"
             />
       </div>
     </div>
@@ -107,7 +107,7 @@ const FilterSidebar = React.memo(({
       <select
         value={inputValues.sort}
         onChange={(e) => handleFilterChange('sort', e.target.value)}
-        className="w-full px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300"
+        className="w-full px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-300"
       >
         <option value="createdAt">Plus récents</option>
         <option value="name">Nom</option>
@@ -122,7 +122,7 @@ const FilterSidebar = React.memo(({
       <select
         value={inputValues.order}
         onChange={(e) => handleFilterChange('order', e.target.value)}
-        className="w-full px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300"
+        className="w-full px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-300"
       >
         <option value="desc">Décroissant</option>
         <option value="asc">Croissant</option>
@@ -136,7 +136,7 @@ const FilterSidebar = React.memo(({
           type="checkbox"
           checked={inputValues.featured}
           onChange={(e) => handleFilterChange('featured', e.target.checked)}
-          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
         />
         <span className="ml-2 text-sm text-gray-700">Produits vedettes</span>
       </label>
@@ -145,7 +145,7 @@ const FilterSidebar = React.memo(({
           type="checkbox"
           checked={inputValues.onSale}
           onChange={(e) => handleFilterChange('onSale', e.target.checked)}
-          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
         />
         <span className="ml-2 text-sm text-gray-700">En promotion</span>
       </label>
@@ -155,7 +155,7 @@ const FilterSidebar = React.memo(({
     <button
       onClick={applyFilters}
       disabled={isSearching}
-      className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      className="w-full px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
     >
       {isSearching ? (
         <>
@@ -164,7 +164,7 @@ const FilterSidebar = React.memo(({
         </>
       ) : (
         <>
-          🔍 Appliquer les filtres
+          <Search className="w-4 h-4" /> Appliquer les filtres
         </>
       )}
     </button>
@@ -379,16 +379,16 @@ const ProductsPage = () => {
         <div className="absolute top-4 left-4 flex flex-col gap-2">
           {product.isFeatured && (
             <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-              ⭐ Vedette
+              <Star className="w-3 h-3 inline mr-1" /> Vedette
             </span>
           )}
           {product.isOnSale && (
             <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-              🔥 -{product.salePercentage}%
+              -{product.salePercentage}%
             </span>
           )}
           {product.category && (
-            <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+            <span className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-medium">
               {product.category.name}
             </span>
           )}
@@ -405,22 +405,22 @@ const ProductsPage = () => {
                 : 'bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-600 hover:text-red-500 hover:border-red-300'
             }`}
           >
-            {isInWishlist(product.id) ? '💝' : '🤍'}
+            {isInWishlist(product.id) ? <Heart className="w-5 h-5 fill-current" /> : <Heart className="w-5 h-5" />}
           </button>
 
           {/* Quick add to cart button */}
           <button
             onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
             disabled={!product.inStock}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            🛒
+            <ShoppingCart className="w-5 h-5" />
           </button>
         </div>
       </div>
 
       <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors duration-300">
+        <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-primary-600 transition-colors duration-300">
           {product.name}
         </h3>
 
@@ -441,7 +441,7 @@ const ProductsPage = () => {
               {formatPrice(product.originalPrice)}
             </span>
           )}
-          <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
             {formatPrice(product.discountedPrice || product.price)}
           </span>
         </div>
@@ -450,11 +450,11 @@ const ProductsPage = () => {
         <div className="mb-4">
           {product.inStock ? (
             <span className="text-green-600 text-sm font-medium">
-              ✅ En stock ({product.stockQuantity})
+              <CheckCircle className="w-4 h-4 inline mr-1" /> En stock ({product.stockQuantity})
             </span>
           ) : (
             <span className="text-red-600 text-sm font-medium">
-              ❌ Rupture de stock
+              <XCircle className="w-4 h-4 inline mr-1" /> Rupture de stock
             </span>
           )}
         </div>
@@ -464,9 +464,9 @@ const ProductsPage = () => {
           <button
             onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
             disabled={!product.inStock}
-            className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            🛒 Ajouter
+            <ShoppingCart className="w-4 h-4 inline mr-1" /> Ajouter
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); handleToggleWishlist(product); }}
@@ -476,7 +476,7 @@ const ProductsPage = () => {
                 : 'bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 hover:text-red-500 hover:border-red-300'
             }`}
           >
-            {isInWishlist(product.id) ? '💝' : '🤍'}
+            {isInWishlist(product.id) ? <Heart className="w-5 h-5 fill-current" /> : <Heart className="w-5 h-5" />}
           </button>
         </div>
       </div>
@@ -486,19 +486,18 @@ const ProductsPage = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-mesh">
       {/* Header */}
-      <section className="relative overflow-hidden py-12">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10"></div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <section className="py-12 lg:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Nos Produits</span>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+              Nos <span className="text-gradient">Produits</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Découvrez notre collection complète de produits de qualité
+            <p className="text-lg text-gray-500 max-w-xl mx-auto">
+              Decouvrez notre collection complete de produits de qualite
             </p>
+            <div className="section-divider mt-6" />
           </div>
         </div>
       </section>
@@ -510,7 +509,7 @@ const ProductsPage = () => {
           <div className="lg:hidden mb-6">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:text-blue-600 transition-all duration-300"
+              className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:text-primary-600 transition-all duration-300"
             >
               <Filter className="w-5 h-5" />
               {showFilters ? 'Masquer les filtres' : 'Afficher les filtres'}
@@ -551,12 +550,12 @@ const ProductsPage = () => {
                 {Object.values(filters).some(value => value !== '' && value !== false) && (
                   <div className="flex flex-wrap gap-2">
                     {filters.search && (
-                      <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                      <span className="px-3 py-1 bg-primary-100 text-primary-800 rounded-full text-sm">
                         Recherche: {filters.search}
                       </span>
                     )}
                     {filters.category && (
-                      <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+                      <span className="px-3 py-1 bg-secondary-100 text-secondary-800 rounded-full text-sm">
                         Catégorie: {categories.find(c => c.id === filters.category)?.name}
                       </span>
                     )}
@@ -591,12 +590,12 @@ const ProductsPage = () => {
               {/* Error State */}
               {error && (
                 <div className="text-center py-12">
-                  <div className="text-red-600 text-xl mb-4">😔</div>
+                  <Frown className="w-8 h-8 text-red-600 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-gray-800 mb-2">Oups !</h3>
                   <p className="text-gray-600 mb-6">{error}</p>
                   <button
                     onClick={() => window.location.reload()}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300"
+                    className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl transition-all duration-300"
                   >
                     Réessayer
                   </button>
@@ -622,7 +621,7 @@ const ProductsPage = () => {
                               ...Object.fromEntries(searchParams),
                               page: pagination.currentPage - 1
                             })}`}
-                            className="px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 text-gray-700 hover:text-blue-600 rounded-xl transition-all duration-300"
+                            className="px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 text-gray-700 hover:text-primary-600 rounded-xl transition-all duration-300"
                           >
                             ← Précédent
                           </Link>
@@ -641,8 +640,8 @@ const ProductsPage = () => {
                               })}`}
                               className={`px-4 py-2 rounded-xl transition-all duration-300 ${
                                 isCurrent
-                                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                                  : 'bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 text-gray-700 hover:text-blue-600'
+                                  ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white'
+                                  : 'bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 text-gray-700 hover:text-primary-600'
                               }`}
                             >
                               {page}
@@ -656,7 +655,7 @@ const ProductsPage = () => {
                               ...Object.fromEntries(searchParams),
                               page: pagination.currentPage + 1
                             })}`}
-                            className="px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 text-gray-700 hover:text-blue-600 rounded-xl transition-all duration-300"
+                            className="px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 text-gray-700 hover:text-primary-600 rounded-xl transition-all duration-300"
                           >
                             Suivant →
                           </Link>
@@ -670,14 +669,14 @@ const ProductsPage = () => {
               {/* Empty State */}
               {!loading && !error && products.length === 0 && (
                 <div className="text-center py-12">
-                  <div className="text-gray-400 text-6xl mb-4">🔍</div>
+                  <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-gray-800 mb-2">Aucun produit trouvé</h3>
                   <p className="text-gray-600 mb-6">
                     Essayez de modifier vos filtres ou de rechercher autre chose
                   </p>
                   <button
                     onClick={clearFilters}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300"
+                    className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl transition-all duration-300"
                   >
                     Réinitialiser les filtres
                   </button>

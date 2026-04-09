@@ -6,7 +6,7 @@ const TIER_COLORS = {
   bronze: { bg: 'from-amber-600 to-orange-700', text: 'text-amber-400', border: 'border-amber-500/30' },
   silver: { bg: 'from-gray-400 to-gray-500', text: 'text-gray-300', border: 'border-gray-400/30' },
   gold: { bg: 'from-yellow-400 to-amber-500', text: 'text-yellow-400', border: 'border-yellow-400/30' },
-  platinum: { bg: 'from-indigo-400 to-purple-500', text: 'text-purple-300', border: 'border-purple-400/30' }
+  platinum: { bg: 'from-indigo-400 to-secondary-500', text: 'text-secondary-300', border: 'border-secondary-400/30' }
 };
 
 const TIER_LABELS = {

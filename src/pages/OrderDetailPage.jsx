@@ -27,9 +27,9 @@ import OrderShareModal from '../components/orders/OrderShareModal';
 const getStatusInfo = (status) => {
   const statusMap = {
     pending: { label: 'En attente', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
-    confirmed: { label: 'Confirmée', color: 'bg-blue-100 text-blue-800', icon: CheckCircle },
-    processing: { label: 'En préparation', color: 'bg-indigo-100 text-indigo-800', icon: Package },
-    shipped: { label: 'Expédiée', color: 'bg-purple-100 text-purple-800', icon: Truck },
+    confirmed: { label: 'Confirmée', color: 'bg-primary-100 text-primary-800', icon: CheckCircle },
+    processing: { label: 'En préparation', color: 'bg-primary-100 text-primary-800', icon: Package },
+    shipped: { label: 'Expédiée', color: 'bg-secondary-100 text-secondary-800', icon: Truck },
     delivered: { label: 'Livrée', color: 'bg-green-100 text-green-800', icon: CheckCircle },
     cancelled: { label: 'Annulée', color: 'bg-red-100 text-red-800', icon: AlertCircle },
     refunded: { label: 'Remboursée', color: 'bg-gray-100 text-gray-800', icon: AlertCircle },
@@ -159,7 +159,7 @@ const OrderDetailPage = () => {
           <div className="mt-6">
             <Link
               to="/login"
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-xl text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 shadow-glow-primary hover:-translate-y-0.5 transition-all duration-300"
             >
               Se connecter
             </Link>
@@ -171,7 +171,7 @@ const OrderDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-mesh flex items-center justify-center">
         <div className="text-center">
           <Package className="mx-auto h-8 w-8 text-gray-400 animate-pulse" />
           <p className="mt-2 text-gray-500">Chargement de la commande...</p>
@@ -182,7 +182,7 @@ const OrderDetailPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-mesh flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="mx-auto h-12 w-12 text-red-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">Erreur</h3>
@@ -190,7 +190,7 @@ const OrderDetailPage = () => {
           <div className="mt-6">
             <button
               onClick={() => navigate('/orders')}
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-xl text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 shadow-glow-primary hover:-translate-y-0.5 transition-all duration-300"
             >
               Retour aux commandes
             </button>
@@ -202,7 +202,7 @@ const OrderDetailPage = () => {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-mesh flex items-center justify-center">
         <div className="text-center">
           <Package className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">Commande non trouvée</h3>
@@ -212,7 +212,7 @@ const OrderDetailPage = () => {
           <div className="mt-6">
             <button
               onClick={() => navigate('/orders')}
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-xl text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 shadow-glow-primary hover:-translate-y-0.5 transition-all duration-300"
             >
               Retour aux commandes
             </button>
@@ -226,13 +226,13 @@ const OrderDetailPage = () => {
   const StatusIcon = statusInfo.icon;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-mesh">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <button
             onClick={() => navigate('/orders')}
-            className="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500 mb-4"
+            className="inline-flex items-center text-sm text-primary-600 hover:text-primary-500 mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour à mes commandes
@@ -243,7 +243,7 @@ const OrderDetailPage = () => {
               <h1 className="text-3xl font-bold text-gray-900">
                 Commande #{order.orderNumber}
               </h1>
-              <p className="mt-2 text-gray-600">
+              <p className="mt-2 text-gray-500">
                 Passée le {formatDate(order.createdAt)}
               </p>
             </div>
@@ -306,7 +306,7 @@ const OrderDetailPage = () => {
             <OrderActivityFeed orderId={order.id} />
 
             {/* Order Items */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-6">
               <h2 className="text-lg font-medium text-gray-900 mb-6">Produits commandés</h2>
               
               <div className="space-y-4">
@@ -315,7 +315,7 @@ const OrderDetailPage = () => {
                     <img
                       src={item.product?.mainImage || '/placeholder-product.jpg'}
                       alt={item.product?.name}
-                      className="w-20 h-20 object-cover rounded-md"
+                      className="w-20 h-20 object-cover rounded-xl"
                     />
                     
                     <div className="flex-1 min-w-0">
@@ -347,7 +347,7 @@ const OrderDetailPage = () => {
 
             {/* Shipping & Tracking */}
             {order.trackingNumber && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-6">
                 <h2 className="text-lg font-medium text-gray-900 mb-6">Suivi du colis</h2>
                 
                 <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
@@ -365,7 +365,7 @@ const OrderDetailPage = () => {
                   
                   <button
                     onClick={() => navigate(`/track-order?order=${order.orderNumber}&email=${order.customerEmail}`)}
-                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 shadow-glow-primary hover:-translate-y-0.5 transition-all duration-300"
                   >
                     Suivre le colis
                   </button>
@@ -377,7 +377,7 @@ const OrderDetailPage = () => {
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             {/* Order Summary */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-6">
               <h2 className="text-lg font-medium text-gray-900 mb-6">Résumé de la commande</h2>
               
               <div className="space-y-3">
@@ -415,7 +415,7 @@ const OrderDetailPage = () => {
             </div>
 
             {/* Customer Information */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-6">
               <h2 className="text-lg font-medium text-gray-900 mb-6">Informations client</h2>
               
               <div className="space-y-4">
@@ -447,7 +447,7 @@ const OrderDetailPage = () => {
             </div>
 
             {/* Payment Information */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-6">
               <h2 className="text-lg font-medium text-gray-900 mb-6">Paiement</h2>
               
               <div className="space-y-3">
@@ -480,7 +480,7 @@ const OrderDetailPage = () => {
             </div>
 
             {/* Actions */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-6">
               <h2 className="text-lg font-medium text-gray-900 mb-6">Actions</h2>
               
               <div className="space-y-3">
@@ -488,7 +488,7 @@ const OrderDetailPage = () => {
                   <button
                     onClick={handleCancelOrder}
                     disabled={isCancelling}
-                    className="w-full inline-flex items-center justify-center px-4 py-2 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-white hover:bg-red-50 disabled:opacity-50"
+                    className="w-full inline-flex items-center justify-center px-4 py-2 border border-red-300 rounded-xl shadow-sm text-sm font-medium text-red-700 bg-white hover:bg-red-50 disabled:opacity-50"
                   >
                     {isCancelling ? 'Annulation...' : 'Annuler la commande'}
                   </button>
@@ -497,7 +497,7 @@ const OrderDetailPage = () => {
                 {(order.status === 'delivered' || order.status === 'shipped') && order.paymentStatus !== 'refunded' && (
                   <button
                     onClick={() => setShowRefundModal(true)}
-                    className="w-full inline-flex items-center justify-center px-4 py-2 border border-orange-300 rounded-md shadow-sm text-sm font-medium text-orange-700 bg-white hover:bg-orange-50"
+                    className="w-full inline-flex items-center justify-center px-4 py-2 border border-orange-300 rounded-xl shadow-sm text-sm font-medium text-orange-700 bg-white hover:bg-orange-50"
                   >
                     Demander un remboursement
                   </button>
@@ -505,7 +505,7 @@ const OrderDetailPage = () => {
                 
                 <button
                   onClick={() => navigate(`/contact?order=${order.orderNumber}`)}
-                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                 >
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Contacter le support
@@ -513,7 +513,7 @@ const OrderDetailPage = () => {
 
                 <a
                   href="tel:+212522000000"
-                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                 >
                   <Phone className="h-4 w-4 mr-2" />
                   Appeler le support
