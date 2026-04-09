@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { OrderCard } from '../components/orders';
+import SmartReorder from '../components/orders/SmartReorder';
 import { useOrders } from '../hooks/useOrders';
 import { 
   Package, 
@@ -361,6 +362,7 @@ const OrdersPage = () => {
           </div>
         ) : (
           <div className="space-y-4">
+            <SmartReorder />
             {orders.map((order) => (
               <OrderCard 
                 key={order.id} 

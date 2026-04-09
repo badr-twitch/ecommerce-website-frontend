@@ -1,5 +1,6 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
 import Layout from './components/layout/Layout';
 import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
@@ -30,12 +31,39 @@ import FAQPage from './pages/FAQPage';
 import ShippingPage from './pages/ShippingPage';
 import ReturnsPage from './pages/ReturnsPage';
 import HelpPage from './pages/HelpPage';
-import { AuthProvider } from './contexts/AuthContext';
+import OrderTrackingPage from './pages/OrderTrackingPage';
+import SharedOrderPage from './pages/SharedOrderPage';
+import { AuthProvider, AuthContext } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { WishlistProvider } from './contexts/WishlistContext';
 import { AdminProvider } from './contexts/AdminContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { Toaster } from 'react-hot-toast';
+
+const PUBLIC_PATHS = [
+  '/login', '/register', '/forgot-password', '/reset-password', '/verify-email',
+  '/privacy', '/terms', '/about', '/faq', '/shipping', '/returns', '/help', '/contact',
+];
+
+const isPublicPath = (pathname) => {
+  if (pathname.startsWith('/orders/shared/')) return true;
+  return PUBLIC_PATHS.includes(pathname);
+};
+
+// Blocks logged-in users with an unverified email from accessing the app
+function EmailVerificationGate({ children }) {
+  const { user, isLoading } = useContext(AuthContext);
+  const location = useLocation();
+
+  if (isLoading) return null;
+
+  const firebaseVerified = getAuth().currentUser?.emailVerified ?? false;
+  if (user && !user.emailVerified && !firebaseVerified && !isPublicPath(location.pathname)) {
+    return <Navigate to="/verify-email" replace />;
+  }
+
+  return children;
+}
 
 function App() {
   console.log('App component rendering...'); // Debug log
@@ -48,6 +76,7 @@ function App() {
             <NotificationProvider>
               <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
               <Router>
+                <EmailVerificationGate>
                 <Layout>
                   <Routes>
                     <Route path="/" element={<HomePage />} />
@@ -67,6 +96,8 @@ function App() {
                     <Route path="/orders/:id" element={<OrderDetailPage />} />
                     <Route path="/checkout" element={<CheckoutPage />} />
                     <Route path="/order-success" element={<OrderSuccessPage />} />
+                    <Route path="/track-order" element={<OrderTrackingPage />} />
+                    <Route path="/orders/shared/:token" element={<SharedOrderPage />} />
                     <Route path="/membership" element={<MembershipPage />} />
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/notification-preferences" element={<NotificationPreferencesPage />} />
@@ -81,6 +112,7 @@ function App() {
                     <Route path="*" element={<NotFoundPage />} />
                   </Routes>
                 </Layout>
+                </EmailVerificationGate>
               </Router>
             </NotificationProvider>
           </AdminProvider>

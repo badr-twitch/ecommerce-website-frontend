@@ -14,7 +14,10 @@ import {
   DollarSign,
   UserPlus,
   BarChart3,
-  MessageSquare
+  MessageSquare,
+  Clock,
+  Activity,
+  Bell
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
@@ -26,6 +29,8 @@ import OrderDetail from './OrderDetail';
 import InventoryAlerts from './InventoryAlerts';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import ReviewModeration from '../../components/reviews/ReviewModeration';
+import MembershipDashboard from './MembershipDashboard';
+import AdminNotificationsPage from './AdminNotificationsPage';
 import { 
   LineChart, 
   Line, 
@@ -569,13 +574,93 @@ const AdminDashboard = () => {
   }, [activeTab, loadProducts, loadCategories, loadOrders, loadUsers]);
 
   // FIXED: Memoize all render functions to prevent recreation
-  const renderDashboard = useCallback(() => (
+  const renderDashboard = useCallback(() => {
+    const today = adminData?.today || {};
+    const pending = adminData?.pendingActions || {};
+    const revenueChange = parseFloat(today.yesterdayRevenue) > 0
+      ? (((parseFloat(today.revenue) - parseFloat(today.yesterdayRevenue)) / parseFloat(today.yesterdayRevenue)) * 100).toFixed(0)
+      : parseFloat(today.revenue) > 0 ? 100 : 0;
+    const weekChange = parseFloat(today.lastWeekRevenue) > 0
+      ? (((parseFloat(today.thisWeekRevenue) - parseFloat(today.lastWeekRevenue)) / parseFloat(today.lastWeekRevenue)) * 100).toFixed(0)
+      : parseFloat(today.thisWeekRevenue) > 0 ? 100 : 0;
+
+    return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Tableau de Bord</h2>
-      
+
       {adminData ? (
         <>
-          {/* Enhanced Statistics Cards */}
+          {/* Today's Stats - Hero Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+              <p className="text-indigo-100 text-sm font-medium">Revenu Aujourd'hui</p>
+              <p className="text-3xl font-bold mt-1">{today.revenue || '0.00'} DH</p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className={`text-xs px-2 py-0.5 rounded-full ${parseFloat(revenueChange) >= 0 ? 'bg-green-400/20 text-green-100' : 'bg-red-400/20 text-red-100'}`}>
+                  {revenueChange >= 0 ? '+' : ''}{revenueChange}% vs hier
+                </span>
+                <span className="text-xs text-indigo-200">{today.yesterdayRevenue || 0} DH hier</span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg p-6 text-white">
+              <p className="text-emerald-100 text-sm font-medium">Commandes Aujourd'hui</p>
+              <p className="text-3xl font-bold mt-1">{today.orders || 0}</p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-xs text-emerald-200">{today.yesterdayOrders || 0} hier</span>
+                <span className="text-xs text-emerald-200">|</span>
+                <span className="text-xs text-emerald-200">{today.newUsers || 0} nouveaux clients</span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
+              <p className="text-amber-100 text-sm font-medium">Revenu cette Semaine</p>
+              <p className="text-3xl font-bold mt-1">{today.thisWeekRevenue || '0.00'} DH</p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className={`text-xs px-2 py-0.5 rounded-full ${parseFloat(weekChange) >= 0 ? 'bg-green-400/20 text-green-100' : 'bg-red-400/20 text-red-100'}`}>
+                  {weekChange >= 0 ? '+' : ''}{weekChange}% vs semaine dern.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Pending Actions */}
+          {(pending.pendingOrders > 0 || pending.confirmedOrders > 0 || pending.lowStockProducts > 0) && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <h3 className="text-sm font-semibold text-amber-800 mb-3">Actions requises</h3>
+              <div className="flex flex-wrap gap-3">
+                {pending.pendingOrders > 0 && (
+                  <button
+                    onClick={() => { setActiveTab('orders'); setOrderFilters(f => ({ ...f, status: 'pending' })); }}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-medium hover:bg-yellow-200 transition-colors"
+                  >
+                    <Clock className="w-4 h-4" />
+                    {pending.pendingOrders} commande(s) en attente
+                  </button>
+                )}
+                {pending.confirmedOrders > 0 && (
+                  <button
+                    onClick={() => { setActiveTab('orders'); setOrderFilters(f => ({ ...f, status: 'confirmed' })); }}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100 text-blue-800 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors"
+                  >
+                    <Package className="w-4 h-4" />
+                    {pending.confirmedOrders} a preparer
+                  </button>
+                )}
+                {pending.lowStockProducts > 0 && (
+                  <button
+                    onClick={() => setActiveTab('inventory')}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-100 text-red-800 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors"
+                  >
+                    <AlertTriangle className="w-4 h-4" />
+                    {pending.lowStockProducts} produit(s) stock faible
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Overall Statistics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white rounded-xl shadow-lg p-6">
               <div className="flex items-center justify-between">
@@ -745,43 +830,87 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Recent Orders */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Commandes Récentes</h3>
-              <ShoppingCart className="w-5 h-5 text-green-600" />
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Commande</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Montant</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {adminData.recentOrders?.slice(0, 5).map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900">#{order.id.slice(0, 8)}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">
-                        {order.user?.firstName} {order.user?.lastName}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{order.totalAmount} DH</td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(order.status)}`}>
-                          {getStatusLabel(order.status)}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">
-                        {new Date(order.createdAt).toLocaleDateString('fr-FR')}
-                      </td>
+          {/* Recent Orders & Activity Feed - Side by Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Recent Orders - 2/3 width */}
+            <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Commandes Récentes</h3>
+                <button
+                  onClick={() => setActiveTab('orders')}
+                  className="text-sm text-indigo-600 hover:text-indigo-500 font-medium"
+                >
+                  Voir tout
+                </button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Commande</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Montant</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {adminData.recentOrders?.slice(0, 5).map((order) => (
+                      <tr key={order.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900">#{order.id.slice(0, 8)}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">
+                          {order.user?.firstName} {order.user?.lastName}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{order.totalAmount} DH</td>
+                        <td className="px-4 py-3">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(order.status)}`}>
+                            {getStatusLabel(order.status)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-500">
+                          {new Date(order.createdAt).toLocaleDateString('fr-FR')}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Activity Feed - 1/3 width */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Activité Récente</h3>
+                <Activity className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                {adminData.recentActivity?.length > 0 ? (
+                  adminData.recentActivity.map((event, index) => (
+                    <div key={index} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50">
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                        event.type === 'new_order' ? 'bg-green-100 text-green-600' :
+                        event.type === 'new_user' ? 'bg-blue-100 text-blue-600' :
+                        event.type === 'low_stock' ? 'bg-red-100 text-red-600' :
+                        'bg-gray-100 text-gray-600'
+                      }`}>
+                        {event.type === 'new_order' && <ShoppingCart className="w-4 h-4" />}
+                        {event.type === 'new_user' && <UserPlus className="w-4 h-4" />}
+                        {event.type === 'low_stock' && <AlertTriangle className="w-4 h-4" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-900 leading-tight">{event.message}</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {new Date(event.timestamp).toLocaleString('fr-FR', {
+                            day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-400 text-center py-4">Aucune activité récente</p>
+                )}
+              </div>
             </div>
           </div>
         </>
@@ -792,7 +921,8 @@ const AdminDashboard = () => {
         </div>
       )}
     </div>
-  ), [adminData]);
+  );
+  }, [adminData]);
 
   // Helper functions for chart colors and labels
   const getStatusColor = useCallback((status) => {
@@ -875,8 +1005,8 @@ const AdminDashboard = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="admin-flex-container flex items-center">
                         {/* FIXED: Use StableImage component with admin CSS classes */}
-                        <StableImage 
-                          src={product.imageUrl} 
+                        <StableImage
+                          src={product.mainImage || product.images?.[0] || product.imageUrl}
                           alt={product.name}
                           width={40}
                           height={40}
@@ -1487,7 +1617,9 @@ const AdminDashboard = () => {
     { id: 'orders', label: 'Commandes', icon: ShoppingCart },
     { id: 'reviews', label: 'Avis', icon: MessageSquare },
     { id: 'inventory', label: 'Inventaire', icon: AlertTriangle },
-    { id: 'users', label: 'Utilisateurs', icon: Users }
+    { id: 'users', label: 'Utilisateurs', icon: Users },
+    { id: 'memberships', label: 'Abonnements', icon: DollarSign },
+    { id: 'notifications', label: 'Notifications', icon: Bell }
   ], []);
 
   // FIXED: Memoize the content rendering to prevent conditional rendering issues
@@ -1509,6 +1641,10 @@ const AdminDashboard = () => {
         return <InventoryAlerts />;
       case 'users':
         return renderUsers();
+      case 'memberships':
+        return <MembershipDashboard />;
+      case 'notifications':
+        return <AdminNotificationsPage />;
       default:
         return renderDashboard();
     }

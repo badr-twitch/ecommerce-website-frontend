@@ -87,6 +87,40 @@ class StorageService {
     }
   }
 
+  // Upload product image
+  async uploadProductImage(file, productId, index = 0, onProgress = null) {
+    const timestamp = Date.now();
+    const path = `products/${productId}/${timestamp}-${index}.jpg`;
+    return await this.uploadFile(file, path, onProgress);
+  }
+
+  // Upload category image
+  async uploadCategoryImage(file, categoryId, onProgress = null) {
+    const timestamp = Date.now();
+    const path = `categories/${categoryId}/${timestamp}.jpg`;
+    return await this.uploadFile(file, path, onProgress);
+  }
+
+  // Delete image by its download URL (works for any Firebase Storage URL)
+  async deleteImageByURL(url) {
+    try {
+      // Only attempt deletion for Firebase Storage URLs
+      if (!url || !url.includes('firebasestorage.googleapis.com')) {
+        return false;
+      }
+      const parsedUrl = new URL(url);
+      const path = parsedUrl.pathname.split('/o/')[1]?.split('?')[0];
+      if (path) {
+        const decodedPath = decodeURIComponent(path);
+        return await this.deleteFile(decodedPath);
+      }
+      return false;
+    } catch (error) {
+      console.error('Delete image by URL error:', error);
+      return false;
+    }
+  }
+
   // Convert data URL to file object
   dataURLtoFile(dataURL, filename) {
     const arr = dataURL.split(',');

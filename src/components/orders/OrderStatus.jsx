@@ -1,14 +1,17 @@
 import React from 'react';
-import { 
-  Package, 
-  CheckCircle, 
-  Clock, 
-  Truck, 
+import { useNavigate } from 'react-router-dom';
+import {
+  Package,
+  CheckCircle,
+  Clock,
+  Truck,
   Home,
   AlertCircle
 } from 'lucide-react';
+import DeliveryCountdown from './DeliveryCountdown';
 
 const OrderStatus = ({ order, className = '' }) => {
+  const navigate = useNavigate();
   const getStatusSteps = () => {
     const steps = [
       {
@@ -184,14 +187,26 @@ const OrderStatus = ({ order, className = '' }) => {
               </div>
             </div>
             
-            <button className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+            <button
+              onClick={() => navigate(`/track-order?order=${order.orderNumber}&email=${order.customerEmail}`)}
+              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+            >
               Suivre le colis
             </button>
           </div>
         </div>
       )}
 
-      {order?.estimatedDeliveryDate && (
+      {order?.estimatedDeliveryDate && order?.status === 'shipped' && (
+        <div className="mt-4">
+          <DeliveryCountdown
+            estimatedDeliveryDate={order.estimatedDeliveryDate}
+            shippedAt={order.shippedAt}
+          />
+        </div>
+      )}
+
+      {order?.estimatedDeliveryDate && order?.status !== 'shipped' && (
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
             Livraison estimée: <span className="font-medium">{new Date(order.estimatedDeliveryDate).toLocaleDateString('fr-FR')}</span>

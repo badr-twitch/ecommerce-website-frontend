@@ -1,6 +1,6 @@
 import React from 'react';
 
-const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod }) => {
+const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod, isMember = false, memberDiscount = 0 }) => {
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6 sticky top-8">
       <div className="border-b border-gray-200 pb-4 mb-6">
@@ -48,12 +48,24 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod }) 
             <span className="text-gray-600">
               Livraison ({shippingMethod.name})
             </span>
-            <span className="text-gray-900">{shippingCost.toFixed(2)} DH</span>
+            {isMember ? (
+              <span className="text-green-600 font-medium">GRATUITE (UMOD Prime)</span>
+            ) : (
+              <span className="text-gray-900">{shippingCost.toFixed(2)} DH</span>
+            )}
+          </div>
+        )}
+
+        {/* Member discount */}
+        {isMember && memberDiscount > 0 && (
+          <div className="flex justify-between text-sm">
+            <span className="text-purple-600 font-medium">Remise UMOD Prime -5%</span>
+            <span className="text-purple-600 font-medium">-{memberDiscount.toFixed(2)} DH</span>
           </div>
         )}
 
         {/* Free shipping indicator */}
-        {subtotal >= 50 && shippingCost > 0 && (
+        {!isMember && subtotal >= 536 && shippingCost === 0 && (
           <div className="bg-green-50 rounded-lg p-3 border border-green-200">
             <div className="flex items-center space-x-2">
               <span className="text-green-600">🎉</span>
@@ -63,6 +75,21 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod }) 
             </div>
             <p className="text-xs text-green-600 mt-1">
               Votre commande dépasse 536 DH
+            </p>
+          </div>
+        )}
+
+        {/* Prime member benefits summary */}
+        {isMember && (
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-3 border border-purple-200">
+            <div className="flex items-center space-x-2">
+              <span className="text-purple-600">👑</span>
+              <span className="text-sm text-purple-800 font-medium">
+                Avantages UMOD Prime appliqués
+              </span>
+            </div>
+            <p className="text-xs text-purple-600 mt-1">
+              Livraison gratuite + 5% de remise sur votre commande
             </p>
           </div>
         )}

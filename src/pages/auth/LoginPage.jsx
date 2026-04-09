@@ -94,7 +94,7 @@ const LoginPage = () => {
     try {
       const result = await login(formData.email.trim(), formData.password);
       if (result.success) {
-        navigate('/');
+        navigate(result.requiresVerification ? '/verify-email' : '/');
       } else {
         setError(result.error || 'Erreur de connexion');
       }

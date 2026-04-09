@@ -14,19 +14,19 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-console.log('Firebase config:', firebaseConfig);
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-console.log('Firebase app initialized:', app);
+
 
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);
-console.log('Firebase auth initialized:', auth);
+
 
 // Initialize Firebase Storage
 export const storage = getStorage(app);
-console.log('Firebase storage initialized:', storage);
+
 
 // Initialize providers
 export const googleProvider = new GoogleAuthProvider();
@@ -41,6 +41,6 @@ facebookProvider.setCustomParameters({
   display: 'popup'
 });
 
-console.log('Firebase providers initialized');
+
 
 export default app; 

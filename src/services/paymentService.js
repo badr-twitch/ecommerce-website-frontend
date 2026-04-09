@@ -1,58 +1,39 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-// Helper function to make API calls
-const apiCall = async (endpoint, options = {}) => {
-  const token = localStorage.getItem('token');
-  const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-      ...(token && !options.headers?.Authorization && { Authorization: `Bearer ${token}` }),
-    },
-    ...options,
-  };
-
-  try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.message || 'Erreur de requête');
-    }
-    
-    return data;
-  } catch (error) {
-    console.error('API Error:', error);
-    throw error;
-  }
-};
+import api from './api';
 
 export const paymentService = {
-  // Get all payment methods
+  // Create a Stripe PaymentIntent for checkout
+  createPaymentIntent: async (amount, currency = 'mad') => {
+    const { data } = await api.post('/orders/create-payment-intent', { amount, currency });
+    return data;
+  },
+
+  // Create an order after payment succeeds
+  createOrder: async (orderData) => {
+    const { data } = await api.post('/orders', orderData);
+    return data;
+  },
+
+  // Get all saved payment methods
   getPaymentMethods: async () => {
-    return await apiCall('/payment-methods');
+    const { data } = await api.get('/payment-methods');
+    return data;
   },
 
-  // Add new payment method
-  addPaymentMethod: async (paymentData) => {
-    console.log('🔍 Frontend - Sending payment data:', paymentData);
-    return await apiCall('/payment-methods', {
-      method: 'POST',
-      body: JSON.stringify(paymentData)
-    });
+  // Create a SetupIntent to save a card
+  createSetupIntent: async () => {
+    const { data } = await api.post('/payment-methods/setup-intent');
+    return data;
   },
 
-  // Delete payment method
+  // Delete a saved payment method
   deletePaymentMethod: async (id) => {
-    return await apiCall(`/payment-methods/${id}`, {
-      method: 'DELETE'
-    });
+    const { data } = await api.delete(`/payment-methods/${id}`);
+    return data;
   },
 
-  // Set payment method as default
+  // Set a payment method as default
   setDefaultPaymentMethod: async (id) => {
-    return await apiCall(`/payment-methods/${id}/default`, {
-      method: 'PUT'
-    });
+    const { data } = await api.put(`/payment-methods/${id}/default`);
+    return data;
   }
-}; 
+};

@@ -4,6 +4,9 @@ import { membershipAPI, formatPrice } from '../services/api';
 import { AuthContext } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { paymentService } from '../services/paymentService';
+import LoyaltyDashboard from '../components/membership/LoyaltyDashboard';
+import SeasonalBanner from '../components/membership/SeasonalBanner';
+import GiftMembershipModal from '../components/membership/GiftMembershipModal';
 
 const MembershipPage = () => {
   const navigate = useNavigate();
@@ -20,6 +23,12 @@ const MembershipPage = () => {
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState(null);
   const [autoRenewPreference, setAutoRenewPreference] = useState(true);
   const [paymentError, setPaymentError] = useState('');
+  const [selectedPlanKey, setSelectedPlanKey] = useState('monthly');
+  const [giftModalOpen, setGiftModalOpen] = useState(false);
+
+  const selectedPlanConfig = plan?.plans?.[selectedPlanKey] || null;
+  const monthlyPlan = plan?.plans?.monthly;
+  const annualPlan = plan?.plans?.annual;
 
   const selectedPaymentMethod = paymentMethods.find(
     (method) => method.id === selectedPaymentMethodId,
@@ -143,6 +152,7 @@ const MembershipPage = () => {
       const response = await membershipAPI.subscribe({
         paymentMethodId: selectedPaymentMethodId,
         autoRenew: autoRenewPreference,
+        planId: selectedPlanConfig?.id,
       });
 
       if (response.data.success) {
@@ -219,17 +229,57 @@ const MembershipPage = () => {
                   offres VIP et protection premium pour chacun de vos achats.
                 </p>
 
-                <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
-                  <div className="p-4 rounded-2xl bg-white/10 border border-white/10 backdrop-blur">
-                    <p className="text-sm text-white/60 uppercase tracking-wide">Tarif unique</p>
-                    <p className="mt-2 text-3xl font-semibold">
-                      {plan ? formatPrice(plan.price, plan.currency) : '69,99 DH'}
-                      <span className="ml-2 text-base text-white/50 font-normal">/ mois</span>
-                    </p>
+                {/* Plan Toggle */}
+                <div className="mt-10 max-w-xl">
+                  <div className="flex items-center justify-center sm:justify-start gap-2 p-1 rounded-full bg-white/10 border border-white/10 w-fit">
+                    <button
+                      onClick={() => setSelectedPlanKey('monthly')}
+                      className={`px-5 py-2 rounded-full text-sm font-semibold transition ${
+                        selectedPlanKey === 'monthly'
+                          ? 'bg-white text-slate-900 shadow-md'
+                          : 'text-white/70 hover:text-white'
+                      }`}
+                    >
+                      Mensuel
+                    </button>
+                    <button
+                      onClick={() => setSelectedPlanKey('annual')}
+                      className={`px-5 py-2 rounded-full text-sm font-semibold transition relative ${
+                        selectedPlanKey === 'annual'
+                          ? 'bg-white text-slate-900 shadow-md'
+                          : 'text-white/70 hover:text-white'
+                      }`}
+                    >
+                      Annuel
+                      {annualPlan?.savings && (
+                        <span className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 text-[10px] font-bold text-white shadow-lg">
+                          -{Math.round(annualPlan.savings)} DH
+                        </span>
+                      )}
+                    </button>
                   </div>
-                  <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/10 backdrop-blur">
-                    <p className="text-sm text-white/70">Essai satisfait ou remboursé</p>
-                    <p className="mt-2 text-lg font-semibold">Remboursement garanti sous 30 jours</p>
+
+                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-2xl bg-white/10 border border-white/10 backdrop-blur">
+                      <p className="text-sm text-white/60 uppercase tracking-wide">
+                        {selectedPlanKey === 'annual' ? 'Tarif annuel' : 'Tarif mensuel'}
+                      </p>
+                      <p className="mt-2 text-3xl font-semibold">
+                        {selectedPlanConfig ? formatPrice(selectedPlanConfig.price, selectedPlanConfig.currency) : '69,99 DH'}
+                        <span className="ml-2 text-base text-white/50 font-normal">
+                          / {selectedPlanKey === 'annual' ? 'an' : 'mois'}
+                        </span>
+                      </p>
+                      {selectedPlanKey === 'annual' && monthlyPlan && (
+                        <p className="mt-1 text-sm text-green-400">
+                          soit {formatPrice(Math.round(annualPlan.price / 12 * 100) / 100, 'MAD')}/mois au lieu de {formatPrice(monthlyPlan.price, 'MAD')}
+                        </p>
+                      )}
+                    </div>
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/10 backdrop-blur">
+                      <p className="text-sm text-white/70">Essai satisfait ou remboursé</p>
+                      <p className="mt-2 text-lg font-semibold">Remboursement garanti sous 30 jours</p>
+                    </div>
                   </div>
                 </div>
 
@@ -322,6 +372,20 @@ const MembershipPage = () => {
                     </div>
                     <h3 className="mt-4 text-xl font-semibold text-white">{perk.title}</h3>
                     <p className="mt-3 text-sm text-white/60 leading-relaxed">{perk.description}</p>
+                    {perk.title === 'Support client 24/7' && (
+                      <a
+                        href="https://wa.me/212522000000"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 border border-green-400/30 text-green-400 text-sm font-medium hover:bg-green-500/30 transition"
+                      >
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.79 23.329l4.47-1.474A11.96 11.96 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-2.168 0-4.19-.588-5.932-1.614l-.425-.252-2.652.875.868-2.578-.278-.44A9.79 9.79 0 012.182 12c0-5.415 4.403-9.818 9.818-9.818S21.818 6.585 21.818 12 17.415 21.818 12 21.818z"/>
+                        </svg>
+                        Contacter via WhatsApp
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}
@@ -344,6 +408,32 @@ const MembershipPage = () => {
               ))}
             </div>
           </section>
+
+          {/* Seasonal Offers */}
+          <section className="mt-24">
+            <SeasonalBanner />
+          </section>
+
+          {/* Loyalty + Gift */}
+          {isAuthenticated && (
+            <section className="mt-24 grid md:grid-cols-2 gap-6">
+              <LoyaltyDashboard />
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur flex flex-col justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Offrir UMOD Prime</h3>
+                  <p className="text-sm text-white/60">
+                    Faites plaisir à vos proches avec un abonnement UMOD Prime. Choisissez le plan et envoyez un code cadeau.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setGiftModalOpen(true)}
+                  className="mt-4 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold hover:opacity-90 transition w-full"
+                >
+                  🎁 Offrir un abonnement
+                </button>
+              </div>
+            </section>
+          )}
 
           {/* FAQ */}
           <section className="mt-24">
@@ -400,6 +490,12 @@ const MembershipPage = () => {
         </div>
       </div>
 
+      <GiftMembershipModal
+        isOpen={giftModalOpen}
+        onClose={() => setGiftModalOpen(false)}
+        plans={plan?.plans}
+      />
+
       {paymentModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 py-6">
           <div className="w-full max-w-lg overflow-hidden rounded-3xl bg-white text-slate-900 shadow-2xl">
@@ -421,8 +517,8 @@ const MembershipPage = () => {
             <div className="space-y-5 px-6 py-6">
               <p className="text-sm text-slate-600">
                 Votre carte sera débitée de{' '}
-                {plan ? formatPrice(plan.price, plan.currency) : '69,99 DH'} pour activer UMOD Prime
-                immédiatement.
+                <span className="font-semibold">{selectedPlanConfig ? formatPrice(selectedPlanConfig.price, selectedPlanConfig.currency) : '69,99 DH'}</span>{' '}
+                pour activer UMOD Prime ({selectedPlanConfig?.billingCycle || 'Mensuel'}) immédiatement.
               </p>
 
               {paymentError && (
@@ -534,7 +630,7 @@ const MembershipPage = () => {
                       Activation…
                     </>
                   ) : (
-                    <>Payer {plan ? formatPrice(plan.price, plan.currency) : '69,99 DH'}</>
+                    <>Payer {selectedPlanConfig ? formatPrice(selectedPlanConfig.price, selectedPlanConfig.currency) : '69,99 DH'}</>
                   )}
                 </button>
               </div>

@@ -1,153 +1,182 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { paymentService } from '../../services/paymentService';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
+
+const CARD_ELEMENT_OPTIONS = {
+  style: {
+    base: {
+      fontSize: '16px',
+      color: '#1f2937',
+      fontFamily: '"Inter", system-ui, sans-serif',
+      '::placeholder': { color: '#9ca3af' },
+      padding: '12px'
+    },
+    invalid: {
+      color: '#dc2626',
+      iconColor: '#dc2626'
+    }
+  },
+  hidePostalCode: true
+};
+
+// Inner form that has access to Stripe context
+const AddCardForm = ({ clientSecret, onSuccess, onClose }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [cardError, setCardError] = useState(null);
+  const [cardComplete, setCardComplete] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleCardChange = (event) => {
+    setCardError(event.error ? event.error.message : null);
+    setCardComplete(event.complete);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!stripe || !elements || !cardComplete) return;
+
+    setIsSubmitting(true);
+    setCardError(null);
+
+    try {
+      const { error, setupIntent } = await stripe.confirmCardSetup(clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement)
+        }
+      });
+
+      if (error) {
+        setCardError(error.message);
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (setupIntent.status === 'succeeded') {
+        onSuccess();
+      } else {
+        setCardError(`Statut inattendu: ${setupIntent.status}`);
+        setIsSubmitting(false);
+      }
+    } catch (err) {
+      setCardError(err.message || 'Une erreur est survenue');
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Informations de carte *
+        </label>
+        <div className={`border rounded-xl p-4 transition-all duration-300 ${
+          cardError ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
+        }`}>
+          <CardElement options={CARD_ELEMENT_OPTIONS} onChange={handleCardChange} />
+        </div>
+        {cardError && (
+          <p className="mt-2 text-sm text-red-600">{cardError}</p>
+        )}
+      </div>
+
+      {/* Security Notice */}
+      <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+        <div className="flex items-center space-x-3">
+          <div className="flex-shrink-0">
+            <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div>
+            <h4 className="font-medium text-gray-900">Paiement sécurisé</h4>
+            <p className="text-sm text-gray-600">
+              Vos données bancaires sont traitées directement par Stripe.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex space-x-4 pt-4">
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={isSubmitting}
+          className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-all duration-300 disabled:opacity-50"
+        >
+          Annuler
+        </button>
+        <button
+          type="submit"
+          disabled={isSubmitting || !stripe || !cardComplete}
+          className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-2 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+        >
+          {isSubmitting ? (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <span>Enregistrement...</span>
+            </div>
+          ) : (
+            'Ajouter la carte'
+          )}
+        </button>
+      </div>
+    </form>
+  );
+};
 
 const AddPaymentModal = ({ isOpen, onClose, onAdd }) => {
-  const [formData, setFormData] = useState({
-    cardNumber: '',
-    cardName: '',
-    expiryDate: '',
-    cvv: ''
-  });
-  
-  const [errors, setErrors] = useState({});
-  const [touched, setTouched] = useState({});
+  const [clientSecret, setClientSecret] = useState(null);
+  const [loadingSetup, setLoadingSetup] = useState(false);
+  const [setupError, setSetupError] = useState(null);
 
-  // Reset form data when modal opens
-  React.useEffect(() => {
+  // Fetch SetupIntent when modal opens
+  useEffect(() => {
     if (isOpen) {
-      setFormData({
-        cardNumber: '',
-        cardName: '',
-        expiryDate: '',
-        cvv: ''
-      });
-      setErrors({});
-      setTouched({});
+      setClientSecret(null);
+      setSetupError(null);
+      setLoadingSetup(true);
+
+      paymentService.createSetupIntent()
+        .then((result) => {
+          setClientSecret(result.clientSecret);
+        })
+        .catch((err) => {
+          console.error('Error creating setup intent:', err);
+          setSetupError(
+            err.response?.data?.error ||
+            err.message ||
+            'Erreur lors de la préparation du formulaire'
+          );
+        })
+        .finally(() => {
+          setLoadingSetup(false);
+        });
     }
   }, [isOpen]);
 
-  const validateField = (name, value) => {
-    switch (name) {
-      case 'cardNumber': {
-        if (!value.trim()) return 'Le numéro de carte est requis';
-        if (!/^\d{16}$/.test(value.replace(/\s/g, ''))) return 'Le numéro de carte doit contenir 16 chiffres';
-        return '';
-      }
-      
-      case 'cardName':
-        if (!value.trim()) return 'Le nom sur la carte est requis';
-        if (value.trim().length < 3) return 'Le nom doit contenir au moins 3 caractères';
-        return '';
-      
-      case 'expiryDate': {
-        if (!value.trim()) return 'La date d\'expiration est requise';
-        if (!/^\d{2}\/\d{2}$/.test(value)) return 'Format: MM/YY';
-        const [month, year] = value.split('/');
-        const currentDate = new Date();
-        const currentYear = currentDate.getFullYear() % 100;
-        const currentMonth = currentDate.getMonth() + 1;
-        
-        if (parseInt(month) < 1 || parseInt(month) > 12) return 'Mois invalide';
-        if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
-          return 'Carte expirée';
-        }
-        return '';
-      }
-      
-      case 'cvv':
-        if (!value.trim()) return 'Le code CVV est requis';
-        if (!/^\d{3,4}$/.test(value)) return 'Le CVV doit contenir 3 ou 4 chiffres';
-        return '';
-      
-      default:
-        return '';
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    let formattedValue = value;
-
-    // Format card number with spaces
-    if (name === 'cardNumber') {
-      formattedValue = value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
-    }
-
-    // Format expiry date
-    if (name === 'expiryDate') {
-      formattedValue = value.replace(/\D/g, '').replace(/(\d{2})(\d)/, '$1/$2');
-    }
-
-    setFormData({
-      ...formData,
-      [name]: formattedValue
-    });
-
-    if (touched[name]) {
-      const fieldError = validateField(name, formattedValue);
-      setErrors({
-        ...errors,
-        [name]: fieldError
-      });
-    }
-  };
-
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
-    setTouched({
-      ...touched,
-      [name]: true
-    });
-    
-    const fieldError = validateField(name, value);
-    setErrors({
-      ...errors,
-      [name]: fieldError
-    });
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    Object.keys(formData).forEach(field => {
-      const fieldError = validateField(field, formData[field]);
-      if (fieldError) {
-        newErrors[field] = fieldError;
-        isValid = false;
-      }
-    });
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      const cardNumber = formData.cardNumber.replace(/\s/g, '');
-      const paymentData = {
-        cardNumber,
-        expiry: formData.expiryDate,
-        cardholderName: formData.cardName,
-        cvv: formData.cvv
-      };
-      
-      onAdd(paymentData);
-      handleClose();
-    }
-  };
-
-  const handleClose = () => {
-    setFormData({
-      cardNumber: '',
-      cardName: '',
-      expiryDate: '',
-      cvv: ''
-    });
-    setErrors({});
-    setTouched({});
+  const handleSuccess = () => {
+    onAdd(); // Trigger reload of payment methods in parent
     onClose();
   };
+
+  const stripeOptions = useMemo(() => {
+    if (!clientSecret) return null;
+    return {
+      clientSecret,
+      appearance: {
+        theme: 'stripe',
+        variables: {
+          colorPrimary: '#2563eb',
+          borderRadius: '12px'
+        }
+      }
+    };
+  }, [clientSecret]);
 
   if (!isOpen) return null;
 
@@ -160,144 +189,42 @@ const AddPaymentModal = ({ isOpen, onClose, onAdd }) => {
               Ajouter une carte
             </h2>
             <button
-              onClick={handleClose}
+              onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors duration-300"
             >
-              <span className="text-2xl">×</span>
+              <span className="text-2xl">&times;</span>
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Card Number */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Numéro de carte *
-              </label>
-              <input
-                type="text"
-                name="cardNumber"
-                value={formData.cardNumber}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                maxLength="19"
-                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-                  errors.cardNumber && touched.cardNumber 
-                    ? 'border-red-300 focus:ring-red-500' 
-                    : 'border-gray-300'
-                }`}
-                placeholder="1234 5678 9012 3456"
-              />
-              {errors.cardNumber && touched.cardNumber && (
-                <p className="mt-1 text-sm text-red-600">{errors.cardNumber}</p>
-              )}
+          {loadingSetup && (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-3 text-gray-600">Chargement...</span>
             </div>
+          )}
 
-            {/* Card Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nom sur la carte *
-              </label>
-              <input
-                type="text"
-                name="cardName"
-                value={formData.cardName}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-                  errors.cardName && touched.cardName 
-                    ? 'border-red-300 focus:ring-red-500' 
-                    : 'border-gray-300'
-                }`}
-                placeholder="JOHN DOE"
-              />
-              {errors.cardName && touched.cardName && (
-                <p className="mt-1 text-sm text-red-600">{errors.cardName}</p>
-              )}
-            </div>
-
-            {/* Expiry Date and CVV */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Date d'expiration *
-                </label>
-                <input
-                  type="text"
-                  name="expiryDate"
-                  value={formData.expiryDate}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  maxLength="5"
-                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-                    errors.expiryDate && touched.expiryDate 
-                      ? 'border-red-300 focus:ring-red-500' 
-                      : 'border-gray-300'
-                  }`}
-                  placeholder="MM/YY"
-                />
-                {errors.expiryDate && touched.expiryDate && (
-                  <p className="mt-1 text-sm text-red-600">{errors.expiryDate}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Code de sécurité *
-                </label>
-                <input
-                  type="text"
-                  name="cvv"
-                  value={formData.cvv}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  maxLength="4"
-                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-                    errors.cvv && touched.cvv 
-                      ? 'border-red-300 focus:ring-red-500' 
-                      : 'border-gray-300'
-                  }`}
-                  placeholder="123"
-                />
-                {errors.cvv && touched.cvv && (
-                  <p className="mt-1 text-sm text-red-600">{errors.cvv}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Security Notice */}
-            <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-              <div className="flex items-center space-x-3">
-                <div className="text-xl">🔒</div>
-                <div>
-                  <h4 className="font-medium text-gray-900">Paiement sécurisé</h4>
-                  <p className="text-sm text-gray-600">
-                    Vos données sont protégées par un cryptage SSL
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex space-x-4 pt-4">
+          {setupError && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+              <p className="text-red-700 font-medium">Erreur</p>
+              <p className="text-red-600 text-sm mt-1">{setupError}</p>
               <button
-                type="button"
-                onClick={handleClose}
-                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-all duration-300"
+                onClick={onClose}
+                className="mt-3 text-sm text-red-700 underline hover:text-red-800"
               >
-                Annuler
-              </button>
-              <button
-                type="submit"
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-2 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                Ajouter la carte
+                Fermer
               </button>
             </div>
-          </form>
+          )}
+
+          {clientSecret && stripeOptions && (
+            <Elements stripe={stripePromise} options={stripeOptions}>
+              <AddCardForm clientSecret={clientSecret} onSuccess={handleSuccess} onClose={onClose} />
+            </Elements>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-export default AddPaymentModal; 
+export default AddPaymentModal;

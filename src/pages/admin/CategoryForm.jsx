@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { X, Save, Plus } from 'lucide-react';
+import ImageUploader from '../../components/admin/ImageUploader';
 
 const CategoryForm = ({ category = null, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -119,43 +120,13 @@ const CategoryForm = ({ category = null, onClose, onSuccess }) => {
             />
           </div>
 
-          {/* Image URL */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              URL de l'Image
-            </label>
-            <input
-              type="url"
-              name="imageUrl"
-              value={formData.imageUrl}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              placeholder="https://example.com/category-image.jpg"
-            />
-          </div>
-
-          {/* Image Preview */}
-          {formData.imageUrl && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Aperçu de l'Image
-              </label>
-              <div className="w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
-                <img
-                  src={formData.imageUrl}
-                  alt="Category preview"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
-                />
-                <div className="hidden w-full h-full items-center justify-center text-gray-500">
-                  Image non disponible
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Category Image */}
+          <ImageUploader
+            label="Image de la Catégorie"
+            value={formData.imageUrl}
+            onChange={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
+            folder={`categories/${category?.id || 'new'}`}
+          />
 
           {/* Actions */}
           <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">

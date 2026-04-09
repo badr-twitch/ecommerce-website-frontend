@@ -18,18 +18,14 @@ api.interceptors.request.use(
       try {
         const token = await auth.currentUser.getIdToken();
         config.headers.Authorization = `Bearer ${token}`;
-        console.log('🔍 API Request Interceptor - Fresh Firebase token added');
       } catch (error) {
-        console.error('🔍 API Request Interceptor - Error getting fresh token:', error);
+        console.error('API Request Interceptor - Error getting fresh token:', error);
         // Fallback to stored token if fresh token fails
         const storedToken = localStorage.getItem('token');
         if (storedToken) {
           config.headers.Authorization = `Bearer ${storedToken}`;
-          console.log('🔍 API Request Interceptor - Using stored token as fallback');
         }
       }
-    } else {
-      console.log('🔍 API Request Interceptor - No authenticated user');
     }
     return config;
   },
@@ -42,21 +38,14 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.log('🔍 API Response Interceptor - Error status:', error.response?.status);
-    console.log('🔍 API Response Interceptor - Error URL:', error.config?.url);
-    
     if (error.response?.status === 401) {
-      console.log('🔍 API Response Interceptor - 401 Unauthorized error');
       // Token expired or invalid
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      
+
       // Only redirect to login for non-orders requests to prevent infinite redirects
       if (!error.config?.url?.includes('/orders')) {
-        console.log('🔍 API Response Interceptor - Redirecting to login');
         window.location.href = '/login';
-      } else {
-        console.log('🔍 API Response Interceptor - Orders request, not redirecting');
       }
     }
     return Promise.reject(error);
@@ -82,6 +71,7 @@ export const productsAPI = {
   getFeatured: () => api.get('/products', { params: { featured: true, limit: 8 } }),
   getOnSale: () => api.get('/products', { params: { onSale: true, limit: 8 } }),
   search: (query, params = {}) => api.get('/products', { params: { search: query, ...params } }),
+  getBrands: () => api.get('/products/brands'),
   addReview: (productId, data) => api.post(`/products/${productId}/reviews`, data),
 };
 
@@ -99,6 +89,13 @@ export const ordersAPI = {
   create: (data) => api.post('/orders', data),
   cancel: (id) => api.post(`/orders/${id}/cancel`),
   updateStatus: (id, data) => api.put(`/orders/${id}/status`, data),
+  track: (orderNumber, email) => api.get(`/orders/track/${orderNumber}`, { params: { email } }),
+  refund: (id, data) => api.post(`/orders/${id}/refund`, data),
+  getInvoice: (id) => api.get(`/orders/${id}/invoice`, { responseType: 'blob' }),
+  getHistory: (id) => api.get(`/orders/${id}/history`),
+  getReorderSuggestions: () => api.get('/orders/reorder-suggestions'),
+  shareOrder: (id, data) => api.post(`/orders/${id}/share`, data),
+  getSharedOrder: (token) => api.get(`/orders/shared/${token}`),
 };
 
 // Users API
@@ -177,6 +174,15 @@ export const membershipAPI = {
   getStatus: () => api.get('/membership/status'),
   subscribe: (data = {}) => api.post('/membership/subscribe', data),
   cancel: () => api.post('/membership/cancel'),
+  reactivate: (data = {}) => api.post('/membership/reactivate', data),
+  toggleAutoRenew: () => api.post('/membership/toggle-auto-renew'),
+  getTransactions: () => api.get('/membership/transactions'),
+  refund: () => api.post('/membership/refund'),
+  getLoyalty: () => api.get('/membership/loyalty'),
+  redeemPoints: (points) => api.post('/membership/loyalty/redeem', { points }),
+  getSeasonalOffers: () => api.get('/membership/seasonal-offers'),
+  purchaseGift: (data) => api.post('/membership/gift', data),
+  redeemGift: (code) => api.post('/membership/gift/redeem', { code }),
 };
 
 // Error handling utility
@@ -207,6 +213,25 @@ export const handleAPIError = (error) => {
     // Other error
     return 'Une erreur inattendue est survenue';
   }
+};
+
+export const adminMembershipAPI = {
+  getStats: () => api.get('/admin/memberships/stats'),
+  getMembers: (params = {}) => api.get('/admin/memberships/users', { params }),
+  updateMember: (userId, data) => api.put(`/admin/memberships/users/${userId}`, data),
+  getTransactions: (params = {}) => api.get('/admin/memberships/transactions', { params }),
+};
+
+export const adminNotificationsAPI = {
+  getAll: (params = {}) => api.get('/notifications/admin/all', { params }),
+  getStats: () => api.get('/notifications/admin/stats'),
+  deleteOne: (id) => api.delete(`/notifications/admin/${id}`),
+  bulkDelete: (ids) => api.post('/notifications/admin/bulk-delete', { ids }),
+  sendToUser: (data) => api.post('/notifications/admin/send-to-user', data),
+  broadcast: (data) => api.post('/notifications/admin/broadcast', data),
+  testAll: () => api.post('/notifications/admin/test-all'),
+  testSound: (soundType) => api.post('/notifications/admin/test-sound', { soundType }),
+  cleanup: () => api.post('/notifications/admin/cleanup'),
 };
 
 export default api; 

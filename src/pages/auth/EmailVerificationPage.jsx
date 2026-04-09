@@ -1,122 +1,114 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { authAPI } from '../../services/api';
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
+import { AuthContext } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
+
+const RESEND_COOLDOWN = 60; // seconds
 
 const EmailVerificationPage = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
-  
-  const [loading, setLoading] = useState(false);
-  const [verified, setVerified] = useState(false);
-  const [error, setError] = useState('');
+  const { user, resendVerificationEmail, updateEmailVerified } = useContext(AuthContext);
+  const [cooldown, setCooldown] = useState(0);
+  const [sending, setSending] = useState(false);
+  const pollRef = useRef(null);
+  const cooldownRef = useRef(null);
 
+  // Poll Firebase every 5 seconds to detect when user verifies their email
   useEffect(() => {
-    if (token) {
-      verifyEmail();
-    } else {
-      setError('Lien de vérification invalide');
-    }
-  }, [token]);
+    const auth = getAuth();
 
-  const verifyEmail = async () => {
-    setLoading(true);
-    try {
-      // Extract user ID from token if needed, or use the token directly
-      const response = await authAPI.verifyEmail(token);
-      
-      if (response.success) {
-        setVerified(true);
-        toast.success('Email vérifié avec succès !');
-        setTimeout(() => {
-          navigate('/login');
-        }, 2000);
-      } else {
-        setError(response.error || 'Erreur lors de la vérification');
-        toast.error(response.error || 'Erreur lors de la vérification');
+    const checkVerification = async () => {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+
+      try {
+        await currentUser.reload();
+        if (currentUser.emailVerified) {
+          clearInterval(pollRef.current);
+          updateEmailVerified();
+          toast.success('Email vérifié ! Bienvenue !');
+          navigate('/', { replace: true });
+        }
+      } catch {
+        // Ignore transient reload errors
       }
-    } catch (error) {
-      console.error('Email verification error:', error);
-      const errorMessage = error.response?.data?.error || 'Erreur lors de la vérification';
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
+    };
+
+    pollRef.current = setInterval(checkVerification, 5000);
+    return () => clearInterval(pollRef.current);
+  }, [navigate]);
+
+  // Cooldown countdown timer
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    cooldownRef.current = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(cooldownRef.current);
+  }, [cooldown]);
+
+  const handleResend = async () => {
+    if (cooldown > 0 || sending) return;
+    setSending(true);
+    const result = await resendVerificationEmail();
+    setSending(false);
+    if (result.success) {
+      setCooldown(RESEND_COOLDOWN);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Vérification de votre email en cours...</p>
-        </div>
-      </div>
-    );
-  }
+  const email = user?.email || getAuth().currentUser?.email || '';
 
-  if (verified) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
-          <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-              <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Email vérifié !</h2>
-            <p className="text-gray-600 mb-6">
-              Votre adresse email a été vérifiée avec succès. Vous pouvez maintenant vous connecter.
-            </p>
-            <Link
-              to="/login"
-              className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
-            >
-              Se connecter
-            </Link>
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+        <div className="text-center">
+          {/* Envelope icon */}
+          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
+            <svg className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Vérifiez votre email</h2>
+
+          <p className="text-gray-600 mb-2">
+            Un lien de vérification a été envoyé à :
+          </p>
+          {email && (
+            <p className="font-semibold text-gray-800 mb-4 break-all">{email}</p>
+          )}
+          <p className="text-sm text-gray-500 mb-6">
+            Cliquez sur le lien dans l'email pour activer votre compte.
+            Cette page se mettra à jour automatiquement une fois votre email vérifié.
+          </p>
+
+          {/* Resend button */}
+          <button
+            onClick={handleResend}
+            disabled={cooldown > 0 || sending}
+            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-semibold mb-3"
+          >
+            {sending
+              ? 'Envoi en cours…'
+              : cooldown > 0
+              ? `Renvoyer l'email (${cooldown}s)`
+              : "Renvoyer l'email de vérification"}
+          </button>
+
+          <p className="text-xs text-gray-400 mb-6">
+            Vérifiez également votre dossier spam si vous ne trouvez pas l'email.
+          </p>
+
+          {/* Live polling indicator */}
+          <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
+            <span className="inline-block h-2 w-2 rounded-full bg-blue-400 animate-pulse" />
+            En attente de vérification…
           </div>
         </div>
       </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
-          <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
-              <svg className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Erreur de vérification</h2>
-            <p className="text-gray-600 mb-6">{error}</p>
-            <div className="space-y-3">
-              <button
-                onClick={verifyEmail}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-              >
-                Réessayer
-              </button>
-              <Link
-                to="/login"
-                className="block w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-center"
-              >
-                Retour à la connexion
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return null;
+    </div>
+  );
 };
 
 export default EmailVerificationPage;
-

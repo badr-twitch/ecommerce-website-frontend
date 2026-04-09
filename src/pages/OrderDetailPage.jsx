@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { ordersAPI } from '../services/api';
 import { OrderStatus } from '../components/orders';
+import OrderActivityFeed from '../components/orders/OrderActivityFeed';
 import { 
   Package, 
   Calendar, 
@@ -21,6 +22,20 @@ import {
   MessageSquare
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import OrderShareModal from '../components/orders/OrderShareModal';
+
+const getStatusInfo = (status) => {
+  const statusMap = {
+    pending: { label: 'En attente', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
+    confirmed: { label: 'Confirmée', color: 'bg-blue-100 text-blue-800', icon: CheckCircle },
+    processing: { label: 'En préparation', color: 'bg-indigo-100 text-indigo-800', icon: Package },
+    shipped: { label: 'Expédiée', color: 'bg-purple-100 text-purple-800', icon: Truck },
+    delivered: { label: 'Livrée', color: 'bg-green-100 text-green-800', icon: CheckCircle },
+    cancelled: { label: 'Annulée', color: 'bg-red-100 text-red-800', icon: AlertCircle },
+    refunded: { label: 'Remboursée', color: 'bg-gray-100 text-gray-800', icon: AlertCircle },
+  };
+  return statusMap[status] || statusMap.pending;
+};
 
 const OrderDetailPage = () => {
   const { id } = useParams();
@@ -30,6 +45,10 @@ const OrderDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
+  const [isRefunding, setIsRefunding] = useState(false);
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [refundReason, setRefundReason] = useState('');
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     if (user && id) {
@@ -83,7 +102,30 @@ const OrderDetailPage = () => {
     }
   };
 
+  const handleRefund = async () => {
+    if (!refundReason.trim()) {
+      toast.error('Veuillez indiquer la raison du remboursement');
+      return;
+    }
 
+    try {
+      setIsRefunding(true);
+      const response = await ordersAPI.refund(id, { reason: refundReason });
+
+      if (response.data.success) {
+        toast.success('Remboursement effectué avec succès');
+        setShowRefundModal(false);
+        setRefundReason('');
+        fetchOrder();
+      } else {
+        toast.error(response.data.error || 'Erreur lors du remboursement');
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Erreur lors du remboursement');
+    } finally {
+      setIsRefunding(false);
+    }
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Non spécifié';
@@ -182,7 +224,6 @@ const OrderDetailPage = () => {
 
   const statusInfo = getStatusInfo(order.status);
   const StatusIcon = statusInfo.icon;
-  const timelineSteps = getTimelineSteps();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -214,13 +255,40 @@ const OrderDetailPage = () => {
               </div>
               
               <div className="flex items-center gap-2">
-                <button className="p-2 text-gray-400 hover:text-gray-600">
+                <button
+                  onClick={() => window.print()}
+                  className="p-2 text-gray-400 hover:text-gray-600"
+                  title="Imprimer"
+                >
                   <Printer className="h-5 w-5" />
                 </button>
-                <button className="p-2 text-gray-400 hover:text-gray-600">
+                <button
+                  onClick={async () => {
+                    try {
+                      toast.loading('Génération de la facture...', { id: 'invoice' });
+                      const response = await ordersAPI.getInvoice(order.id);
+                      const blob = new Blob([response.data], { type: 'application/pdf' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `facture-${order.orderNumber}.pdf`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                      toast.success('Facture téléchargée', { id: 'invoice' });
+                    } catch (e) {
+                      toast.error('Erreur lors du téléchargement', { id: 'invoice' });
+                    }
+                  }}
+                  className="p-2 text-gray-400 hover:text-gray-600"
+                  title="Télécharger la facture"
+                >
                   <Download className="h-5 w-5" />
                 </button>
-                <button className="p-2 text-gray-400 hover:text-gray-600">
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  className="p-2 text-gray-400 hover:text-gray-600"
+                  title="Partager"
+                >
                   <Share2 className="h-5 w-5" />
                 </button>
               </div>
@@ -233,6 +301,9 @@ const OrderDetailPage = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Order Timeline */}
             <OrderStatus order={order} />
+
+            {/* Activity Feed */}
+            <OrderActivityFeed orderId={order.id} />
 
             {/* Order Items */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -254,9 +325,9 @@ const OrderDetailPage = () => {
                       <p className="text-sm text-gray-500">
                         Quantité: {item.quantity}
                       </p>
-                      {item.product?.discountPercentage > 0 && (
+                      {item.product?.salePercentage > 0 && (
                         <p className="text-sm text-green-600">
-                          Réduction: {item.product.discountPercentage}%
+                          Réduction: {item.product.salePercentage}%
                         </p>
                       )}
                     </div>
@@ -292,7 +363,10 @@ const OrderDetailPage = () => {
                     </div>
                   </div>
                   
-                  <button className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                  <button
+                    onClick={() => navigate(`/track-order?order=${order.orderNumber}&email=${order.customerEmail}`)}
+                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                  >
                     Suivre le colis
                   </button>
                 </div>
@@ -419,21 +493,86 @@ const OrderDetailPage = () => {
                     {isCancelling ? 'Annulation...' : 'Annuler la commande'}
                   </button>
                 )}
+
+                {(order.status === 'delivered' || order.status === 'shipped') && order.paymentStatus !== 'refunded' && (
+                  <button
+                    onClick={() => setShowRefundModal(true)}
+                    className="w-full inline-flex items-center justify-center px-4 py-2 border border-orange-300 rounded-md shadow-sm text-sm font-medium text-orange-700 bg-white hover:bg-orange-50"
+                  >
+                    Demander un remboursement
+                  </button>
+                )}
                 
-                <button className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                <button
+                  onClick={() => navigate(`/contact?order=${order.orderNumber}`)}
+                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                >
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Contacter le support
                 </button>
-                
-                <button className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+
+                <a
+                  href="tel:+212522000000"
+                  className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                >
                   <Phone className="h-4 w-4 mr-2" />
                   Appeler le support
-                </button>
+                </a>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Refund Modal */}
+      {showRefundModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Demander un remboursement</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Commande #{order.orderNumber} — {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'MAD' }).format(order.totalAmount)}
+            </p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Raison du remboursement
+              </label>
+              <textarea
+                value={refundReason}
+                onChange={(e) => setRefundReason(e.target.value)}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                placeholder="Décrivez la raison de votre demande..."
+              />
+            </div>
+            <p className="text-xs text-gray-500 mb-4">
+              Le remboursement sera traité sous 5 à 10 jours ouvrés sur votre moyen de paiement d'origine.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleRefund}
+                disabled={isRefunding || !refundReason.trim()}
+                className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
+              >
+                {isRefunding ? 'Traitement...' : 'Confirmer le remboursement'}
+              </button>
+              <button
+                onClick={() => { setShowRefundModal(false); setRefundReason(''); }}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {order && (
+        <OrderShareModal
+          order={order}
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+        />
+      )}
     </div>
   );
 };

@@ -240,9 +240,9 @@ const RegisterPage = () => {
       }
 
       const result = await register(registerData);
-      
+
       if (result.success) {
-        navigate('/');
+        navigate('/verify-email');
       } else {
         setError(result.error || 'Erreur lors de l\'inscription');
       }

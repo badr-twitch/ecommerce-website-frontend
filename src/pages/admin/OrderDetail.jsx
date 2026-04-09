@@ -1,16 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { X, Eye, Package, Truck, CheckCircle, XCircle, Clock, User, MapPin, CreditCard } from 'lucide-react';
+import { X, Eye, Package, Truck, CheckCircle, XCircle, Clock, User, MapPin, CreditCard, RefreshCw, MessageSquare, Trash2, Send } from 'lucide-react';
 
 const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
   const [loading, setLoading] = useState(false);
   const [statusComment, setStatusComment] = useState('');
   const [orderDetails, setOrderDetails] = useState(null);
+  // Refund state
+  const [showRefundSection, setShowRefundSection] = useState(false);
+  const [refundAmount, setRefundAmount] = useState('');
+  const [refundReason, setRefundReason] = useState('');
+  const [refundType, setRefundType] = useState('full');
+  const [isRefunding, setIsRefunding] = useState(false);
+  // Notes state
+  const [notes, setNotes] = useState([]);
+  const [newNote, setNewNote] = useState('');
+  const [isAddingNote, setIsAddingNote] = useState(false);
 
   useEffect(() => {
     if (order) {
       loadOrderDetails();
+      loadNotes();
     }
   }, [order]);
 
@@ -29,6 +40,77 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
     } catch (error) {
       console.error('❌ Error loading order details:', error);
       toast.error('Erreur lors du chargement des détails de la commande');
+    }
+  };
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return { headers: { Authorization: `Bearer ${token}` } };
+  };
+
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+  const loadNotes = async () => {
+    try {
+      const response = await axios.get(`${apiBase}/admin/orders/${order.id}/notes`, getAuthHeaders());
+      setNotes(response.data.data || []);
+    } catch (error) {
+      console.error('Error loading notes:', error);
+    }
+  };
+
+  const handleAddNote = async () => {
+    if (!newNote.trim()) return;
+    setIsAddingNote(true);
+    try {
+      const response = await axios.post(
+        `${apiBase}/admin/orders/${order.id}/notes`,
+        { content: newNote, isInternal: true },
+        getAuthHeaders()
+      );
+      setNotes(prev => [response.data.data, ...prev]);
+      setNewNote('');
+      toast.success('Note ajoutée');
+    } catch (error) {
+      toast.error('Erreur lors de l\'ajout de la note');
+    } finally {
+      setIsAddingNote(false);
+    }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    try {
+      await axios.delete(`${apiBase}/admin/orders/${order.id}/notes/${noteId}`, getAuthHeaders());
+      setNotes(prev => prev.filter(n => n.id !== noteId));
+      toast.success('Note supprimée');
+    } catch (error) {
+      toast.error('Erreur lors de la suppression');
+    }
+  };
+
+  const handleRefund = async () => {
+    if (!refundReason.trim()) {
+      toast.error('Veuillez indiquer une raison');
+      return;
+    }
+    setIsRefunding(true);
+    try {
+      const data = { reason: refundReason };
+      if (refundType === 'partial' && refundAmount) {
+        data.amount = parseFloat(refundAmount);
+      }
+      await axios.post(
+        `${apiBase}/admin/orders/${order.id}/refund`,
+        data,
+        getAuthHeaders()
+      );
+      toast.success('Remboursement effectué avec succès');
+      onStatusUpdate();
+      onClose();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Erreur lors du remboursement');
+    } finally {
+      setIsRefunding(false);
     }
   };
 
@@ -291,6 +373,141 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
                 ))}
               </div>
             </div>
+          </div>
+
+          {/* Refund Section */}
+          {!['cancelled', 'refunded'].includes(orderDetails.status) && (
+            <div className="mt-6">
+              {!showRefundSection ? (
+                <button
+                  onClick={() => setShowRefundSection(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Rembourser cette commande
+                </button>
+              ) : (
+                <div className="bg-orange-50 rounded-lg p-6 border border-orange-200">
+                  <h3 className="text-lg font-semibold text-orange-900 mb-4 flex items-center gap-2">
+                    <RefreshCw className="w-5 h-5" />
+                    Remboursement
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex gap-4">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          value="full"
+                          checked={refundType === 'full'}
+                          onChange={() => setRefundType('full')}
+                          className="text-orange-600 focus:ring-orange-500"
+                        />
+                        <span className="text-sm">Total ({orderDetails.totalAmount} DH)</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          value="partial"
+                          checked={refundType === 'partial'}
+                          onChange={() => setRefundType('partial')}
+                          className="text-orange-600 focus:ring-orange-500"
+                        />
+                        <span className="text-sm">Partiel</span>
+                      </label>
+                    </div>
+                    {refundType === 'partial' && (
+                      <input
+                        type="number"
+                        value={refundAmount}
+                        onChange={(e) => setRefundAmount(e.target.value)}
+                        placeholder="Montant en DH"
+                        max={parseFloat(orderDetails.totalAmount)}
+                        min={0.01}
+                        step={0.01}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                      />
+                    )}
+                    <textarea
+                      value={refundReason}
+                      onChange={(e) => setRefundReason(e.target.value)}
+                      rows={2}
+                      placeholder="Raison du remboursement (obligatoire)"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleRefund}
+                        disabled={isRefunding || !refundReason.trim()}
+                        className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
+                      >
+                        {isRefunding ? 'Traitement...' : 'Confirmer le remboursement'}
+                      </button>
+                      <button
+                        onClick={() => { setShowRefundSection(false); setRefundReason(''); setRefundAmount(''); }}
+                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                      >
+                        Annuler
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Order Notes */}
+          <div className="mt-6 bg-gray-50 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <MessageSquare className="w-5 h-5" />
+              Notes internes ({notes.length})
+            </h3>
+
+            {/* Add note form */}
+            <div className="flex gap-2 mb-4">
+              <input
+                type="text"
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddNote()}
+                placeholder="Ajouter une note..."
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+              />
+              <button
+                onClick={handleAddNote}
+                disabled={isAddingNote || !newNote.trim()}
+                className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Notes list */}
+            {notes.length > 0 ? (
+              <div className="space-y-3 max-h-60 overflow-y-auto">
+                {notes.map((note) => (
+                  <div key={note.id} className="bg-white rounded-lg p-3 border border-gray-200 group">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-800">{note.content}</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {note.author ? `${note.author.firstName} ${note.author.lastName}` : 'Admin'} — {new Date(note.createdAt).toLocaleDateString('fr-FR')}{' '}
+                          {new Date(note.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteNote(note.id)}
+                        className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all"
+                        title="Supprimer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 text-center py-2">Aucune note pour cette commande</p>
+            )}
           </div>
         </div>
       </div>

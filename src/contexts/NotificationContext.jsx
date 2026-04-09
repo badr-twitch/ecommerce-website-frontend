@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { auth } from '../config/firebase';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -21,32 +22,36 @@ export const NotificationProvider = ({ children }) => {
   const [preferences, setPreferences] = useState({});
   const [isConnected, setIsConnected] = useState(false);
   const [showNotificationCenter, setShowNotificationCenter] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const PAGE_SIZE = 20;
   
   const socketRef = useRef(null);
   const audioRef = useRef(null);
+  const preferencesLoadedRef = useRef(false);
 
   // Initialize socket connection
-  const initializeSocket = useCallback(() => {
+  const initializeSocket = useCallback(async () => {
     if (!isAuthenticated) return;
     if (socketRef.current?.connected) return;
 
     try {
-      socketRef.current = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
+      // Get Firebase token for socket authentication
+      const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+      if (!token) return;
+
+      const socketUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace('/api', '');
+      socketRef.current = io(socketUrl, {
         transports: ['websocket', 'polling'],
-        withCredentials: true
+        withCredentials: true,
+        auth: { token }
       });
 
       socketRef.current.on('connect', () => {
         setIsConnected(true);
 
-        // Join admin room if user is admin
+        // Join admin room if user is admin (server verifies role)
         if (user?.role === 'admin') {
           socketRef.current.emit('join-admin');
-        }
-
-        // Join user room
-        if (user?.uid) {
-          socketRef.current.emit('join-user', user.uid);
         }
       });
 
@@ -63,8 +68,9 @@ export const NotificationProvider = ({ children }) => {
         // Update unread count
         setUnreadCount(prev => prev + 1);
 
-        // Show toast notification if enabled
-        if (preferences[notification.type]?.toastEnabled !== false) {
+        // Show toast notification if enabled (only check preference if loaded)
+        const shouldShowToast = !preferencesLoadedRef.current || preferences[notification.type]?.toastEnabled !== false;
+        if (shouldShowToast) {
           const toastOptions = {
             duration: notification.priority === 'critical' ? 8000 : 4000,
             position: 'top-right',
@@ -160,22 +166,43 @@ export const NotificationProvider = ({ children }) => {
     }
   }, []);
 
-  // Load notifications from API
+  // Load notifications from API (initial load)
   const loadNotifications = useCallback(async () => {
     if (!isAuthenticated) return;
 
     try {
       const response = await api.get('/notifications', {
-        params: { limit: 50 }
+        params: { limit: PAGE_SIZE, offset: 0 }
       });
 
       if (response.data.success) {
-        setNotifications(response.data.data);
+        const data = response.data.data;
+        setNotifications(data);
+        setHasMore(data.length >= PAGE_SIZE);
       }
     } catch (error) {
       console.error('❌ Error loading notifications:', error);
     }
   }, [isAuthenticated]);
+
+  // Load more notifications (pagination)
+  const loadMoreNotifications = useCallback(async () => {
+    if (!isAuthenticated || !hasMore) return;
+
+    try {
+      const response = await api.get('/notifications', {
+        params: { limit: PAGE_SIZE, offset: notifications.length }
+      });
+
+      if (response.data.success) {
+        const data = response.data.data;
+        setNotifications(prev => [...prev, ...data]);
+        setHasMore(data.length >= PAGE_SIZE);
+      }
+    } catch (error) {
+      console.error('❌ Error loading more notifications:', error);
+    }
+  }, [isAuthenticated, hasMore, notifications.length]);
 
   // Load unread count
   const loadUnreadCount = useCallback(async () => {
@@ -201,6 +228,7 @@ export const NotificationProvider = ({ children }) => {
       
       if (response.data.success) {
         setPreferences(response.data.data);
+        preferencesLoadedRef.current = true;
       }
     } catch (error) {
       console.error('❌ Error loading notification preferences:', error);
@@ -225,6 +253,25 @@ export const NotificationProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('❌ Error marking notification as read:', error);
+    }
+  }, []);
+
+  // Delete a notification
+  const deleteNotification = useCallback(async (notificationId) => {
+    try {
+      const response = await api.delete(`/notifications/${notificationId}`);
+
+      if (response.data.success) {
+        setNotifications(prev => {
+          const notif = prev.find(n => n.id === notificationId);
+          if (notif && !notif.isRead) {
+            setUnreadCount(c => Math.max(0, c - 1));
+          }
+          return prev.filter(n => n.id !== notificationId);
+        });
+      }
+    } catch (error) {
+      console.error('❌ Error deleting notification:', error);
     }
   }, []);
 
@@ -300,10 +347,13 @@ export const NotificationProvider = ({ children }) => {
     unreadCount,
     preferences,
     isConnected,
+    hasMore,
     showNotificationCenter,
     setShowNotificationCenter,
     markAsRead,
     markAllAsRead,
+    deleteNotification,
+    loadMoreNotifications,
     updatePreferences,
     loadNotifications,
     loadUnreadCount,

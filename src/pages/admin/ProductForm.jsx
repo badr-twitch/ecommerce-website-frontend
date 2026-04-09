@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { X, Save, Plus } from 'lucide-react';
+import ImageUploader from '../../components/admin/ImageUploader';
 
 const ProductForm = ({ product = null, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -12,7 +13,8 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
     originalPrice: '',
     stockQuantity: '',
     categoryId: '',
-    imageUrl: '',
+    mainImage: '',
+    images: [],
     isOnSale: false,
     salePercentage: '',
     saleStartDate: '',
@@ -38,7 +40,8 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
         originalPrice: product.originalPrice || '',
         stockQuantity: product.stockQuantity !== undefined ? product.stockQuantity : '',
         categoryId: product.categoryId || '',
-        imageUrl: product.imageUrl || '',
+        mainImage: product.mainImage || product.imageUrl || '',
+        images: product.images || [],
         isOnSale: product.isOnSale || false,
         salePercentage: product.salePercentage || '',
         saleStartDate: product.saleStartDate || '',
@@ -132,10 +135,6 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
         : `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/products`;
 
       const method = isEditing ? 'put' : 'post';
-      
-      console.log('🔍 Making request to:', url);
-      console.log('🔍 Request method:', method.toUpperCase());
-      console.log('🔍 Request headers:', { Authorization: `Bearer ${token}` });
       
       const response = await axios[method](url, cleanedData, {
         headers: {
@@ -468,43 +467,23 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
             </select>
           </div>
 
-          {/* Image URL */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              URL de l'Image
-            </label>
-            <input
-              type="url"
-              name="imageUrl"
-              value={formData.imageUrl}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              placeholder="https://example.com/image.jpg"
-            />
-          </div>
+          {/* Main Image */}
+          <ImageUploader
+            label="Image Principale"
+            value={formData.mainImage}
+            onChange={(url) => setFormData(prev => ({ ...prev, mainImage: url }))}
+            folder={`products/${product?.id || 'new'}`}
+          />
 
-          {/* Image Preview */}
-          {formData.imageUrl && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Aperçu de l'Image
-              </label>
-              <div className="w-full h-48 bg-gray-100 rounded-lg overflow-hidden">
-                <img
-                  src={formData.imageUrl}
-                  alt="Product preview"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
-                />
-                <div className="hidden w-full h-full items-center justify-center text-gray-500">
-                  Image non disponible
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Gallery Images */}
+          <ImageUploader
+            label="Images de la Galerie"
+            value={formData.images}
+            onChange={(urls) => setFormData(prev => ({ ...prev, images: urls }))}
+            multiple
+            maxFiles={8}
+            folder={`products/${product?.id || 'new'}`}
+          />
 
           {/* Actions */}
           <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">

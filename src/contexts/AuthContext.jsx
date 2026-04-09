@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signInWithPopup, 
-  signOut, 
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
   onAuthStateChanged,
-  updateProfile as updateFirebaseProfile
+  updateProfile as updateFirebaseProfile,
+  sendEmailVerification
 } from 'firebase/auth';
 import { auth, googleProvider, facebookProvider } from '../config/firebase';
 import toast from 'react-hot-toast';
@@ -104,13 +105,6 @@ const apiCall = async (endpoint, options = {}) => {
     config.headers['Content-Type'] = 'application/json';
   }
 
-  console.log('🔍 Frontend - API Call config:', {
-    url: `${API_BASE_URL}${endpoint}`,
-    method: config.method,
-    headers: config.headers,
-    body: config.body
-  });
-
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
     const data = await response.json();
@@ -135,8 +129,6 @@ export const AuthProvider = ({ children }) => {
       // Get custom claims (including phone number)
       const tokenResult = await firebaseUser.getIdTokenResult();
       const customClaims = tokenResult.claims || {};
-      console.log('🔍 Firebase custom claims retrieved:', customClaims);
-      
       const userData = {
         firebaseUid: firebaseUser.uid,
         email: firebaseUser.email,
@@ -156,8 +148,6 @@ export const AuthProvider = ({ children }) => {
         billingCountry: additionalData.billingCountry || 'France',
       };
       
-      console.log('📱 User data with phone from custom claims:', userData);
-
       // Try to get existing user from database
       try {
         const existingUser = await apiCall('/auth/user', {
@@ -176,8 +166,6 @@ export const AuthProvider = ({ children }) => {
       }
 
       // If user doesn't exist in database, create them
-      console.log('🔍 Frontend - Sending userData to backend:', userData);
-      console.log('🔍 Frontend - userData JSON:', JSON.stringify(userData));
       const newUser = await apiCall('/auth/register-firebase', {
         method: 'POST',
         body: JSON.stringify(userData),
@@ -257,7 +245,7 @@ export const AuthProvider = ({ children }) => {
       });
       
       toast.success('Connexion réussie !');
-      return { success: true };
+      return { success: true, requiresVerification: !firebaseUser.emailVerified };
     } catch (error) {
       let errorMessage = 'Erreur de connexion';
       
@@ -301,7 +289,10 @@ export const AuthProvider = ({ children }) => {
       await updateFirebaseProfile(firebaseUser, {
         displayName: `${firstName} ${lastName}`,
       });
-      
+
+      // Send email verification before completing registration
+      await sendEmailVerification(firebaseUser);
+
       const token = await firebaseUser.getIdToken();
       localStorage.setItem('token', token);
       
@@ -328,8 +319,8 @@ export const AuthProvider = ({ children }) => {
         payload: { user: updatedUserData, token },
       });
       
-      toast.success('Compte créé avec succès !');
-      return { success: true };
+      toast.success('Compte créé ! Vérifiez votre email pour activer votre compte.');
+      return { success: true, requiresVerification: true };
     } catch (error) {
       let errorMessage = 'Erreur lors de la création du compte';
       
@@ -350,6 +341,24 @@ export const AuthProvider = ({ children }) => {
       dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
       toast.error(errorMessage);
       return { success: false, error: errorMessage };
+    }
+  };
+
+  // Resend verification email
+  const resendVerificationEmail = async () => {
+    try {
+      if (auth.currentUser) {
+        await sendEmailVerification(auth.currentUser);
+        toast.success('Email de vérification renvoyé !');
+        return { success: true };
+      }
+      return { success: false, error: 'Aucun utilisateur connecté' };
+    } catch (error) {
+      const message = error.code === 'auth/too-many-requests'
+        ? 'Trop de demandes. Attendez quelques minutes avant de réessayer.'
+        : 'Erreur lors de l\'envoi de l\'email';
+      toast.error(message);
+      return { success: false, error: message };
     }
   };
 
@@ -464,11 +473,9 @@ export const AuthProvider = ({ children }) => {
         
         // Update Firebase profile
         await updateFirebaseProfile(auth.currentUser, firebaseUpdateData);
-        console.log('✅ Firebase profile updated successfully');
       }
 
       // Then, update backend database
-      console.log('📱 Sending profile update to backend:', userData);
       const response = await apiCall('/auth/profile', {
         method: 'PUT',
         body: JSON.stringify(userData)
@@ -482,11 +489,6 @@ export const AuthProvider = ({ children }) => {
         // Force refresh Firebase token to get updated custom claims
         if (auth.currentUser) {
           await auth.currentUser.getIdToken(true);
-          console.log('✅ Firebase token refreshed with updated custom claims');
-          
-          // Verify the custom claims were updated
-          const tokenResult = await auth.currentUser.getIdTokenResult();
-          console.log('🔍 Updated custom claims after profile update:', tokenResult.claims);
         }
         
         return { success: true };
@@ -560,6 +562,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Mark email as verified in local state (called after Firebase confirms verification)
+  const updateEmailVerified = () => {
+    if (state.user) {
+      const updatedUser = { ...state.user, emailVerified: true };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      dispatch({ type: 'UPDATE_USER', payload: updatedUser });
+    }
+  };
+
   // Clear error function
   const clearError = () => {
     dispatch({ type: 'CLEAR_ERROR' });
@@ -573,6 +584,8 @@ export const AuthProvider = ({ children }) => {
     error: state.error,
     login,
     register,
+    resendVerificationEmail,
+    updateEmailVerified,
     signInWithGoogle,
     signInWithFacebook,
     logout,

@@ -7,14 +7,15 @@ import { Star, Search, Filter, Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Memoized FilterSidebar component - defined outside to prevent recreation
-const FilterSidebar = React.memo(({ 
-  inputValues, 
-  categories, 
-  handleInputChange, 
-  handleFilterChange, 
-  applyFilters, 
-  clearFilters, 
-  isSearching 
+const FilterSidebar = React.memo(({
+  inputValues,
+  categories,
+  brands,
+  handleInputChange,
+  handleFilterChange,
+  applyFilters,
+  clearFilters,
+  isSearching
 }) => (
   <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50">
     <div className="flex items-center justify-between mb-6">
@@ -59,6 +60,25 @@ const FilterSidebar = React.memo(({
         ))}
       </select>
     </div>
+
+    {/* Brand */}
+    {brands && brands.length > 0 && (
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Marque</label>
+        <select
+          value={inputValues.brand}
+          onChange={(e) => handleFilterChange('brand', e.target.value)}
+          className="w-full px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300"
+        >
+          <option value="">Toutes les marques</option>
+          {brands.map((brand) => (
+            <option key={brand} value={brand}>
+              {brand}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
 
     {/* Price Range */}
     <div className="mb-6">
@@ -171,7 +191,8 @@ const ProductsPage = () => {
     sort: searchParams.get('sort') || 'createdAt',
     order: searchParams.get('order') || 'desc',
     featured: searchParams.get('featured') === 'true',
-    onSale: searchParams.get('onSale') === 'true'
+    onSale: searchParams.get('onSale') === 'true',
+    brand: searchParams.get('brand') || ''
   });
 
   // Separate state for all input values (to prevent focus loss)
@@ -183,13 +204,15 @@ const ProductsPage = () => {
     sort: searchParams.get('sort') || 'createdAt',
     order: searchParams.get('order') || 'desc',
     featured: searchParams.get('featured') === 'true',
-    onSale: searchParams.get('onSale') === 'true'
+    onSale: searchParams.get('onSale') === 'true',
+    brand: searchParams.get('brand') || ''
   });
 
   const [showFilters, setShowFilters] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [brands, setBrands] = useState([]);
 
-  // Load categories
+  // Load categories and brands
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -199,7 +222,16 @@ const ProductsPage = () => {
         console.error('Error loading categories:', error);
       }
     };
+    const loadBrands = async () => {
+      try {
+        const response = await productsAPI.getBrands();
+        setBrands(response.data.brands || []);
+      } catch (error) {
+        console.error('Error loading brands:', error);
+      }
+    };
     loadCategories();
+    loadBrands();
   }, []);
 
   // Load products
@@ -488,9 +520,10 @@ const ProductsPage = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Filters Sidebar */}
             <div className={`lg:w-80 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-              <FilterSidebar 
+              <FilterSidebar
                 inputValues={inputValues}
                 categories={categories}
+                brands={brands}
                 handleInputChange={handleInputChange}
                 handleFilterChange={handleFilterChange}
                 applyFilters={applyFilters}

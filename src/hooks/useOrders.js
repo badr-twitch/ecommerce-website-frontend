@@ -18,25 +18,17 @@ export const useOrders = (initialFilters = {}) => {
   const [filters, setFilters] = useState(initialFilters);
 
   useEffect(() => {
-    console.log('🔍 useOrders useEffect - user:', user, 'authLoading:', authLoading);
-    console.log('🔍 User object keys:', user ? Object.keys(user) : 'No user');
-    console.log('🔍 User ID values:', user ? { uid: user.uid, firebaseUid: user.firebaseUid, id: user.id } : 'No user');
-    
     // Check if token exists in localStorage
     const token = localStorage.getItem('token');
-    console.log('🔍 Token exists:', !!token);
-    
+
     // Wait for authentication to complete
     if (authLoading) {
-      console.log('⏳ Authentication still loading...');
       return;
     }
-    
+
     if (user && token && (user.uid || user.firebaseUid || user.id)) {
-      console.log('✅ User authenticated and token exists, fetching orders...');
       fetchOrders();
     } else {
-      console.log('❌ User not authenticated, missing UID, or no token');
       setLoading(false);
       setOrders([]);
       setError('');
@@ -69,17 +61,6 @@ export const useOrders = (initialFilters = {}) => {
         }
       });
 
-      console.log('🔍 Making orders API call with params:', params);
-      console.log('🔍 Token being sent:', localStorage.getItem('token') ? 'Token exists' : 'No token');
-      
-             // Test the token format
-       const currentToken = localStorage.getItem('token');
-       if (currentToken) {
-         console.log('🔍 Token format check - Length:', currentToken.length);
-         console.log('🔍 Token format check - Starts with:', currentToken.substring(0, 20) + '...');
-         console.log('🔍 Token format check - Contains dots:', currentToken.includes('.'));
-       }
-      
       const response = await ordersAPI.getAll(params);
       
       if (response.data.success) {

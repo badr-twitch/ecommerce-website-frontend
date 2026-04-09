@@ -39,7 +39,6 @@ class UserService {
         try {
           const credential = EmailAuthProvider.credential(currentUser.email, password);
           await reauthenticateWithCredential(currentUser, credential);
-          console.log('✅ User re-authenticated successfully');
         } catch (reauthError) {
           if (reauthError.code === 'auth/wrong-password') {
             throw new Error('Mot de passe incorrect');

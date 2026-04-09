@@ -21,7 +21,8 @@ const NotificationPreferencesPage = () => {
     inventory_out_of_stock: 'Rupture de stock',
     inventory_restored: 'Stock restauré',
     user_registration: 'Nouveaux utilisateurs',
-    system_error: 'Erreurs système'
+    system_error: 'Erreurs système',
+    membership: 'Abonnement UMOD Prime'
   };
 
   const handleToggle = (type, setting) => {
@@ -62,7 +63,11 @@ const NotificationPreferencesPage = () => {
       };
       return defaults[setting];
     }
-    return preferences[type][setting] !== false; // Convert to boolean
+    // emailEnabled defaults to false, others default to true
+    if (setting === 'emailEnabled') {
+      return preferences[type][setting] === true;
+    }
+    return preferences[type][setting] !== false;
   };
 
   // Get global sounds value
@@ -148,7 +153,7 @@ const NotificationPreferencesPage = () => {
                         />
                         <span className="text-sm text-gray-600">Notifications toast</span>
                       </label>
-                      
+
                       <label className="flex items-center space-x-3">
                         <input
                           type="checkbox"
@@ -157,6 +162,16 @@ const NotificationPreferencesPage = () => {
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <span className="text-sm text-gray-600">Sons</span>
+                      </label>
+
+                      <label className="flex items-center space-x-3">
+                        <input
+                          type="checkbox"
+                          checked={getPreferenceValue(type, 'emailEnabled') === true}
+                          onChange={() => handleToggle(type, 'emailEnabled')}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-600">Notifications par email</span>
                       </label>
                     </div>
                   )}

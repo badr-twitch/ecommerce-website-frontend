@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const ShippingOptions = ({ shippingData, onSelect, onBack }) => {
+const ShippingOptions = ({ shippingData, onSelect, onBack, isMember = false }) => {
   const [selectedMethod, setSelectedMethod] = useState(null);
 
   const shippingMethods = [
@@ -76,9 +76,24 @@ const ShippingOptions = ({ shippingData, onSelect, onBack }) => {
         </button>
       </div>
 
+      {/* Prime Member Banner */}
+      {isMember && (
+        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 text-white mb-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">👑</span>
+            <div>
+              <h4 className="font-semibold">UMOD Prime — Livraison express gratuite</h4>
+              <p className="text-sm text-white/80">Toutes les options de livraison sont gratuites avec votre abonnement.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Shipping Methods */}
       <div className="space-y-4">
-        {shippingMethods.map((method) => (
+        {shippingMethods.map((method) => {
+          const displayPrice = isMember ? 0 : method.price;
+          return (
           <div
             key={method.id}
             className={`border-2 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:shadow-md ${
@@ -104,7 +119,7 @@ const ShippingOptions = ({ shippingData, onSelect, onBack }) => {
                   <div className="mt-3">
                     <div className="flex items-center space-x-4 text-sm text-gray-600">
                       <span>⏱️ {method.estimatedDays}</span>
-                      <span>💰 {parseFloat(method.price).toFixed(2)} DH</span>
+                      <span>💰 {isMember ? 'GRATUIT' : `${parseFloat(method.price).toFixed(2)} DH`}</span>
                     </div>
                     <div className="mt-2">
                       <ul className="text-xs text-gray-500 space-y-1">
@@ -120,18 +135,28 @@ const ShippingOptions = ({ shippingData, onSelect, onBack }) => {
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-gray-900">
-                  {parseFloat(method.price).toFixed(2)} DH
-                </div>
-                {method.id === 'pickup' && (
-                  <div className="text-xs text-green-600 mt-1">
-                    Gratuit après 322 DH
+                {isMember ? (
+                  <div>
+                    <div className="text-lg font-bold text-green-600">GRATUIT</div>
+                    <div className="text-xs text-gray-400 line-through">{parseFloat(method.price).toFixed(2)} DH</div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {parseFloat(method.price).toFixed(2)} DH
+                    </div>
+                    {method.id === 'pickup' && (
+                      <div className="text-xs text-green-600 mt-1">
+                        Gratuit après 322 DH
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             </div>
           </div>
-        ))}
+        );
+        })}
       </div>
 
       {/* Special Offers */}

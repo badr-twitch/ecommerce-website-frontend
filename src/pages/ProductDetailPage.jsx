@@ -1,12 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShoppingCart, Heart, Star, Package, Truck, Shield, RefreshCw } from 'lucide-react';
+import ImageGallery from 'react-image-gallery';
+import 'react-image-gallery/styles/css/image-gallery.css';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { toast } from 'react-hot-toast';
 import { productsAPI } from '../services/api';
 import { ProductRecommendations, FrequentlyBoughtTogether } from '../components/recommendations';
+
+function ProductImageGallery({ product }) {
+  const items = useMemo(() => {
+    const urls = [];
+    if (product.mainImage) urls.push(product.mainImage);
+    if (Array.isArray(product.images)) {
+      product.images.forEach((img) => {
+        if (img && !urls.includes(img)) urls.push(img);
+      });
+    }
+    if (urls.length === 0) urls.push('/placeholder-product.jpg');
+
+    return urls.map((url) => ({
+      original: url,
+      thumbnail: url,
+      originalAlt: product.name,
+      thumbnailAlt: product.name,
+    }));
+  }, [product]);
+
+  if (items.length === 1) {
+    return (
+      <div className="w-full h-96 bg-gray-100 rounded-lg overflow-hidden">
+        <img
+          src={items[0].original}
+          alt={product.name}
+          className="w-full h-full object-cover"
+          onError={(e) => { e.target.src = '/placeholder-product.jpg'; }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <ImageGallery
+      items={items}
+      showPlayButton={false}
+      showFullscreenButton={true}
+      showNav={true}
+      thumbnailPosition="bottom"
+      lazyLoad={true}
+    />
+  );
+}
 
 const ProductDetailPage = () => {
   const { id: productId } = useParams();
@@ -159,38 +205,8 @@ const ProductDetailPage = () => {
         {/* Product Details */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           {/* Product Images */}
-          <div className="space-y-4">
-            <div className="w-full h-96 bg-gray-100 rounded-lg overflow-hidden">
-              <img
-                src={product.mainImage || product.images?.[0] || '/placeholder-product.jpg'}
-                alt={product.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.src = '/placeholder-product.jpg';
-                }}
-              />
-            </div>
-            
-            {/* Additional Images (if any) */}
-            {product.additionalImages && product.additionalImages.length > 0 && (
-              <div className="grid grid-cols-4 gap-2">
-                {product.additionalImages.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`w-full h-20 bg-gray-100 rounded overflow-hidden border-2 ${
-                      selectedImage === index ? 'border-blue-500' : 'border-transparent'
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${product.name} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
+          <div className="rounded-lg overflow-hidden">
+            <ProductImageGallery product={product} />
           </div>
 
           {/* Product Info */}

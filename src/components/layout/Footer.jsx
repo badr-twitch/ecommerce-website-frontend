@@ -85,6 +85,7 @@ const Footer = () => {
             </h3>
             <ul className="space-y-3">
               {[
+                { to: "/track-order", label: "Suivre ma commande", icon: "📦" },
                 { to: "/help", label: "Aide", icon: "❓" },
                 { to: "/shipping", label: "Livraison", icon: "🚚" },
                 { to: "/returns", label: "Retours", icon: "↩️" },

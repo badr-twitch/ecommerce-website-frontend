@@ -14,7 +14,7 @@ import toast from 'react-hot-toast';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { Package } from 'lucide-react';
-import { membershipAPI } from '../services/api';
+import api, { membershipAPI } from '../services/api';
 import MembershipManageModal from '../components/membership/MembershipManageModal';
 
 const ProfilePage = () => {
@@ -27,7 +27,6 @@ const ProfilePage = () => {
   // Orders hook
   const { orders: userOrders, loading: ordersLoading } = useOrders();
   
-  console.log('🔍 ProfilePage - userOrders:', userOrders, 'ordersLoading:', ordersLoading);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -91,6 +90,7 @@ const ProfilePage = () => {
     orderUpdates: true,
     newsletter: false
   });
+  const [savingSettings, setSavingSettings] = useState(false);
 
   // Payment methods state
   const [paymentMethods, setPaymentMethods] = useState([]);
@@ -223,7 +223,6 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
         const response = await membershipAPI.getStatus();
 
         if (response.data?.success) {
-          console.log('✅ ProfilePage - Membership status loaded:', response.data.data);
           setMembershipData(response.data.data);
         } else {
           setMembershipData({
@@ -258,12 +257,10 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
   const handleMembershipRefresh = useCallback(() => loadMembershipData(true), [loadMembershipData]);
 
   const loadPaymentMethods = useCallback(async () => {
-    console.log('🔍 ProfilePage - loadPaymentMethods invoked');
     try {
       setLoadingPaymentMethods(true);
       const response = await paymentService.getPaymentMethods();
       const methods = response.paymentMethods || [];
-      console.log('🔍 ProfilePage - loadPaymentMethods received methods:', methods);
       setPaymentMethods(methods);
       return methods;
     } catch (error) {
@@ -333,12 +330,10 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
       console.log('🔄 ProfilePage - Preparing membership subscription with payment');
 
       let methods = paymentMethods.filter((method) => method?.isActive !== false);
-      console.log('🔍 ProfilePage - Existing in-state payment methods:', methods);
 
       if (!methods.length) {
         const fetched = await loadPaymentMethods();
         methods = (fetched || []).filter((method) => method?.isActive !== false);
-        console.log('🔍 ProfilePage - Refetched payment methods:', methods);
       }
 
       if (!methods.length) {
@@ -417,6 +412,8 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
   const [isVerifyingCode, setIsVerifyingCode] = useState(false);
   const [isSettingNewPhone, setIsSettingNewPhone] = useState(false);
   const [currentPhoneVerified, setCurrentPhoneVerified] = useState(false);
+  const [newPhoneOtpSent, setNewPhoneOtpSent] = useState(false);
+  const [newPhoneVerificationCode, setNewPhoneVerificationCode] = useState('');
 
   // Load payment methods and shipping addresses on component mount
   useEffect(() => {
@@ -426,6 +423,18 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
       loadShippingAddresses();
     }
   }, [user, loadPaymentMethods]);
+
+  // Initialize notification settings from user data
+  useEffect(() => {
+    if (user?.notificationSettings) {
+      setAccountSettings({
+        emailNotifications: user.notificationSettings.emailNotifications ?? true,
+        marketingEmails: user.notificationSettings.marketingEmails ?? false,
+        orderUpdates: user.notificationSettings.orderUpdates ?? true,
+        newsletter: user.notificationSettings.newsletter ?? false
+      });
+    }
+  }, [user]);
 
   const loadShippingAddresses = async () => {
     try {
@@ -460,8 +469,6 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
       setIsLoading(false);
       return;
     }
-
-    console.log('📱 Updating profile (without phone):', profileData);
 
     try {
       // Remove phone from update data - phone changes require SMS verification
@@ -563,6 +570,19 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
     }
   };
 
+  const handleSaveNotificationPreferences = async () => {
+    try {
+      setSavingSettings(true);
+      await api.put('/auth/notification-preferences', accountSettings);
+      toast.success('Préférences de notification sauvegardées');
+      await refreshUser();
+    } catch (error) {
+      toast.error('Erreur lors de la sauvegarde des préférences');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -603,14 +623,13 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
     }
   };
 
-  const handleAddPaymentMethod = async (paymentData) => {
+  const handleAddPaymentMethod = async () => {
     try {
-      await paymentService.addPaymentMethod(paymentData);
-      await loadPaymentMethods(); // Reload from database
+      await loadPaymentMethods(); // Reload from Stripe
       setShowAddPayment(false);
       toast.success('Méthode de paiement ajoutée avec succès !');
     } catch (error) {
-      toast.error('Erreur lors de l\'ajout de la méthode de paiement');
+      toast.error('Erreur lors du chargement des méthodes de paiement');
     }
   };
 
@@ -787,14 +806,10 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
   // Phone verification functions
   const handleSendPhoneVerification = async () => {
     try {
-      console.log('🔍 Starting phone verification process...');
       setIsSendingVerification(true);
-      
+
       const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/send-phone-verification`;
-      console.log('🔍 API URL:', apiUrl);
-      
       const token = localStorage.getItem('token');
-      console.log('🔍 Token exists:', !!token);
       
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -804,16 +819,11 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
         }
       });
 
-      console.log('🔍 Response status:', response.status);
       const result = await response.json();
-      console.log('🔍 Response result:', result);
-      
+
       if (result.success) {
         toast.success('SMS de vérification envoyé ! Vérifiez votre téléphone.');
         setShowPhoneVerification(true);
-        
-        // Temporary: Show verification code in console for testing
-        console.log('🔐 TEMPORARY: Check backend console for verification code');
       } else {
         toast.error(result.error || 'Erreur lors de l\'envoi du SMS de vérification');
       }
@@ -868,8 +878,6 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
     try {
       setIsSendingVerification(true);
-      console.log('📱 Sending SMS verification for new phone:', newPhoneNumber);
-      
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/send-new-phone-verification`, {
         method: 'POST',
         headers: {
@@ -880,8 +888,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
       });
 
       const result = await response.json();
-      console.log('📱 New phone verification SMS result:', result);
-      
+
       if (result.success) {
         toast.success('SMS de vérification envoyé ! Vérifiez votre téléphone.');
         // Don't close modal - user needs to enter code
@@ -889,7 +896,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
         toast.error(result.error || 'Erreur lors de l\'envoi du SMS de vérification');
       }
     } catch (error) {
-      console.error('❌ Error sending new phone verification:', error);
+      console.error('Error sending new phone verification:', error);
       toast.error('Erreur lors de l\'envoi du SMS de vérification');
     } finally {
       setIsSendingVerification(false);
@@ -910,8 +917,6 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
     try {
       setIsVerifyingCode(true);
-      console.log('📱 Verifying new phone number:', newPhoneNumber);
-      
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/verify-new-phone`, {
         method: 'POST',
         headers: {
@@ -922,8 +927,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
       });
 
       const result = await response.json();
-      console.log('📱 Verify new phone result:', result);
-      
+
       if (result.success) {
         toast.success('Numéro de téléphone vérifié et enregistré avec succès !');
         setShowPhoneVerification(false);
@@ -956,10 +960,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
     try {
       setIsSettingNewPhone(true);
-      
-      console.log('🔍 Setting new phone number:', newPhoneNumber);
-      console.log('🔍 Request body:', { newPhoneNumber });
-      
+
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/set-new-phone`, {
         method: 'POST',
         headers: {
@@ -969,47 +970,70 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
         body: JSON.stringify({ newPhoneNumber })
       });
 
-      console.log('🔍 Response status:', response.status);
       const result = await response.json();
-      console.log('🔍 Response result:', result);
-      
+
+      if (result.success) {
+        toast.success('Code de vérification envoyé au nouveau numéro');
+        setNewPhoneOtpSent(true);
+        setNewPhoneVerificationCode('');
+      } else {
+        toast.error(result.error || 'Erreur lors de l\'envoi du code de vérification');
+      }
+    } catch (error) {
+      toast.error('Erreur lors de l\'envoi du code de vérification');
+    } finally {
+      setIsSettingNewPhone(false);
+    }
+  };
+
+  const handleVerifyNewPhoneOtp = async () => {
+    if (!newPhoneVerificationCode || newPhoneVerificationCode.length !== 6) {
+      toast.error('Veuillez entrer le code à 6 chiffres');
+      return;
+    }
+
+    try {
+      setIsVerifyingCode(true);
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/verify-new-phone`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          verificationCode: newPhoneVerificationCode,
+          newPhoneNumber
+        })
+      });
+
+      const result = await response.json();
+
       if (result.success) {
         toast.success('Numéro de téléphone mis à jour avec succès !');
         setProfileData({ ...profileData, phone: result.phone });
         setShowPhoneVerification(false);
         setNewPhoneNumber('');
         setCurrentPhoneVerified(false);
-        
-        // Force refresh Firebase token to get updated custom claims
+        setNewPhoneOtpSent(false);
+        setNewPhoneVerificationCode('');
+
         if (auth.currentUser) {
           try {
-            console.log('🔄 Refreshing Firebase token...');
             await auth.currentUser.getIdToken(true);
-            console.log('✅ Firebase token refreshed after phone update');
-            
-            // Verify the custom claims were updated
-            const tokenResult = await auth.currentUser.getIdTokenResult();
-            console.log('🔍 Updated custom claims after phone update:', tokenResult.claims);
-            console.log('📱 Phone number in custom claims:', tokenResult.claims.phone);
-            
-            // Also check the user object
-            console.log('🔍 Current auth user:', auth.currentUser);
-            
           } catch (error) {
-            console.error('❌ Error refreshing Firebase token:', error);
+            // Token refresh failed, non-critical
           }
         }
-        
-        // Refresh user data
-        window.location.reload();
+
+        await refreshUser();
       } else {
-        toast.error(result.error || 'Erreur lors de la mise à jour du numéro');
+        toast.error(result.error || 'Code de vérification invalide');
       }
     } catch (error) {
-      console.error('❌ Error setting new phone:', error);
-      toast.error('Erreur lors de la mise à jour du numéro');
+      toast.error('Erreur lors de la vérification');
     } finally {
-      setIsSettingNewPhone(false);
+      setIsVerifyingCode(false);
     }
   };
 
@@ -1066,11 +1090,6 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
         if (auth.currentUser) {
           try {
             await auth.currentUser.getIdToken(true);
-            console.log('✅ Firebase token refreshed after phone removal');
-            
-            // Verify the custom claims were updated
-            const tokenResult = await auth.currentUser.getIdTokenResult();
-            console.log('🔍 Updated custom claims after phone removal:', tokenResult.claims);
           } catch (error) {
             console.error('❌ Error refreshing Firebase token:', error);
           }
@@ -1530,28 +1549,73 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                         placeholder="Entrez le nouveau numéro"
                                       />
                                     </div>
-                                    <div className="flex gap-2">
-                                      <button
-                                        type="button"
-                                        onClick={handleSetNewPhone}
-                                        disabled={isSettingNewPhone || !newPhoneNumber || newPhoneNumber.length < 10}
-                                        className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
-                                      >
-                                        {isSettingNewPhone ? 'Mise à jour...' : 'Mettre à jour'}
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setShowPhoneVerification(false);
-                                          setVerificationCode('');
-                                          setNewPhoneNumber('');
-                                          setCurrentPhoneVerified(false);
-                                        }}
-                                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
-                                      >
-                                        Annuler
-                                      </button>
-                                    </div>
+                                    {!newPhoneOtpSent ? (
+                                      <div className="flex gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={handleSetNewPhone}
+                                          disabled={isSettingNewPhone || !newPhoneNumber || newPhoneNumber.length < 10}
+                                          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                                        >
+                                          {isSettingNewPhone ? 'Envoi du code...' : 'Envoyer le code de vérification'}
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setShowPhoneVerification(false);
+                                            setVerificationCode('');
+                                            setNewPhoneNumber('');
+                                            setCurrentPhoneVerified(false);
+                                          }}
+                                          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                                        >
+                                          Annuler
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <div className="space-y-3">
+                                        <p className="text-sm text-green-600">
+                                          Un code de vérification a été envoyé au {newPhoneNumber}
+                                        </p>
+                                        <div>
+                                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Code de vérification
+                                          </label>
+                                          <input
+                                            type="text"
+                                            value={newPhoneVerificationCode}
+                                            onChange={(e) => setNewPhoneVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                            placeholder="Entrez le code à 6 chiffres"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            maxLength={6}
+                                          />
+                                        </div>
+                                        <div className="flex gap-2">
+                                          <button
+                                            type="button"
+                                            onClick={handleVerifyNewPhoneOtp}
+                                            disabled={isVerifyingCode || newPhoneVerificationCode.length !== 6}
+                                            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                                          >
+                                            {isVerifyingCode ? 'Vérification...' : 'Vérifier et mettre à jour'}
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              setShowPhoneVerification(false);
+                                              setVerificationCode('');
+                                              setNewPhoneNumber('');
+                                              setCurrentPhoneVerified(false);
+                                              setNewPhoneOtpSent(false);
+                                              setNewPhoneVerificationCode('');
+                                            }}
+                                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                                          >
+                                            Annuler
+                                          </button>
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 )}
                               </div>
@@ -2063,9 +2127,9 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                     {paymentMethods.map((method) => (
                       <div key={method.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-6 bg-gray-200 rounded flex items-center justify-center">
-                            <span className="text-xs font-medium text-gray-600">
-                              {method.cardType || 'CARTE'}
+                          <div className="w-16 h-6 bg-gray-200 rounded flex items-center justify-center">
+                            <span className="text-xs font-bold text-gray-600 uppercase">
+                              {method.brand || 'CARTE'}
                             </span>
                           </div>
                           <div>
@@ -2073,7 +2137,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               •••• •••• •••• {method.last4}
                             </p>
                             <p className="text-sm text-gray-600">
-                              Expire {method.expiryMonth}/{method.expiryYear}
+                              Expire {method.expiry || `${method.expiryMonth}/${method.expiryYear}`}
                             </p>
                           </div>
                         </div>
@@ -2150,10 +2214,10 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               )}
                             </div>
                             <p className="text-gray-600">
-                              {address.streetAddress}
+                              {address.address}
                             </p>
                             <p className="text-gray-600">
-                              {address.city}, {address.state} {address.postalCode}
+                              {address.city}, {address.postalCode}
                             </p>
                             <p className="text-gray-600">
                               {address.country}
@@ -2248,6 +2312,16 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
                   </div>
+                </div>
+
+                <div className="mt-4">
+                  <button
+                    onClick={handleSaveNotificationPreferences}
+                    disabled={savingSettings}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors duration-300"
+                  >
+                    {savingSettings ? 'Sauvegarde...' : 'Sauvegarder les préférences'}
+                  </button>
                 </div>
 
                 <div className="border-t border-gray-200 pt-6">

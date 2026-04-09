@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { CartContext } from '../../contexts/CartContext';
 import { WishlistContext } from '../../contexts/WishlistContext';
@@ -9,9 +9,23 @@ const Header = () => {
   const { user, logout } = useContext(AuthContext);
   const { cartItems } = useContext(CartContext);
   const { getWishlistCount } = useContext(WishlistContext);
+  const navigate = useNavigate();
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   const wishlistCount = getWishlistCount();
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const query = searchQuery.trim();
+    if (query) {
+      navigate(`/products?search=${encodeURIComponent(query)}`);
+      setSearchQuery('');
+      setSearchOpen(false);
+    }
+  };
 
   return (
     <header className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-200/50">
@@ -52,6 +66,30 @@ const Header = () => {
 
           {/* Right side actions */}
           <div className="flex items-center space-x-3">
+            {/* Search Bar - Desktop */}
+            <form onSubmit={handleSearch} className="hidden md:flex items-center relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Rechercher..."
+                className="w-48 lg:w-64 px-4 py-2 pl-10 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 transition-all duration-300"
+              />
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </form>
+
+            {/* Search Toggle - Mobile */}
+            <button
+              onClick={() => setSearchOpen(!searchOpen)}
+              className="md:hidden p-3 text-gray-700 hover:text-blue-600 transition-all duration-300"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+
             {/* Wishlist */}
             <Link 
               to="/wishlist" 
@@ -106,6 +144,11 @@ const Header = () => {
                   <span className="hidden sm:block text-sm font-medium">
                     {user.displayName || user.email}
                   </span>
+                  {user.membershipStatus === 'active' && (
+                    <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-sm">
+                      Prime
+                    </span>
+                  )}
                   <span className="text-xs opacity-60 group-hover:opacity-100 transition-opacity duration-300">▼</span>
                 </button>
                 
@@ -169,6 +212,25 @@ const Header = () => {
             </button>
           </div>
         </div>
+
+        {/* Mobile Search Bar (expandable) */}
+        {searchOpen && (
+          <div className="md:hidden pb-4">
+            <form onSubmit={handleSearch} className="flex items-center relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Rechercher des produits..."
+                autoFocus
+                className="w-full px-4 py-3 pl-10 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 transition-all duration-300"
+              />
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </form>
+          </div>
+        )}
       </div>
     </header>
   );

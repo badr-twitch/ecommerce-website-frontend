@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { CartContext } from '../../contexts/CartContext';
+import { ordersAPI } from '../../services/api';
+import toast from 'react-hot-toast';
 import { 
   Package, 
   Calendar, 
@@ -20,6 +23,8 @@ import {
 
 const OrderCard = ({ order, showDetails = false, onToggleDetails }) => {
   const [isExpanded, setIsExpanded] = useState(showDetails);
+  const { addItem } = useContext(CartContext);
+  const navigate = useNavigate();
 
   const getStatusInfo = (status) => {
     const statusConfig = {
@@ -272,32 +277,75 @@ const OrderCard = ({ order, showDetails = false, onToggleDetails }) => {
             </Link>
             
             {order.trackingNumber && (
-              <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+              <button
+                onClick={() => navigate(`/track-order?order=${order.orderNumber}&email=${order.customerEmail}`)}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+              >
                 <Truck className="h-4 w-4 mr-2" />
                 Suivre le colis
               </button>
             )}
 
             {order.status === 'delivered' && (
-              <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+              <button
+                onClick={() => {
+                  const firstItem = order.orderItems?.[0];
+                  if (firstItem) navigate(`/products/${firstItem.productId || firstItem.product?.id}#reviews`);
+                }}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+              >
                 <Star className="h-4 w-4 mr-2" />
                 Évaluer
               </button>
             )}
 
             {order.status === 'delivered' && (
-              <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+              <button
+                onClick={() => {
+                  order.orderItems?.forEach(item => {
+                    addItem({
+                      id: item.productId || item.product?.id,
+                      name: item.productName || item.product?.name,
+                      mainImage: item.productImage || item.product?.mainImage,
+                      price: item.unitPrice
+                    }, item.quantity);
+                  });
+                  navigate('/cart');
+                }}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+              >
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Recommander
               </button>
             )}
 
-            <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            <button
+              onClick={async () => {
+                try {
+                  toast.loading('Génération de la facture...', { id: 'invoice' });
+                  const response = await ordersAPI.getInvoice(order.id);
+                  const blob = new Blob([response.data], { type: 'application/pdf' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `facture-${order.orderNumber}.pdf`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                  toast.success('Facture téléchargée', { id: 'invoice' });
+                } catch (e) {
+                  toast.error('Erreur lors du téléchargement de la facture', { id: 'invoice' });
+                }
+              }}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            >
               <Download className="h-4 w-4 mr-2" />
               Facture
             </button>
 
-            <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            <button
+              onClick={() => navigate(`/contact?order=${order.orderNumber}`)}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            >
               <MessageCircle className="h-4 w-4 mr-2" />
               Support
             </button>

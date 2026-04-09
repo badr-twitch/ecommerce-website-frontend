@@ -5,29 +5,55 @@ import api from '../../services/api';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
+const PRESETS = [
+  { value: '7', label: '7 jours' },
+  { value: '30', label: '30 jours' },
+  { value: '90', label: '3 mois' },
+  { value: '365', label: '1 an' },
+];
+
 const AnalyticsDashboard = () => {
   const [activeTab, setActiveTab] = useState('sales');
+
+  // Input state (what the user is currently editing)
   const [period, setPeriod] = useState('30');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+
+  // Applied state (what's actually fetched and displayed)
+  const [applied, setApplied] = useState({ period: '30', startDate: '', endDate: '' });
+
   const [loading, setLoading] = useState(false);
   const [salesData, setSalesData] = useState(null);
   const [customerData, setCustomerData] = useState(null);
   const [productData, setProductData] = useState(null);
   const [exportLoading, setExportLoading] = useState(false);
 
+  // Active filter label displayed above charts
+  const activeFilterLabel = useMemo(() => {
+    if (applied.startDate && applied.endDate) {
+      return `${new Date(applied.startDate).toLocaleDateString('fr-FR')} → ${new Date(applied.endDate).toLocaleDateString('fr-FR')}`;
+    }
+    const labels = { '7': '7 derniers jours', '30': '30 derniers jours', '90': '3 derniers mois', '365': 'Cette année' };
+    return labels[applied.period] || `${applied.period} derniers jours`;
+  }, [applied]);
+
+  // Whether the custom date form has changed vs what's applied
+  const hasPendingCustomRange = startDate && endDate && (
+    startDate !== applied.startDate || endDate !== applied.endDate
+  );
+
   // Fetch sales analytics
   const fetchSalesAnalytics = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (startDate && endDate) {
-        params.append('startDate', startDate);
-        params.append('endDate', endDate);
+      if (applied.startDate && applied.endDate) {
+        params.append('startDate', applied.startDate);
+        params.append('endDate', applied.endDate);
       } else {
-        params.append('period', period);
+        params.append('period', applied.period);
       }
-      
       const response = await api.get(`/admin/analytics/sales?${params}`);
       setSalesData(response.data.data);
     } catch (error) {
@@ -36,13 +62,19 @@ const AnalyticsDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [period, startDate, endDate]);
+  }, [applied]);
 
   // Fetch customer analytics
   const fetchCustomerAnalytics = useCallback(async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams({ period });
+      const params = new URLSearchParams();
+      if (applied.startDate && applied.endDate) {
+        params.append('startDate', applied.startDate);
+        params.append('endDate', applied.endDate);
+      } else {
+        params.append('period', applied.period);
+      }
       const response = await api.get(`/admin/analytics/customers?${params}`);
       setCustomerData(response.data.data);
     } catch (error) {
@@ -51,13 +83,13 @@ const AnalyticsDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [period]);
+  }, [applied]);
 
   // Fetch product analytics
   const fetchProductAnalytics = useCallback(async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams({ period });
+      const params = new URLSearchParams({ period: applied.period });
       const response = await api.get(`/admin/analytics/products?${params}`);
       setProductData(response.data.data);
     } catch (error) {
@@ -66,7 +98,7 @@ const AnalyticsDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [period]);
+  }, [applied]);
 
   // Load data based on active tab
   useEffect(() => {
@@ -85,32 +117,58 @@ const AnalyticsDashboard = () => {
     }
   }, [activeTab, fetchSalesAnalytics, fetchCustomerAnalytics, fetchProductAnalytics]);
 
+  // Handle preset button click — auto-applies immediately
+  const handlePresetClick = (value) => {
+    setPeriod(value);
+    setStartDate('');
+    setEndDate('');
+    setApplied({ period: value, startDate: '', endDate: '' });
+  };
+
+  // Handle custom range apply
+  const handleApplyCustomRange = () => {
+    if (!startDate || !endDate) {
+      toast.error('Veuillez sélectionner une date de début et de fin');
+      return;
+    }
+    if (new Date(startDate) > new Date(endDate)) {
+      toast.error('La date de début doit être antérieure à la date de fin');
+      return;
+    }
+    setApplied({ period, startDate, endDate });
+  };
+
+  // Reset to default
+  const handleReset = () => {
+    setPeriod('30');
+    setStartDate('');
+    setEndDate('');
+    setApplied({ period: '30', startDate: '', endDate: '' });
+  };
+
   // Export report
   const exportReport = useCallback(async (reportType) => {
     try {
       setExportLoading(true);
       const response = await api.post('/admin/analytics/export', {
         reportType,
-        startDate: startDate || undefined,
-        endDate: endDate || undefined,
+        startDate: applied.startDate || undefined,
+        endDate: applied.endDate || undefined,
         format: 'csv'
       });
 
-      // Create and download CSV
       const { data, filename } = response.data.data;
       if (data.length === 0) {
         toast.error('Aucune donnée à exporter');
         return;
       }
 
-      // Convert to CSV
       const headers = Object.keys(data[0]);
       const csvContent = [
         headers.join(','),
         ...data.map(row => headers.map(header => `"${row[header]}"`).join(','))
       ].join('\n');
 
-      // Download file
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
@@ -128,7 +186,7 @@ const AnalyticsDashboard = () => {
     } finally {
       setExportLoading(false);
     }
-  }, [startDate, endDate]);
+  }, [applied]);
 
   // Memoized chart data
   const salesChartData = useMemo(() => {
@@ -200,51 +258,87 @@ const AnalyticsDashboard = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white p-6 rounded-lg shadow mb-6">
-          <div className="flex flex-wrap items-center gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Période</label>
-              <select
-                value={period}
-                onChange={(e) => setPeriod(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <div className="bg-white p-6 rounded-lg shadow mb-6 space-y-4">
+          {/* Preset buttons row */}
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-sm font-medium text-gray-600 mr-1">Période :</span>
+            {PRESETS.map(({ value, label }) => (
+              <button
+                key={value}
+                onClick={() => handlePresetClick(value)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  applied.period === value && !applied.startDate
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
               >
-                <option value="7">7 derniers jours</option>
-                <option value="30">30 derniers jours</option>
-                <option value="90">90 derniers jours</option>
-                <option value="365">1 an</option>
-              </select>
-            </div>
-            
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Custom date range row */}
+          <div className="flex flex-wrap items-end gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Date de début</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Date de début</label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            
+            <span className="text-gray-400 pb-2">→</span>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Date de fin</label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+            <button
+              onClick={handleApplyCustomRange}
+              disabled={!startDate || !endDate}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                hasPendingCustomRange
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm ring-2 ring-blue-300'
+                  : 'bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed'
+              }`}
+            >
+              Appliquer
+            </button>
+            {(startDate || endDate || applied.period !== '30') && (
+              <button
+                onClick={handleReset}
+                className="px-4 py-2 rounded-md text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                Réinitialiser
+              </button>
+            )}
 
+            {/* Export button pushed to the right */}
             <div className="ml-auto">
               <button
                 onClick={() => exportReport(activeTab)}
                 disabled={exportLoading}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 disabled:opacity-50"
+                className="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 disabled:opacity-50"
               >
                 {exportLoading ? 'Export...' : 'Exporter CSV'}
               </button>
             </div>
+          </div>
+
+          {/* Active filter badge */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">Affichage :</span>
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
+              applied.startDate ? 'bg-indigo-100 text-indigo-700' : 'bg-blue-50 text-blue-700'
+            }`}>
+              <span className="w-1.5 h-1.5 rounded-full bg-current inline-block"></span>
+              {activeFilterLabel}
+            </span>
           </div>
         </div>
 
@@ -507,8 +601,8 @@ const AnalyticsDashboard = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">{product.price} DH</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            product.stockQuantity === 0 
-                              ? 'bg-red-100 text-red-800' 
+                            product.stockQuantity === 0
+                              ? 'bg-red-100 text-red-800'
                               : 'bg-yellow-100 text-yellow-800'
                           }`}>
                             {product.stockQuantity} unité(s)
@@ -527,4 +621,4 @@ const AnalyticsDashboard = () => {
   );
 };
 
-export default AnalyticsDashboard; 
+export default AnalyticsDashboard;
