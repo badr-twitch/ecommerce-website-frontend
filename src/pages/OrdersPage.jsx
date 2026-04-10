@@ -215,14 +215,14 @@ const OrdersPage = () => {
                 placeholder="Rechercher par numéro de commande..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="input pl-10"
               />
             </div>
 
             {/* Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+              className="btn-outline inline-flex items-center cursor-pointer"
             >
               <Filter className="h-4 w-4 mr-2" />
               Filtres
@@ -238,7 +238,7 @@ const OrdersPage = () => {
                   setSortOrder(order);
                   updateFilters({ sortBy: field, sortOrder: order });
                 }}
-                className="appearance-none bg-white border border-gray-300 rounded-xl px-3 py-2 pr-8 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="select pr-8 cursor-pointer"
               >
                 <option value="createdAt-desc">Plus récent</option>
                 <option value="createdAt-asc">Plus ancien</option>
@@ -254,7 +254,7 @@ const OrdersPage = () => {
             <button
               onClick={refreshOrders}
               disabled={loading}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              className="btn-outline inline-flex items-center cursor-pointer disabled:opacity-50"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Actualiser
@@ -273,7 +273,7 @@ const OrdersPage = () => {
                   <select
                     value={filters.status}
                     onChange={(e) => handleFilterChange('status', e.target.value)}
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="select cursor-pointer"
                   >
                     <option value="">Tous les statuts</option>
                     <option value="pending">En attente</option>
@@ -295,7 +295,7 @@ const OrdersPage = () => {
                     type="date"
                     value={filters.dateFrom}
                     onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="input"
                   />
                 </div>
 
@@ -308,7 +308,7 @@ const OrdersPage = () => {
                     type="date"
                     value={filters.dateTo}
                     onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="input"
                   />
                 </div>
 
@@ -316,7 +316,7 @@ const OrdersPage = () => {
                 <div className="flex items-end">
                   <button
                     onClick={clearFilters}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                    className="btn-outline w-full cursor-pointer"
                   >
                     Effacer les filtres
                   </button>
@@ -381,29 +381,29 @@ const OrdersPage = () => {
               <button
                 onClick={() => handlePageChange(pagination.currentPage - 1)}
                 disabled={pagination.currentPage === 1}
-                className="px-3 py-2 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-outline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Précédent
               </button>
-              
+
               {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`px-3 py-2 border rounded-xl text-sm font-medium ${
+                  className={`px-3 py-2 border rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 ${
                     page === pagination.currentPage
-                      ? 'border-primary-500 bg-primary-600 text-white'
-                      : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                      ? 'border-primary-500 bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-sm'
+                      : 'border-gray-200 text-gray-700 bg-white/80 hover:bg-primary-50 hover:border-primary-300'
                   }`}
                 >
                   {page}
                 </button>
               ))}
-              
+
               <button
                 onClick={() => handlePageChange(pagination.currentPage + 1)}
                 disabled={pagination.currentPage === pagination.totalPages}
-                className="px-3 py-2 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-outline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Suivant
               </button>

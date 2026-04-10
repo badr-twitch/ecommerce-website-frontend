@@ -20,10 +20,10 @@ const ProductDetail = ({ product, onClose, onEdit, onDelete }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in">
+      <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-scale-in">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-2xl font-bold text-gray-900">Détails du Produit</h2>
           <div className="flex items-center space-x-2">
             <button
@@ -53,7 +53,7 @@ const ProductDetail = ({ product, onClose, onEdit, onDelete }) => {
         <div className="p-6 space-y-6">
           {/* Product Image */}
           {product.imageUrl && (
-            <div className="w-full h-64 bg-gray-100 rounded-lg overflow-hidden">
+            <div className="w-full h-64 bg-gray-100 rounded-2xl overflow-hidden shadow-soft">
               <img
                 src={product.imageUrl}
                 alt={product.name}
@@ -103,7 +103,7 @@ const ProductDetail = ({ product, onClose, onEdit, onDelete }) => {
 
             {/* Promotion Details */}
             {product.isOnSale && (
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+              <div className="bg-orange-50/50 border border-orange-200 rounded-xl p-4">
                 <h4 className="text-sm font-medium text-gray-700 mb-3">Détails de la Promotion</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {product.salePercentage && (

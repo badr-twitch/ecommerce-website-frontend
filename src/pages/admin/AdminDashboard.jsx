@@ -31,6 +31,7 @@ import AnalyticsDashboard from './AnalyticsDashboard';
 import ReviewModeration from '../../components/reviews/ReviewModeration';
 import MembershipDashboard from './MembershipDashboard';
 import AdminNotificationsPage from './AdminNotificationsPage';
+import AdminSidebarLayout from '../../components/admin/AdminSidebarLayout';
 import { 
   LineChart, 
   Line, 
@@ -626,7 +627,7 @@ const AdminDashboard = () => {
 
           {/* Pending Actions */}
           {(pending.pendingOrders > 0 || pending.confirmedOrders > 0 || pending.lowStockProducts > 0) && (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <div className="bg-amber-50/80 backdrop-blur-sm border border-amber-200/60 rounded-2xl shadow-soft p-4">
               <h3 className="text-sm font-semibold text-amber-800 mb-3">Actions requises</h3>
               <div className="flex flex-wrap gap-3">
                 {pending.pendingOrders > 0 && (
@@ -662,17 +663,19 @@ const AdminDashboard = () => {
 
           {/* Overall Statistics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="card-hover p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-600 text-sm">Total Produits</p>
                   <p className="text-2xl font-bold text-gray-900">{adminData.statistics?.totalProducts || 0}</p>
                 </div>
-                <Package className="w-8 h-8 text-primary-600" />
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500/10 to-blue-600/10 rounded-xl flex items-center justify-center">
+                  <Package className="w-5 h-5 text-blue-600" />
+                </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="card-hover p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-600 text-sm">Total Commandes</p>
@@ -681,11 +684,13 @@ const AdminDashboard = () => {
                     {adminData.statistics?.orderGrowthRate > 0 ? '+' : ''}{adminData.statistics?.orderGrowthRate || 0}% ce mois
                   </p>
                 </div>
-                <ShoppingCart className="w-8 h-8 text-green-600" />
+                <div className="w-10 h-10 bg-gradient-to-br from-green-500/10 to-green-600/10 rounded-xl flex items-center justify-center">
+                  <ShoppingCart className="w-5 h-5 text-green-600" />
+                </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="card-hover p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-600 text-sm">Total Utilisateurs</p>
@@ -694,11 +699,13 @@ const AdminDashboard = () => {
                     {adminData.statistics?.conversionRate || 0}% conversion
                   </p>
                 </div>
-                <Users className="w-8 h-8 text-purple-600" />
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500/10 to-purple-600/10 rounded-xl flex items-center justify-center">
+                  <Users className="w-5 h-5 text-purple-600" />
+                </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="card-hover p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-600 text-sm">Chiffre d'Affaires</p>
@@ -707,7 +714,9 @@ const AdminDashboard = () => {
                     {adminData.statistics?.averageOrderValue || 0} DH panier moyen
                   </p>
                 </div>
-                <DollarSign className="w-8 h-8 text-yellow-600" />
+                <div className="w-10 h-10 bg-gradient-to-br from-amber-500/10 to-amber-600/10 rounded-xl flex items-center justify-center">
+                  <DollarSign className="w-5 h-5 text-amber-600" />
+                </div>
               </div>
             </div>
           </div>
@@ -715,7 +724,7 @@ const AdminDashboard = () => {
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Revenue Trend Chart */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="card p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Évolution des Revenus</h3>
                 <TrendingUp className="w-5 h-5 text-green-600" />
@@ -744,7 +753,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* User Registrations Chart */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="card p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Inscriptions Utilisateurs</h3>
                 <UserPlus className="w-5 h-5 text-primary-600" />
@@ -776,7 +785,7 @@ const AdminDashboard = () => {
           {/* Order Status Distribution & Top Products */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Order Status Distribution */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="card p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Répartition des Commandes</h3>
                 <BarChart3 className="w-5 h-5 text-purple-600" />
@@ -803,7 +812,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* Top Selling Products */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="card p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Produits les Plus Vendus</h3>
                 <Package className="w-5 h-5 text-orange-600" />
@@ -833,7 +842,7 @@ const AdminDashboard = () => {
           {/* Recent Orders & Activity Feed - Side by Side */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Orders - 2/3 width */}
-            <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
+            <div className="lg:col-span-2 card p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Commandes Récentes</h3>
                 <button
@@ -878,7 +887,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* Activity Feed - 1/3 width */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="card p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Activité Récente</h3>
                 <Activity className="w-5 h-5 text-indigo-600" />
@@ -965,9 +974,9 @@ const AdminDashboard = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Gestion des Produits</h2>
-        <button 
+        <button
           onClick={handleAddProduct}
-          className="admin-button bg-primary-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-primary-700 transition-colors"
+          className="btn-primary flex items-center gap-2"
         >
           <Plus className="w-4 h-4 admin-icon" />
           Ajouter un produit
@@ -977,10 +986,10 @@ const AdminDashboard = () => {
       {loading ? (
         <div className="text-center py-8 admin-loading">Chargement...</div>
       ) : (
-        <div className="admin-card bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="admin-table w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50/80">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Produit
@@ -1001,7 +1010,7 @@ const AdminDashboard = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {products.map((product) => (
-                  <tr key={product.id} className="admin-hover-transition hover:bg-gray-50 transition-colors">
+                  <tr key={product.id} className="admin-hover-transition hover:bg-primary-50/30 transition-colors duration-200">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="admin-flex-container flex items-center">
                         {/* FIXED: Use StableImage component with admin CSS classes */}
@@ -1084,9 +1093,9 @@ const AdminDashboard = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Gestion des Catégories</h2>
-        <button 
+        <button
           onClick={handleAddCategory}
-          className="bg-primary-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-primary-700 transition-colors"
+          className="btn-primary flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           Ajouter une catégorie
@@ -1098,7 +1107,7 @@ const AdminDashboard = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories.map((category) => (
-            <div key={category.id} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+            <div key={category.id} className="card-hover p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">{category.name}</h3>
                 <div className="flex space-x-2">
@@ -1159,21 +1168,21 @@ const AdminDashboard = () => {
               <button
                 onClick={() => setShowBulkStatusModal(true)}
                 disabled={bulkActionLoading}
-                className="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700 disabled:opacity-50"
+                className="btn-primary text-sm px-3 py-1.5 disabled:opacity-50"
               >
                 {bulkActionLoading ? 'Mise à jour...' : 'Mettre à jour le statut'}
               </button>
               <button
                 onClick={handleBulkExport}
                 disabled={bulkActionLoading}
-                className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:opacity-50"
+                className="btn-primary text-sm px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:opacity-50"
               >
                 {bulkActionLoading ? 'Export...' : 'Exporter CSV'}
               </button>
               <button
                 onClick={() => setShowBulkNotifyModal(true)}
                 disabled={bulkActionLoading}
-                className="px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 disabled:opacity-50"
+                className="btn-primary text-sm px-3 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50"
               >
                 {bulkActionLoading ? 'Envoi...' : 'Envoyer notifications'}
               </button>
@@ -1182,7 +1191,7 @@ const AdminDashboard = () => {
                   setSelectedOrders([]);
                   setSelectAllOrders(false);
                 }}
-                className="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700"
+                className="btn-outline text-sm px-3 py-1.5"
               >
                 Annuler
               </button>
@@ -1192,7 +1201,7 @@ const AdminDashboard = () => {
       )}
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
+      <div className="card p-6">
         <h3 className="text-lg font-semibold mb-4">Filtres</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
@@ -1200,7 +1209,7 @@ const AdminDashboard = () => {
             <select
               value={orderFilters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
+              className="input"
             >
               <option value="all">Tous les statuts</option>
               <option value="pending">En attente</option>
@@ -1219,7 +1228,7 @@ const AdminDashboard = () => {
               value={orderFilters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
               placeholder="Nom, email du client..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
+              className="input"
             />
           </div>
 
@@ -1230,7 +1239,7 @@ const AdminDashboard = () => {
               value={orderFilters.minAmount}
               onChange={(e) => handleFilterChange('minAmount', e.target.value)}
               placeholder="0"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
+              className="input"
             />
           </div>
 
@@ -1241,7 +1250,7 @@ const AdminDashboard = () => {
               value={orderFilters.maxAmount}
               onChange={(e) => handleFilterChange('maxAmount', e.target.value)}
               placeholder="1000"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
+              className="input"
             />
           </div>
 
@@ -1251,7 +1260,7 @@ const AdminDashboard = () => {
               type="date"
               value={orderFilters.startDate}
               onChange={(e) => handleFilterChange('startDate', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
+              className="input"
             />
           </div>
 
@@ -1261,7 +1270,7 @@ const AdminDashboard = () => {
               type="date"
               value={orderFilters.endDate}
               onChange={(e) => handleFilterChange('endDate', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
+              className="input"
             />
           </div>
         </div>
@@ -1269,13 +1278,13 @@ const AdminDashboard = () => {
         <div className="flex space-x-4 mt-4">
           <button
             onClick={handleFilterSubmit}
-            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            className="btn-primary"
           >
             Appliquer les filtres
           </button>
           <button
             onClick={clearFilters}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            className="btn-outline"
           >
             Effacer les filtres
           </button>
@@ -1285,10 +1294,10 @@ const AdminDashboard = () => {
       {loading ? (
         <div className="text-center py-8">Chargement...</div>
       ) : (
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50/80">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <input
@@ -1320,7 +1329,7 @@ const AdminDashboard = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={order.id} className="hover:bg-primary-50/30 transition-colors duration-200">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <input
                         type="checkbox"
@@ -1344,11 +1353,11 @@ const AdminDashboard = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        order.status === 'pending' ? 'badge-warning' :
                         order.status === 'processing' ? 'bg-primary-100 text-primary-800' :
                         order.status === 'shipped' ? 'bg-purple-100 text-purple-800' :
-                        order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                        order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                        order.status === 'delivered' ? 'badge-success' :
+                        order.status === 'cancelled' ? 'badge-danger' :
                         'bg-gray-100 text-gray-800'
                       }`}>
                         {order.status === 'pending' ? 'En attente' :
@@ -1388,10 +1397,10 @@ const AdminDashboard = () => {
       {loading ? (
         <div className="text-center py-8">Chargement...</div>
       ) : (
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50/80">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Utilisateur
@@ -1413,7 +1422,7 @@ const AdminDashboard = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {/* FIXED: Add null check and ensure users is an array */}
                 {Array.isArray(users) && users.map((user) => (
-                  <tr key={user.id}>
+                  <tr key={user.id} className="hover:bg-primary-50/30 transition-colors duration-200">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
                         {user.firstName} {user.lastName}
@@ -1478,136 +1487,6 @@ const AdminDashboard = () => {
     </div>
   ), [users, loading, changeUserRole, toggleUserStatus]);
 
-  const renderProductDetail = useCallback(() => (
-    <ProductDetail 
-      product={selectedProduct} 
-      onClose={handleProductDetailClose} 
-      onEdit={handleProductDetailEdit} 
-      onDelete={handleProductDetailDelete} 
-      onSuccess={handleProductSuccess}
-    />
-  ), [selectedProduct, handleProductDetailClose, handleProductDetailEdit, handleProductDetailDelete, handleProductSuccess]);
-
-  const renderProductForm = useCallback(() => (
-    <ProductForm 
-      product={editingProduct} 
-      categories={categories} 
-      onClose={handleProductFormClose} 
-      onSuccess={handleProductSuccess} 
-    />
-  ), [editingProduct, categories, handleProductFormClose, handleProductSuccess]);
-
-  const renderCategoryForm = useCallback(() => (
-    <CategoryForm 
-      category={editingCategory} 
-      onClose={handleCategoryFormClose} 
-      onSuccess={handleCategorySuccess} 
-    />
-  ), [editingCategory, handleCategoryFormClose, handleCategorySuccess]);
-
-  const renderOrderDetail = useCallback(() => (
-    <OrderDetail 
-      order={selectedOrder} 
-      onClose={handleOrderDetailClose} 
-      onStatusUpdate={updateOrderStatus}
-    />
-  ), [selectedOrder, handleOrderDetailClose, updateOrderStatus]);
-
-  const renderBulkStatusModal = useCallback(() => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
-        <h3 className="text-lg font-semibold mb-4">Mettre à jour le statut des commandes</h3>
-        <div className="space-y-3">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
-            <select
-              value={bulkStatusForm.status}
-              onChange={(e) => setBulkStatusForm(prev => ({ ...prev, status: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
-            >
-              <option value="pending">En attente</option>
-              <option value="processing">En cours de traitement</option>
-              <option value="shipped">Expédiée</option>
-              <option value="delivered">Livrée</option>
-              <option value="cancelled">Annulée</option>
-              <option value="refunded">Remboursée</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire (optionnel)</label>
-            <textarea
-              value={bulkStatusForm.comment}
-              onChange={(e) => setBulkStatusForm(prev => ({ ...prev, comment: e.target.value }))}
-              rows="3"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
-            ></textarea>
-          </div>
-          <div className="flex justify-end space-x-2">
-            <button
-              onClick={() => setShowBulkStatusModal(false)}
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              Annuler
-            </button>
-            <button
-              onClick={handleBulkStatusUpdate}
-              disabled={bulkActionLoading}
-              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
-            >
-              {bulkActionLoading ? 'Mise à jour...' : 'Mettre à jour le statut'}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  ), [bulkStatusForm, handleBulkStatusUpdate, bulkActionLoading]);
-
-  const renderBulkNotifyModal = useCallback(() => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
-        <h3 className="text-lg font-semibold mb-4">Envoyer des notifications aux commandes</h3>
-        <div className="space-y-3">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Type de notification</label>
-            <select
-              value={bulkNotifyForm.notificationType}
-              onChange={(e) => setBulkNotifyForm(prev => ({ ...prev, notificationType: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
-            >
-              <option value="status_update">Mise à jour du statut</option>
-              <option value="shipping_update">Mise à jour de l'expédition</option>
-              <option value="custom">Message personnalisé</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Message personnalisé (optionnel)</label>
-            <textarea
-              value={bulkNotifyForm.customMessage}
-              onChange={(e) => setBulkNotifyForm(prev => ({ ...prev, customMessage: e.target.value }))}
-              rows="3"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
-            ></textarea>
-          </div>
-          <div className="flex justify-end space-x-2">
-            <button
-              onClick={() => setShowBulkNotifyModal(false)}
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              Annuler
-            </button>
-            <button
-              onClick={handleBulkNotify}
-              disabled={bulkActionLoading}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
-            >
-              {bulkActionLoading ? 'Envoi...' : 'Envoyer les notifications'}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  ), [bulkNotifyForm, handleBulkNotify, bulkActionLoading]);
-
   // FIXED: Memoize tab configuration to prevent recreation
   const tabConfig = useMemo(() => [
     { id: 'dashboard', label: 'Tableau de bord', icon: TrendingUp },
@@ -1654,170 +1533,139 @@ const AdminDashboard = () => {
   console.log(`🔄 AdminDashboard rendered ${renderCount.current} times, activeTab: ${activeTab}`);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Administration</h1>
-          <p className="text-gray-600">Gérez votre boutique en ligne</p>
-        </div>
+    <AdminSidebarLayout activeTab={activeTab} onTabChange={handleTabChange} tabs={tabConfig}>
+      {renderContent()}
 
-        {/* Navigation Tabs */}
-        <div className="mb-8">
-          <nav className="flex space-x-8">
-            {tabConfig.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === tab.id
-                    ? 'bg-primary-100 text-primary-700'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
+      {/* Modals */}
+      {showProductForm && (
+        <ProductForm
+          product={editingProduct}
+          onClose={handleProductFormClose}
+          onSuccess={handleProductSuccess}
+        />
+      )}
 
-        {/* FIXED: Content - Use stable rendering instead of conditional */}
-        <div>
-          {renderContent()}
-        </div>
+      {showProductDetail && (
+        <ProductDetail
+          product={selectedProduct}
+          onClose={handleProductDetailClose}
+          onEdit={handleProductDetailEdit}
+          onDelete={handleProductDetailDelete}
+        />
+      )}
 
-        {/* Modals */}
-        {showProductForm && (
-          <ProductForm
-            product={editingProduct}
-            onClose={handleProductFormClose}
-            onSuccess={handleProductSuccess}
-          />
-        )}
+      {showCategoryForm && (
+        <CategoryForm
+          category={editingCategory}
+          onClose={handleCategoryFormClose}
+          onSuccess={handleCategorySuccess}
+        />
+      )}
 
-        {showProductDetail && (
-          <ProductDetail
-            product={selectedProduct}
-            onClose={handleProductDetailClose}
-            onEdit={handleProductDetailEdit}
-            onDelete={handleProductDetailDelete}
-          />
-        )}
+      {showOrderDetail && (
+        <OrderDetail
+          order={selectedOrder}
+          onClose={handleOrderDetailClose}
+          onStatusUpdate={handleOrderStatusUpdate}
+        />
+      )}
 
-        {showCategoryForm && (
-          <CategoryForm
-            category={editingCategory}
-            onClose={handleCategoryFormClose}
-            onSuccess={handleCategorySuccess}
-          />
-        )}
-
-        {showOrderDetail && (
-          <OrderDetail
-            order={selectedOrder}
-            onClose={handleOrderDetailClose}
-            onStatusUpdate={handleOrderStatusUpdate}
-          />
-        )}
-
-        {/* Bulk Operation Modals */}
-        {showBulkStatusModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
-              <h3 className="text-lg font-semibold mb-4">Mettre à jour le statut des commandes</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
-                  <select
-                    value={bulkStatusForm.status}
-                    onChange={(e) => setBulkStatusForm(prev => ({ ...prev, status: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
-                  >
-                    <option value="pending">En attente</option>
-                    <option value="processing">En cours de traitement</option>
-                    <option value="shipped">Expédiée</option>
-                    <option value="delivered">Livrée</option>
-                    <option value="cancelled">Annulée</option>
-                    <option value="refunded">Remboursée</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire (optionnel)</label>
-                  <textarea
-                    value={bulkStatusForm.comment}
-                    onChange={(e) => setBulkStatusForm(prev => ({ ...prev, comment: e.target.value }))}
-                    rows="3"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
-                  ></textarea>
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <button
-                    onClick={() => setShowBulkStatusModal(false)}
-                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    onClick={handleBulkStatusUpdate}
-                    disabled={bulkActionLoading}
-                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
-                  >
-                    {bulkActionLoading ? 'Mise à jour...' : 'Mettre à jour le statut'}
-                  </button>
-                </div>
+      {/* Bulk Operation Modals */}
+      {showBulkStatusModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 p-6 max-w-md w-full mx-4 animate-scale-in">
+            <h3 className="text-lg font-semibold mb-4">Mettre à jour le statut des commandes</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                <select
+                  value={bulkStatusForm.status}
+                  onChange={(e) => setBulkStatusForm(prev => ({ ...prev, status: e.target.value }))}
+                  className="input"
+                >
+                  <option value="pending">En attente</option>
+                  <option value="processing">En cours de traitement</option>
+                  <option value="shipped">Expédiée</option>
+                  <option value="delivered">Livrée</option>
+                  <option value="cancelled">Annulée</option>
+                  <option value="refunded">Remboursée</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire (optionnel)</label>
+                <textarea
+                  value={bulkStatusForm.comment}
+                  onChange={(e) => setBulkStatusForm(prev => ({ ...prev, comment: e.target.value }))}
+                  rows="3"
+                  className="input"
+                ></textarea>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <button
+                  onClick={() => setShowBulkStatusModal(false)}
+                  className="btn-outline"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleBulkStatusUpdate}
+                  disabled={bulkActionLoading}
+                  className="btn-primary disabled:opacity-50"
+                >
+                  {bulkActionLoading ? 'Mise à jour...' : 'Mettre à jour le statut'}
+                </button>
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {showBulkNotifyModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
-              <h3 className="text-lg font-semibold mb-4">Envoyer des notifications aux commandes</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Type de notification</label>
-                  <select
-                    value={bulkNotifyForm.notificationType}
-                    onChange={(e) => setBulkNotifyForm(prev => ({ ...prev, notificationType: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
-                  >
-                    <option value="status_update">Mise à jour du statut</option>
-                    <option value="shipping_update">Mise à jour de l'expédition</option>
-                    <option value="custom">Message personnalisé</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Message personnalisé (optionnel)</label>
-                  <textarea
-                    value={bulkNotifyForm.customMessage}
-                    onChange={(e) => setBulkNotifyForm(prev => ({ ...prev, customMessage: e.target.value }))}
-                    rows="3"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
-                  ></textarea>
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <button
-                    onClick={() => setShowBulkNotifyModal(false)}
-                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    onClick={handleBulkNotify}
-                    disabled={bulkActionLoading}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
-                  >
-                    {bulkActionLoading ? 'Envoi...' : 'Envoyer les notifications'}
-                  </button>
-                </div>
+      {showBulkNotifyModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 p-6 max-w-md w-full mx-4 animate-scale-in">
+            <h3 className="text-lg font-semibold mb-4">Envoyer des notifications aux commandes</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Type de notification</label>
+                <select
+                  value={bulkNotifyForm.notificationType}
+                  onChange={(e) => setBulkNotifyForm(prev => ({ ...prev, notificationType: e.target.value }))}
+                  className="input"
+                >
+                  <option value="status_update">Mise à jour du statut</option>
+                  <option value="shipping_update">Mise à jour de l'expédition</option>
+                  <option value="custom">Message personnalisé</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Message personnalisé (optionnel)</label>
+                <textarea
+                  value={bulkNotifyForm.customMessage}
+                  onChange={(e) => setBulkNotifyForm(prev => ({ ...prev, customMessage: e.target.value }))}
+                  rows="3"
+                  className="input"
+                ></textarea>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <button
+                  onClick={() => setShowBulkNotifyModal(false)}
+                  className="btn-outline"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleBulkNotify}
+                  disabled={bulkActionLoading}
+                  className="btn-primary disabled:opacity-50"
+                >
+                  {bulkActionLoading ? 'Envoi...' : 'Envoyer les notifications'}
+                </button>
               </div>
             </div>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </AdminSidebarLayout>
   );
 };
 

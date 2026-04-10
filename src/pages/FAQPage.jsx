@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageCircle, Phone } from 'lucide-react';
+import { MessageCircle, Phone, ChevronDown } from 'lucide-react';
 
 const FAQPage = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -194,23 +194,21 @@ const FAQPage = () => {
                     const isOpen = openIndex === index;
                     
                     return (
-                      <div 
+                      <div
                         key={questionIndex}
-                        className="border-2 border-gray-200 rounded-xl overflow-hidden hover:border-primary-300 transition-colors"
+                        className="border border-gray-200/60 rounded-xl overflow-hidden hover:border-primary-300 transition-all duration-200 bg-white/60 backdrop-blur-sm"
                       >
                         <button
                           onClick={() => toggleQuestion(categoryIndex, questionIndex)}
-                          className="w-full px-6 py-4 text-left flex items-center justify-between bg-white/50 hover:bg-white transition-colors"
+                          className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-primary-50/30 transition-colors duration-200 cursor-pointer"
                         >
                           <span className="font-semibold text-gray-900 pr-4">
                             {faq.q}
                           </span>
-                          <span className={`text-2xl text-primary-600 transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-                            ▼
-                          </span>
+                          <ChevronDown className={`w-5 h-5 text-primary-600 flex-shrink-0 transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                         </button>
                         <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96' : 'max-h-0'}`}>
-                          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                          <div className="px-6 py-4 bg-primary-50/30 border-t border-gray-100">
                             <p className="text-gray-700 leading-relaxed">
                               {faq.a}
                             </p>

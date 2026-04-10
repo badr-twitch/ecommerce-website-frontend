@@ -90,17 +90,17 @@ const CategoryPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div className="min-h-screen bg-mesh flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600"></div>
       </div>
     );
   }
 
   if (error || !category) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-mesh flex flex-col items-center justify-center px-4">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">{error || 'Catégorie non trouvée'}</h1>
-        <Link to="/categories" className="text-primary-600 hover:text-primary-700">
+        <Link to="/categories" className="btn-primary">
           Voir toutes les catégories
         </Link>
       </div>
@@ -155,15 +155,15 @@ const CategoryPage = () => {
         )}
 
         {/* Filters Bar */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 p-4 mb-6">
-          <div className="flex flex-wrap items-center gap-4">
+        <div className="bg-white/60 backdrop-blur-sm rounded-2xl border border-white/60 shadow-sm p-4 mb-6">
+          <div className="flex flex-wrap items-center gap-3">
             {/* Sort */}
             <div className="flex items-center gap-2">
-              <label className="text-sm text-gray-600">Trier par:</label>
+              <label className="text-sm text-gray-600 font-medium">Trier:</label>
               <select
                 value={sort}
                 onChange={(e) => handleSortChange(e.target.value)}
-                className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                className="select py-2 text-sm cursor-pointer"
               >
                 <option value="createdAt">Plus récents</option>
                 <option value="name">Nom</option>
@@ -173,16 +173,14 @@ const CategoryPage = () => {
             </div>
 
             {/* Order */}
-            <div className="flex items-center gap-2">
-              <select
-                value={order}
-                onChange={(e) => handleOrderChange(e.target.value)}
-                className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50"
-              >
-                <option value="desc">Décroissant</option>
-                <option value="asc">Croissant</option>
-              </select>
-            </div>
+            <select
+              value={order}
+              onChange={(e) => handleOrderChange(e.target.value)}
+              className="select py-2 text-sm cursor-pointer"
+            >
+              <option value="desc">Décroissant</option>
+              <option value="asc">Croissant</option>
+            </select>
 
             {/* Price range */}
             <div className="flex items-center gap-2">
@@ -191,7 +189,7 @@ const CategoryPage = () => {
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
                 placeholder="Min DH"
-                className="w-24 px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                className="input w-24 py-2 text-sm"
               />
               <span className="text-gray-400">-</span>
               <input
@@ -199,11 +197,11 @@ const CategoryPage = () => {
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
                 placeholder="Max DH"
-                className="w-24 px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                className="input w-24 py-2 text-sm"
               />
               <button
                 onClick={handlePriceFilter}
-                className="px-3 py-1.5 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                className="btn-primary py-2 px-4 text-sm cursor-pointer"
               >
                 Filtrer
               </button>
@@ -213,9 +211,9 @@ const CategoryPage = () => {
 
         {/* Products Grid */}
         {products.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-gray-500 text-lg">Aucun produit trouvé dans cette catégorie</p>
-            <Link to="/products" className="mt-4 inline-block text-primary-600 hover:text-primary-700">
+          <div className="card-glass p-12 text-center">
+            <p className="text-gray-500 text-lg mb-4">Aucun produit trouvé dans cette catégorie</p>
+            <Link to="/products" className="btn-primary">
               Voir tous les produits
             </Link>
           </div>
@@ -278,47 +276,49 @@ const CategoryPage = () => {
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="flex justify-center items-center gap-2 mt-10">
-            <button
-              onClick={() => handlePageChange(page - 1)}
-              disabled={page <= 1}
-              className="px-4 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              Précédent
-            </button>
+          <div className="flex justify-center mt-10">
+            <div className="inline-flex items-center gap-1.5 bg-white/80 backdrop-blur-sm rounded-2xl border border-white/60 shadow-sm p-1.5">
+              <button
+                onClick={() => handlePageChange(page - 1)}
+                disabled={page <= 1}
+                className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              >
+                Préc.
+              </button>
 
-            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-              .filter(p => p === 1 || p === pagination.totalPages || Math.abs(p - page) <= 2)
-              .reduce((acc, p, i, arr) => {
-                if (i > 0 && p - arr[i - 1] > 1) acc.push('...');
-                acc.push(p);
-                return acc;
-              }, [])
-              .map((p, i) =>
-                p === '...' ? (
-                  <span key={`dots-${i}`} className="px-2 text-gray-400">...</span>
-                ) : (
-                  <button
-                    key={p}
-                    onClick={() => handlePageChange(p)}
-                    className={`px-4 py-2 text-sm rounded-lg transition-colors ${
-                      p === page
-                        ? 'bg-primary-600 text-white'
-                        : 'border border-gray-200 hover:bg-gray-50'
-                    }`}
-                  >
-                    {p}
-                  </button>
-                )
-              )}
+              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                .filter(p => p === 1 || p === pagination.totalPages || Math.abs(p - page) <= 2)
+                .reduce((acc, p, i, arr) => {
+                  if (i > 0 && p - arr[i - 1] > 1) acc.push('...');
+                  acc.push(p);
+                  return acc;
+                }, [])
+                .map((p, i) =>
+                  p === '...' ? (
+                    <span key={`dots-${i}`} className="px-2 text-gray-400">...</span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => handlePageChange(p)}
+                      className={`min-w-[2.5rem] h-10 flex items-center justify-center rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                        p === page
+                          ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-glow-primary'
+                          : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
 
-            <button
-              onClick={() => handlePageChange(page + 1)}
-              disabled={page >= pagination.totalPages}
-              className="px-4 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              Suivant
-            </button>
+              <button
+                onClick={() => handlePageChange(page + 1)}
+                disabled={page >= pagination.totalPages}
+                className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              >
+                Suiv.
+              </button>
+            </div>
           </div>
         )}
       </div>

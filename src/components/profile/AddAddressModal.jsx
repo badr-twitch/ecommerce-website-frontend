@@ -161,8 +161,8 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+      <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 max-w-md w-full max-h-[90vh] overflow-y-auto animate-scale-in">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-900">
@@ -188,11 +188,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
                 value={formData.name}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
-                  errors.name && touched.name 
-                    ? 'border-red-300 focus:ring-red-500' 
-                    : 'border-gray-300'
-                }`}
+                className={`input ${errors.name && touched.name ? 'border-red-300 focus:border-red-500' : ''}`}
                 placeholder="Domicile, Bureau, etc."
               />
               {errors.name && touched.name && (
@@ -212,11 +208,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
                   value={formData.firstName}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
-                    errors.firstName && touched.firstName 
-                      ? 'border-red-300 focus:ring-red-500' 
-                      : 'border-gray-300'
-                  }`}
+                  className={`input ${errors.firstName && touched.firstName ? 'border-red-300 focus:border-red-500' : ''}`}
                   placeholder="Prénom"
                 />
                 {errors.firstName && touched.firstName && (
@@ -234,11 +226,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
                   value={formData.lastName}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
-                    errors.lastName && touched.lastName 
-                      ? 'border-red-300 focus:ring-red-500' 
-                      : 'border-gray-300'
-                  }`}
+                  className={`input ${errors.lastName && touched.lastName ? 'border-red-300 focus:border-red-500' : ''}`}
                   placeholder="Nom"
                 />
                 {errors.lastName && touched.lastName && (
@@ -258,11 +246,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
                 value={formData.phone}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
-                  errors.phone && touched.phone 
-                    ? 'border-red-300 focus:ring-red-500' 
-                    : 'border-gray-300'
-                }`}
+                className={`input ${errors.phone && touched.phone ? 'border-red-300 focus:border-red-500' : ''}`}
                 placeholder="06 12 34 56 78"
               />
               {errors.phone && touched.phone && (
@@ -281,11 +265,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
                 value={formData.address}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 resize-none ${
-                  errors.address && touched.address 
-                    ? 'border-red-300 focus:ring-red-500' 
-                    : 'border-gray-300'
-                }`}
+                className={`input resize-none ${errors.address && touched.address ? 'border-red-300 focus:border-red-500' : ''}`}
                 placeholder="Numéro, rue, appartement..."
               />
               {errors.address && touched.address && (
@@ -305,11 +285,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
                   value={formData.city}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
-                    errors.city && touched.city 
-                      ? 'border-red-300 focus:ring-red-500' 
-                      : 'border-gray-300'
-                  }`}
+                  className={`input ${errors.city && touched.city ? 'border-red-300 focus:border-red-500' : ''}`}
                   placeholder="Paris"
                 />
                 {errors.city && touched.city && (
@@ -327,11 +303,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
                   value={formData.postalCode}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
-                    errors.postalCode && touched.postalCode 
-                      ? 'border-red-300 focus:ring-red-500' 
-                      : 'border-gray-300'
-                  }`}
+                  className={`input ${errors.postalCode && touched.postalCode ? 'border-red-300 focus:border-red-500' : ''}`}
                   placeholder="75001"
                 />
                 {errors.postalCode && touched.postalCode && (
@@ -349,7 +321,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
                 name="country"
                 value={formData.country}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300"
+                className="select"
               >
                 <option value="France">France</option>
                 <option value="Belgique">Belgique</option>
@@ -365,13 +337,13 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
               <button
                 type="button"
                 onClick={handleClose}
-                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-all duration-300"
+                className="btn-outline flex-1"
               >
                 Annuler
               </button>
               <button
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="btn-primary flex-1"
               >
                 {editingAddress ? 'Modifier l\'adresse' : 'Ajouter l\'adresse'}
               </button>

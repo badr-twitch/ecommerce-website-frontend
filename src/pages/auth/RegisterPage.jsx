@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
-import { Mail, Lock, User as UserIcon, Building2, ArrowRight, Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, User as UserIcon, Building2, ArrowRight, Eye, EyeOff, ShieldCheck, Briefcase } from 'lucide-react';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -27,6 +27,8 @@ const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [passwordStrength, setPasswordStrength] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { register, signInWithGoogle, signInWithFacebook } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -362,7 +364,7 @@ const RegisterPage = () => {
                     className="sr-only"
                   />
                   <div className="flex flex-col items-center text-center">
-                    <span className="text-2xl mb-2">👤</span>
+                    <UserIcon className="w-6 h-6 mb-2 text-primary-600" />
                     <span className="text-sm font-semibold text-gray-900">Particulier</span>
                     <span className="text-xs text-gray-500 mt-1">Achat personnel</span>
                   </div>
@@ -381,7 +383,7 @@ const RegisterPage = () => {
                     className="sr-only"
                   />
                   <div className="flex flex-col items-center text-center">
-                    <span className="text-2xl mb-2">🏢</span>
+                    <Building2 className="w-6 h-6 mb-2 text-primary-600" />
                     <span className="text-sm font-semibold text-gray-900">Professionnel</span>
                     <span className="text-xs text-gray-500 mt-1">Achat entreprise</span>
                   </div>
@@ -404,11 +406,7 @@ const RegisterPage = () => {
                     value={formData.firstName}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
-                      errors.firstName && touched.firstName 
-                        ? 'border-red-300 focus:border-red-500' 
-                        : 'border-gray-300'
-                    }`}
+                    className={`input ${errors.firstName && touched.firstName ? 'border-red-300 focus:border-red-500' : ''}`}
                     placeholder="Votre prénom"
                   />
                   {errors.firstName && touched.firstName && (
@@ -430,11 +428,7 @@ const RegisterPage = () => {
                     value={formData.lastName}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
-                      errors.lastName && touched.lastName 
-                        ? 'border-red-300 focus:border-red-500' 
-                        : 'border-gray-300'
-                    }`}
+                    className={`input ${errors.lastName && touched.lastName ? 'border-red-300 focus:border-red-500' : ''}`}
                     placeholder="Votre nom"
                   />
                   {errors.lastName && touched.lastName && (
@@ -458,11 +452,7 @@ const RegisterPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
-                    errors.email && touched.email 
-                      ? 'border-red-300 focus:border-red-500' 
-                      : 'border-gray-300'
-                  }`}
+                  className={`input ${errors.email && touched.email ? 'border-red-300 focus:border-red-500' : ''}`}
                   placeholder="votre@email.com"
                 />
                 {errors.email && touched.email && (
@@ -476,22 +466,25 @@ const RegisterPage = () => {
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Mot de passe
               </label>
-              <div className="mt-1">
+              <div className="mt-1 relative">
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   value={formData.password}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
-                    errors.password && touched.password 
-                      ? 'border-red-300 focus:border-red-500' 
-                      : 'border-gray-300'
-                  }`}
+                  className={`input pr-12 ${errors.password && touched.password ? 'border-red-300 focus:border-red-500' : ''}`}
                   placeholder="Votre mot de passe"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3.5 p-1 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
                 {formData.password && (
                   <div className="mt-2">
                     <div className="flex items-center space-x-2">
@@ -526,22 +519,25 @@ const RegisterPage = () => {
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
                 Confirmer le mot de passe
               </label>
-              <div className="mt-1">
+              <div className="mt-1 relative">
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
-                  type="password"
+                  type={showConfirmPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
-                    errors.confirmPassword && touched.confirmPassword 
-                      ? 'border-red-300 focus:border-red-500' 
-                      : 'border-gray-300'
-                  }`}
+                  className={`input pr-12 ${errors.confirmPassword && touched.confirmPassword ? 'border-red-300 focus:border-red-500' : ''}`}
                   placeholder="Confirmez votre mot de passe"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-3.5 p-1 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
                 {errors.confirmPassword && touched.confirmPassword && (
                   <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
                 )}
@@ -553,7 +549,7 @@ const RegisterPage = () => {
               <div className="space-y-6 pt-4 border-t border-gray-200">
                 <div className="bg-primary-50 rounded-xl p-4 border border-primary-200">
                   <h3 className="text-sm font-semibold text-primary-900 mb-2 flex items-center">
-                    <span className="mr-2">🏢</span>
+                    <Briefcase className="w-4 h-4 mr-2" />
                     Informations professionnelles
                   </h3>
                   <p className="text-xs text-primary-700">
@@ -574,11 +570,7 @@ const RegisterPage = () => {
                       value={formData.companyName}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
-                        errors.companyName && touched.companyName
-                          ? 'border-red-300 focus:border-red-500'
-                          : 'border-gray-300'
-                      }`}
+                      className={`input ${errors.companyName && touched.companyName ? 'border-red-300 focus:border-red-500' : ''}`}
                       placeholder="Nom de votre entreprise"
                     />
                     {errors.companyName && touched.companyName && (
@@ -603,11 +595,7 @@ const RegisterPage = () => {
                         handleChange({ ...e, target: { ...e.target, value } });
                       }}
                       onBlur={handleBlur}
-                      className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
-                        errors.siret && touched.siret
-                          ? 'border-red-300 focus:border-red-500'
-                          : 'border-gray-300'
-                      }`}
+                      className={`input ${errors.siret && touched.siret ? 'border-red-300 focus:border-red-500' : ''}`}
                       placeholder="12345678901234"
                       maxLength={14}
                     />
@@ -631,7 +619,7 @@ const RegisterPage = () => {
                       value={formData.vatNumber}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300"
+                      className="input"
                       placeholder="FR12345678901"
                     />
                   </div>
@@ -650,11 +638,7 @@ const RegisterPage = () => {
                       value={formData.billingAddress}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
-                        errors.billingAddress && touched.billingAddress
-                          ? 'border-red-300 focus:border-red-500'
-                          : 'border-gray-300'
-                      }`}
+                      className={`input ${errors.billingAddress && touched.billingAddress ? 'border-red-300 focus:border-red-500' : ''}`}
                       placeholder="Numéro et nom de rue"
                     />
                     {errors.billingAddress && touched.billingAddress && (
@@ -677,11 +661,7 @@ const RegisterPage = () => {
                         value={formData.billingCity}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
-                          errors.billingCity && touched.billingCity
-                            ? 'border-red-300 focus:border-red-500'
-                            : 'border-gray-300'
-                        }`}
+                        className={`input ${errors.billingCity && touched.billingCity ? 'border-red-300 focus:border-red-500' : ''}`}
                         placeholder="Ville"
                       />
                       {errors.billingCity && touched.billingCity && (
@@ -705,11 +685,7 @@ const RegisterPage = () => {
                           handleChange({ ...e, target: { ...e.target, value } });
                         }}
                         onBlur={handleBlur}
-                        className={`w-full px-4 py-3 border-2 rounded-xl text-sm placeholder-gray-400 focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300 ${
-                          errors.billingPostalCode && touched.billingPostalCode
-                            ? 'border-red-300 focus:border-red-500'
-                            : 'border-gray-300'
-                        }`}
+                        className={`input ${errors.billingPostalCode && touched.billingPostalCode ? 'border-red-300 focus:border-red-500' : ''}`}
                         placeholder="75001"
                         maxLength={5}
                       />
@@ -731,7 +707,7 @@ const RegisterPage = () => {
                       name="billingCountry"
                       value={formData.billingCountry}
                       onChange={handleChange}
-                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:border-primary-500 focus:outline-none sm:text-sm transition-all duration-300"
+                      className="select cursor-pointer"
                     >
                       <option value="France">France</option>
                       <option value="Belgique">Belgique</option>
@@ -752,7 +728,7 @@ const RegisterPage = () => {
                 type="checkbox"
                 checked={formData.acceptTerms}
                 onChange={handleChange}
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded cursor-pointer"
               />
               <label htmlFor="acceptTerms" className="ml-2 block text-sm text-gray-900">
                 J'accepte les{' '}
@@ -783,7 +759,7 @@ const RegisterPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 rounded-xl shadow-glow-primary hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]"
+                className="btn-primary w-full py-3.5 cursor-pointer"
               >
                 {isLoading ? (
                   <>
@@ -815,7 +791,7 @@ const RegisterPage = () => {
               type="button"
               onClick={handleGoogleSignIn}
               disabled={isLoading}
-              className="flex items-center justify-center gap-2 py-3 px-4 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 transition-all duration-200 active:scale-[0.97]"
+              className="btn-outline py-3 cursor-pointer"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -830,7 +806,7 @@ const RegisterPage = () => {
               type="button"
               onClick={handleFacebookSignIn}
               disabled={isLoading}
-              className="flex items-center justify-center gap-2 py-3 px-4 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 transition-all duration-200 active:scale-[0.97]"
+              className="btn-outline py-3 cursor-pointer"
             >
               <svg className="w-4 h-4" fill="#1877F2" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M20 10C20 4.477 15.523 0 10 0S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" clipRule="evenodd" />

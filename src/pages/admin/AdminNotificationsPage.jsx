@@ -24,10 +24,10 @@ const NOTIFICATION_TYPES = {
 };
 
 const PRIORITY_COLORS = {
-  critical: 'bg-red-100 text-red-800',
-  high: 'bg-orange-100 text-orange-800',
-  medium: 'bg-blue-100 text-blue-800',
-  low: 'bg-green-100 text-green-800'
+  critical: 'badge-danger',
+  high: 'badge-warning',
+  medium: 'badge-primary',
+  low: 'badge-success'
 };
 
 const AdminNotificationsPage = () => {
@@ -192,7 +192,7 @@ const AdminNotificationsPage = () => {
   return (
     <div className="space-y-6">
       {/* Tabs */}
-      <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
+      <div className="flex space-x-1 bg-gray-100/80 backdrop-blur-sm rounded-xl p-1">
         {[
           { id: 'dashboard', label: 'Tableau de bord' },
           { id: 'list', label: 'Notifications' },
@@ -201,8 +201,8 @@ const AdminNotificationsPage = () => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === tab.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+            className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              activeTab === tab.id ? 'bg-white text-gray-900 shadow-soft' : 'text-gray-600 hover:text-gray-900'
             }`}
           >
             {tab.label}
@@ -215,19 +215,19 @@ const AdminNotificationsPage = () => {
         <div className="space-y-6">
           {/* KPI Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard label="Total" value={stats.total} color="blue" />
-            <StatCard label="Non lues" value={stats.unread} color="red" />
-            <StatCard label="Dernières 24h" value={stats.last24Hours} color="green" />
-            <StatCard label="Critiques" value={stats.byPriority.critical} color="orange" />
+            <StatCard label="Total" value={stats.total} color="blue" icon="total" />
+            <StatCard label="Non lues" value={stats.unread} color="red" icon="unread" />
+            <StatCard label="Dernières 24h" value={stats.last24Hours} color="green" icon="recent" />
+            <StatCard label="Critiques" value={stats.byPriority.critical} color="orange" icon="critical" />
           </div>
 
           {/* Priority Breakdown */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="card p-6">
             <h3 className="text-lg font-semibold mb-4">Par priorité</h3>
             <div className="grid grid-cols-4 gap-4">
               {Object.entries(stats.byPriority).map(([key, val]) => (
                 <div key={key} className="text-center">
-                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${PRIORITY_COLORS[key]}`}>
+                  <span className={`${PRIORITY_COLORS[key]}`}>
                     {key}
                   </span>
                   <p className="text-2xl font-bold mt-2">{val}</p>
@@ -237,11 +237,11 @@ const AdminNotificationsPage = () => {
           </div>
 
           {/* Type Breakdown */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="card p-6">
             <h3 className="text-lg font-semibold mb-4">Par type</h3>
             <div className="grid grid-cols-3 gap-4">
               {Object.entries(stats.byType).map(([key, val]) => (
-                <div key={key} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <div key={key} className="flex justify-between items-center p-3 bg-gray-50/80 rounded-xl">
                   <span className="text-sm text-gray-600">{NOTIFICATION_TYPES[key] || key}</span>
                   <span className="text-lg font-bold">{val}</span>
                 </div>
@@ -251,11 +251,11 @@ const AdminNotificationsPage = () => {
 
           {/* Actions */}
           <div className="flex space-x-3">
-            <button onClick={handleTestAll} className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium flex items-center gap-2">
+            <button onClick={handleTestAll} className="btn-primary flex items-center gap-2">
               <Bell className="w-4 h-4" />
               Tester toutes les notifications
             </button>
-            <button onClick={handleCleanup} className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm font-medium flex items-center gap-2">
+            <button onClick={handleCleanup} className="btn-outline flex items-center gap-2">
               <RefreshCw className="w-4 h-4" />
               Nettoyage
             </button>
@@ -267,32 +267,32 @@ const AdminNotificationsPage = () => {
       {activeTab === 'list' && (
         <div className="space-y-4">
           {/* Filters */}
-          <div className="flex flex-wrap gap-3 items-center bg-white p-4 rounded-lg border border-gray-200">
+          <div className="flex flex-wrap gap-3 items-center card p-4">
             <Filter className="w-4 h-4 text-gray-500" />
-            <select value={filterType} onChange={e => { setFilterType(e.target.value); }} className="border rounded-md px-3 py-1.5 text-sm">
+            <select value={filterType} onChange={e => { setFilterType(e.target.value); }} className="select">
               <option value="">Tous les types</option>
               {Object.entries(NOTIFICATION_TYPES).map(([k, v]) => (
                 <option key={k} value={k}>{v}</option>
               ))}
             </select>
-            <select value={filterPriority} onChange={e => { setFilterPriority(e.target.value); }} className="border rounded-md px-3 py-1.5 text-sm">
+            <select value={filterPriority} onChange={e => { setFilterPriority(e.target.value); }} className="select">
               <option value="">Toutes priorités</option>
               <option value="critical">Critique</option>
               <option value="high">Haute</option>
               <option value="medium">Moyenne</option>
               <option value="low">Basse</option>
             </select>
-            <select value={filterRead} onChange={e => { setFilterRead(e.target.value); }} className="border rounded-md px-3 py-1.5 text-sm">
+            <select value={filterRead} onChange={e => { setFilterRead(e.target.value); }} className="select">
               <option value="">Toutes</option>
               <option value="false">Non lues</option>
               <option value="true">Lues</option>
             </select>
-            <button onClick={() => loadNotifications(0)} className="px-3 py-1.5 bg-primary-600 text-white rounded-md text-sm hover:bg-primary-700">
+            <button onClick={() => loadNotifications(0)} className="btn-primary">
               Filtrer
             </button>
 
             {selectedIds.size > 0 && (
-              <button onClick={handleBulkDelete} className="ml-auto px-3 py-1.5 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 flex items-center gap-1">
+              <button onClick={handleBulkDelete} className="btn-danger ml-auto flex items-center gap-1">
                 <Trash2 className="w-3.5 h-3.5" />
                 Supprimer ({selectedIds.size})
               </button>
@@ -300,9 +300,9 @@ const AdminNotificationsPage = () => {
           </div>
 
           {/* Table */}
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="card overflow-hidden">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50/80 border-b border-gray-200">
                 <tr>
                   <th className="p-3 text-left">
                     <input type="checkbox" checked={selectedIds.size === notifications.length && notifications.length > 0} onChange={toggleSelectAll} className="rounded" />
@@ -319,9 +319,12 @@ const AdminNotificationsPage = () => {
                 {loading ? (
                   <tr><td colSpan={7} className="p-8 text-center text-gray-500">Chargement...</td></tr>
                 ) : notifications.length === 0 ? (
-                  <tr><td colSpan={7} className="p-8 text-center text-gray-500">Aucune notification</td></tr>
+                  <tr><td colSpan={7} className="p-12 text-center">
+                    <Bell className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500">Aucune notification</p>
+                  </td></tr>
                 ) : notifications.map(n => (
-                  <tr key={n.id} className={`hover:bg-gray-50 ${!n.isRead ? 'bg-primary-50/30' : ''}`}>
+                  <tr key={n.id} className={`hover:bg-primary-50/30 transition-colors duration-200 ${!n.isRead ? 'bg-primary-50/20 border-l-4 border-l-primary-500' : ''}`}>
                     <td className="p-3">
                       <input type="checkbox" checked={selectedIds.has(n.id)} onChange={() => toggleSelect(n.id)} className="rounded" />
                     </td>
@@ -366,7 +369,7 @@ const AdminNotificationsPage = () => {
                 <button
                   onClick={() => loadNotifications(pagination.offset - pagination.limit)}
                   disabled={currentPage <= 1}
-                  className="p-2 border rounded-md disabled:opacity-50 hover:bg-gray-50"
+                  className="btn-outline p-2 disabled:opacity-50"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -374,7 +377,7 @@ const AdminNotificationsPage = () => {
                 <button
                   onClick={() => loadNotifications(pagination.offset + pagination.limit)}
                   disabled={currentPage >= totalPages}
-                  className="p-2 border rounded-md disabled:opacity-50 hover:bg-gray-50"
+                  className="btn-outline p-2 disabled:opacity-50"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -386,7 +389,7 @@ const AdminNotificationsPage = () => {
 
       {/* Send Tab */}
       {activeTab === 'send' && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="card p-6">
           <h3 className="text-lg font-semibold mb-6">Envoyer une notification</h3>
           <form onSubmit={handleSend} className="space-y-4 max-w-lg">
             <div>
@@ -410,7 +413,7 @@ const AdminNotificationsPage = () => {
                   type="text"
                   value={sendForm.userId}
                   onChange={e => setSendForm({ ...sendForm, userId: e.target.value })}
-                  className="w-full border rounded-md px-3 py-2 text-sm"
+                  className="input"
                   placeholder="UUID de l'utilisateur"
                 />
               </div>
@@ -418,7 +421,7 @@ const AdminNotificationsPage = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-              <select value={sendForm.type} onChange={e => setSendForm({ ...sendForm, type: e.target.value })} className="w-full border rounded-md px-3 py-2 text-sm">
+              <select value={sendForm.type} onChange={e => setSendForm({ ...sendForm, type: e.target.value })} className="select">
                 {Object.entries(NOTIFICATION_TYPES).map(([k, v]) => (
                   <option key={k} value={k}>{v}</option>
                 ))}
@@ -427,7 +430,7 @@ const AdminNotificationsPage = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Priorité</label>
-              <select value={sendForm.priority} onChange={e => setSendForm({ ...sendForm, priority: e.target.value })} className="w-full border rounded-md px-3 py-2 text-sm">
+              <select value={sendForm.priority} onChange={e => setSendForm({ ...sendForm, priority: e.target.value })} className="select">
                 <option value="low">Basse</option>
                 <option value="medium">Moyenne</option>
                 <option value="high">Haute</option>
@@ -441,7 +444,7 @@ const AdminNotificationsPage = () => {
                 type="text"
                 value={sendForm.title}
                 onChange={e => setSendForm({ ...sendForm, title: e.target.value })}
-                className="w-full border rounded-md px-3 py-2 text-sm"
+                className="input"
                 placeholder="Titre de la notification"
               />
             </div>
@@ -452,12 +455,12 @@ const AdminNotificationsPage = () => {
                 value={sendForm.message}
                 onChange={e => setSendForm({ ...sendForm, message: e.target.value })}
                 rows={3}
-                className="w-full border rounded-md px-3 py-2 text-sm"
+                className="input"
                 placeholder="Contenu du message"
               />
             </div>
 
-            <button type="submit" className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium flex items-center gap-2">
+            <button type="submit" className="btn-primary flex items-center gap-2">
               <Send className="w-4 h-4" />
               {sendForm.mode === 'broadcast' ? 'Diffuser' : 'Envoyer'}
             </button>
@@ -469,17 +472,31 @@ const AdminNotificationsPage = () => {
 };
 
 const StatCard = ({ label, value, color }) => {
-  const colors = {
-    blue: 'bg-primary-50 text-primary-700 border-primary-200',
-    red: 'bg-red-50 text-red-700 border-red-200',
-    green: 'bg-green-50 text-green-700 border-green-200',
-    orange: 'bg-orange-50 text-orange-700 border-orange-200'
+  const iconColors = {
+    blue: 'from-primary-500/10 to-primary-600/10 text-primary-600',
+    red: 'from-red-500/10 to-red-600/10 text-red-600',
+    green: 'from-green-500/10 to-green-600/10 text-green-600',
+    orange: 'from-orange-500/10 to-orange-600/10 text-orange-600'
+  };
+
+  const textColors = {
+    blue: 'text-primary-700',
+    red: 'text-red-700',
+    green: 'text-green-700',
+    orange: 'text-orange-700'
   };
 
   return (
-    <div className={`rounded-lg border p-4 ${colors[color]}`}>
-      <p className="text-sm font-medium opacity-80">{label}</p>
-      <p className="text-3xl font-bold mt-1">{value}</p>
+    <div className="card-hover p-4">
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${iconColors[color]}`}>
+          <Bell className="w-5 h-5" />
+        </div>
+        <div>
+          <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
+          <p className={`text-2xl font-bold ${textColors[color]}`}>{value}</p>
+        </div>
+      </div>
     </div>
   );
 };

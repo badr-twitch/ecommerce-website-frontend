@@ -3,7 +3,7 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { productsAPI, categoriesAPI, formatPrice } from '../services/api';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
-import { Star, Search, Filter, Settings, Heart, ShoppingCart, CheckCircle, XCircle, Frown } from 'lucide-react';
+import { Star, Search, Filter, SlidersHorizontal, Heart, ShoppingCart, CheckCircle, XCircle, Frown, ChevronLeft, ChevronRight, ArrowUpDown, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Memoized FilterSidebar component - defined outside to prevent recreation
@@ -17,40 +17,45 @@ const FilterSidebar = React.memo(({
   clearFilters,
   isSearching
 }) => (
-  <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-soft sticky top-24">
+  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/60 shadow-soft sticky top-24">
     <div className="flex items-center justify-between mb-6">
-      <h3 className="text-xl font-bold text-gray-800">Filtres</h3>
+      <div className="flex items-center gap-2.5">
+        <div className="w-9 h-9 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-sm">
+          <SlidersHorizontal className="w-4 h-4 text-white" />
+        </div>
+        <h3 className="text-lg font-bold text-gray-900">Filtres</h3>
+      </div>
       <button
         onClick={clearFilters}
-        className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+        className="text-primary-600 hover:text-primary-700 text-sm font-medium cursor-pointer transition-colors duration-200"
       >
         Réinitialiser
       </button>
     </div>
 
     {/* Search */}
-    <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-2">Recherche</label>
+    <div className="mb-5">
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">Recherche</label>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-              type="text"
-              value={inputValues.search}
-              onChange={(e) => handleInputChange('search', e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && applyFilters()}
-              placeholder="Rechercher un produit... (Entrée pour appliquer)"
-              className="w-full pl-10 pr-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-300"
-            />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <input
+          type="text"
+          value={inputValues.search}
+          onChange={(e) => handleInputChange('search', e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && applyFilters()}
+          placeholder="Rechercher..."
+          className="input pl-10"
+        />
       </div>
     </div>
 
     {/* Category */}
-    <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
+    <div className="mb-5">
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">Catégorie</label>
       <select
         value={inputValues.category}
         onChange={(e) => handleFilterChange('category', e.target.value)}
-        className="w-full px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-300"
+        className="select cursor-pointer"
       >
         <option value="">Toutes les catégories</option>
         {categories.map((category) => (
@@ -63,12 +68,12 @@ const FilterSidebar = React.memo(({
 
     {/* Brand */}
     {brands && brands.length > 0 && (
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Marque</label>
+      <div className="mb-5">
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">Marque</label>
         <select
           value={inputValues.brand}
           onChange={(e) => handleFilterChange('brand', e.target.value)}
-          className="w-full px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-300"
+          className="select cursor-pointer"
         >
           <option value="">Toutes les marques</option>
           {brands.map((brand) => (
@@ -81,33 +86,33 @@ const FilterSidebar = React.memo(({
     )}
 
     {/* Price Range */}
-    <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-2">Prix</label>
+    <div className="mb-5">
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">Prix (DH)</label>
       <div className="grid grid-cols-2 gap-2">
-                    <input
-              type="number"
-              value={inputValues.minPrice}
-              onChange={(e) => handleInputChange('minPrice', e.target.value)}
-              placeholder="Min"
-              className="px-3 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-300"
-            />
-                    <input
-              type="number"
-              value={inputValues.maxPrice}
-              onChange={(e) => handleInputChange('maxPrice', e.target.value)}
-              placeholder="Max"
-              className="px-3 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-300"
-            />
+        <input
+          type="number"
+          value={inputValues.minPrice}
+          onChange={(e) => handleInputChange('minPrice', e.target.value)}
+          placeholder="Min"
+          className="input"
+        />
+        <input
+          type="number"
+          value={inputValues.maxPrice}
+          onChange={(e) => handleInputChange('maxPrice', e.target.value)}
+          placeholder="Max"
+          className="input"
+        />
       </div>
     </div>
 
     {/* Sort */}
-    <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-2">Trier par</label>
+    <div className="mb-5">
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">Trier par</label>
       <select
         value={inputValues.sort}
         onChange={(e) => handleFilterChange('sort', e.target.value)}
-        className="w-full px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-300"
+        className="select cursor-pointer"
       >
         <option value="createdAt">Plus récents</option>
         <option value="name">Nom</option>
@@ -117,12 +122,12 @@ const FilterSidebar = React.memo(({
     </div>
 
     {/* Order */}
-    <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-2">Ordre</label>
+    <div className="mb-5">
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">Ordre</label>
       <select
         value={inputValues.order}
         onChange={(e) => handleFilterChange('order', e.target.value)}
-        className="w-full px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-300"
+        className="select cursor-pointer"
       >
         <option value="desc">Décroissant</option>
         <option value="asc">Croissant</option>
@@ -131,23 +136,23 @@ const FilterSidebar = React.memo(({
 
     {/* Checkboxes */}
     <div className="space-y-3 mb-6">
-      <label className="flex items-center">
+      <label className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-primary-50/50 transition-colors duration-200 cursor-pointer">
         <input
           type="checkbox"
           checked={inputValues.featured}
           onChange={(e) => handleFilterChange('featured', e.target.checked)}
-          className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+          className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 cursor-pointer"
         />
-        <span className="ml-2 text-sm text-gray-700">Produits vedettes</span>
+        <span className="text-sm font-medium text-gray-700">Produits vedettes</span>
       </label>
-      <label className="flex items-center">
+      <label className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-primary-50/50 transition-colors duration-200 cursor-pointer">
         <input
           type="checkbox"
           checked={inputValues.onSale}
           onChange={(e) => handleFilterChange('onSale', e.target.checked)}
-          className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+          className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 cursor-pointer"
         />
-        <span className="ml-2 text-sm text-gray-700">En promotion</span>
+        <span className="text-sm font-medium text-gray-700">En promotion</span>
       </label>
     </div>
 
@@ -155,7 +160,7 @@ const FilterSidebar = React.memo(({
     <button
       onClick={applyFilters}
       disabled={isSearching}
-      className="w-full px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      className="btn-primary w-full cursor-pointer flex items-center justify-center gap-2"
     >
       {isSearching ? (
         <>
@@ -365,120 +370,108 @@ const ProductsPage = () => {
   const ProductCard = React.memo(({ product }) => (
     <div
       onClick={() => navigate(`/products/${product.id}`)}
-      className="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden group hover:shadow-2xl transition-all duration-500 border border-gray-200/50 transform hover:-translate-y-2 hover:scale-105 cursor-pointer"
+      className="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 border border-white/60 hover:-translate-y-1 cursor-pointer"
     >
       <div className="relative overflow-hidden">
         <img
-          src={product.mainImage || product.images?.[0] || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop'}
+          src={product.mainImage || product.images?.[0] || '/placeholder-product.jpg'}
           alt={product.name}
-          className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
+          className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
+          onError={(e) => { e.target.src = '/placeholder-product.jpg'; }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* Badges */}
-        <div className="absolute top-4 left-4 flex flex-col gap-2">
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {product.isFeatured && (
-            <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-              <Star className="w-3 h-3 inline mr-1" /> Vedette
+            <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm">
+              <Star className="w-3 h-3" /> Vedette
             </span>
           )}
           {product.isOnSale && (
-            <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+            <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm">
               -{product.salePercentage}%
-            </span>
-          )}
-          {product.category && (
-            <span className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-              {product.category.name}
             </span>
           )}
         </div>
 
-        {/* Quick action buttons */}
-        <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          {/* Wishlist button */}
+        {/* Quick action buttons on hover */}
+        <div className="absolute bottom-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
           <button
             onClick={(e) => { e.stopPropagation(); handleToggleWishlist(product); }}
-            className={`p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 ${
+            className={`p-2.5 rounded-xl shadow-lg transition-all duration-200 cursor-pointer ${
               isInWishlist(product.id)
-                ? 'bg-red-500 hover:bg-red-600 text-white'
-                : 'bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-600 hover:text-red-500 hover:border-red-300'
+                ? 'bg-red-500 text-white hover:bg-red-600'
+                : 'bg-white/90 backdrop-blur-sm text-gray-600 hover:text-red-500'
             }`}
           >
-            {isInWishlist(product.id) ? <Heart className="w-5 h-5 fill-current" /> : <Heart className="w-5 h-5" />}
+            <Heart className="w-4 h-4" fill={isInWishlist(product.id) ? 'currentColor' : 'none'} />
           </button>
-
-          {/* Quick add to cart button */}
           <button
             onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
             disabled={!product.inStock}
-            className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
-            <ShoppingCart className="w-5 h-5" />
+            <ShoppingCart className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-primary-600 transition-colors duration-300">
+      <div className="p-5">
+        {/* Category tag */}
+        {product.category && (
+          <span className="text-xs font-medium text-primary-600 uppercase tracking-wide">
+            {product.category.name}
+          </span>
+        )}
+
+        <h3 className="text-base font-bold text-gray-900 mt-1 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors duration-200">
           {product.name}
         </h3>
 
         {/* Rating */}
         {product.averageRating > 0 && (
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-1.5 mb-3">
             <div className="flex">
               {renderStars(product.averageRating)}
             </div>
-            <span className="text-sm text-gray-600">({product.reviewCount})</span>
+            <span className="text-xs text-gray-500">({product.reviewCount})</span>
           </div>
         )}
 
-        {/* Price */}
-        <div className="flex items-center gap-3 mb-4">
-          {product.isOnSale && product.originalPrice && (
-            <span className="text-lg text-gray-500 line-through">
-              {formatPrice(product.originalPrice)}
+        {/* Price + Stock row */}
+        <div className="flex items-end justify-between mt-auto">
+          <div>
+            {product.isOnSale && product.originalPrice && (
+              <span className="text-sm text-gray-400 line-through block">
+                {formatPrice(product.originalPrice)}
+              </span>
+            )}
+            <span className="text-xl font-bold text-gray-900">
+              {formatPrice(product.discountedPrice || product.price)}
             </span>
-          )}
-          <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
-            {formatPrice(product.discountedPrice || product.price)}
-          </span>
+          </div>
+          <div>
+            {product.inStock ? (
+              <span className="badge-success text-xs">
+                <CheckCircle className="w-3 h-3 mr-1" /> En stock
+              </span>
+            ) : (
+              <span className="badge-danger text-xs">
+                <XCircle className="w-3 h-3 mr-1" /> Épuisé
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Stock status */}
-        <div className="mb-4">
-          {product.inStock ? (
-            <span className="text-green-600 text-sm font-medium">
-              <CheckCircle className="w-4 h-4 inline mr-1" /> En stock ({product.stockQuantity})
-            </span>
-          ) : (
-            <span className="text-red-600 text-sm font-medium">
-              <XCircle className="w-4 h-4 inline mr-1" /> Rupture de stock
-            </span>
-          )}
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-3">
-          <button
-            onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
-            disabled={!product.inStock}
-            className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ShoppingCart className="w-4 h-4 inline mr-1" /> Ajouter
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); handleToggleWishlist(product); }}
-            className={`px-4 py-3 rounded-xl transition-all duration-300 hover:shadow-lg ${
-              isInWishlist(product.id)
-                ? 'bg-red-500 hover:bg-red-600 text-white'
-                : 'bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 hover:text-red-500 hover:border-red-300'
-            }`}
-          >
-            {isInWishlist(product.id) ? <Heart className="w-5 h-5 fill-current" /> : <Heart className="w-5 h-5" />}
-          </button>
-        </div>
+        {/* Add to cart CTA */}
+        <button
+          onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
+          disabled={!product.inStock}
+          className="btn-primary w-full mt-4 cursor-pointer text-sm py-2.5"
+        >
+          <ShoppingCart className="w-4 h-4 mr-1.5" /> Ajouter au panier
+        </button>
       </div>
     </div>
   ));
@@ -488,37 +481,37 @@ const ProductsPage = () => {
   return (
     <div className="min-h-screen bg-mesh">
       {/* Header */}
-      <section className="py-12 lg:py-16">
+      <section className="pt-10 pb-6 lg:pt-14 lg:pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3">
               Nos <span className="text-gradient">Produits</span>
             </h1>
-            <p className="text-lg text-gray-500 max-w-xl mx-auto">
+            <p className="text-base lg:text-lg text-gray-500 max-w-xl mx-auto">
               Decouvrez notre collection complete de produits de qualite
             </p>
-            <div className="section-divider mt-6" />
+            <div className="section-divider mt-5" />
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="py-8">
+      <section className="pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Mobile Filter Toggle */}
-          <div className="lg:hidden mb-6">
+          <div className="lg:hidden mb-5">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 rounded-xl flex items-center justify-center gap-2 text-gray-700 hover:text-primary-600 transition-all duration-300"
+              className="btn-outline w-full cursor-pointer flex items-center justify-center gap-2"
             >
-              <Filter className="w-5 h-5" />
+              <Filter className="w-4 h-4" />
               {showFilters ? 'Masquer les filtres' : 'Afficher les filtres'}
             </button>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Filters Sidebar */}
-            <div className={`lg:w-80 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+            <div className={`lg:w-72 flex-shrink-0 ${showFilters ? 'block' : 'hidden lg:block'}`}>
               <FilterSidebar
                 inputValues={inputValues}
                 categories={categories}
@@ -532,56 +525,57 @@ const ProductsPage = () => {
             </div>
 
             {/* Products Grid */}
-            <div className="flex-1">
-              {/* Results Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-                <div className="mb-4 sm:mb-0">
-                  <h2 className="text-2xl font-bold text-gray-800">
-                    {loading ? 'Chargement...' : `${pagination.totalItems || 0} produits trouvés`}
-                  </h2>
-                  {!loading && pagination.totalItems > 0 && (
-                    <p className="text-gray-600">
-                      Page {pagination.currentPage} sur {pagination.totalPages}
+            <div className="flex-1 min-w-0">
+              {/* Results Toolbar */}
+              <div className="bg-white/60 backdrop-blur-sm rounded-2xl border border-white/60 shadow-sm p-4 mb-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {loading ? 'Chargement...' : `${pagination.totalItems || 0} produits trouvés`}
                     </p>
-                  )}
-                </div>
-
-                {/* Active Filters */}
-                {Object.values(filters).some(value => value !== '' && value !== false) && (
-                  <div className="flex flex-wrap gap-2">
-                    {filters.search && (
-                      <span className="px-3 py-1 bg-primary-100 text-primary-800 rounded-full text-sm">
-                        Recherche: {filters.search}
-                      </span>
-                    )}
-                    {filters.category && (
-                      <span className="px-3 py-1 bg-secondary-100 text-secondary-800 rounded-full text-sm">
-                        Catégorie: {categories.find(c => c.id === filters.category)?.name}
-                      </span>
-                    )}
-                    {filters.featured && (
-                      <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
-                        Vedettes
-                      </span>
-                    )}
-                    {filters.onSale && (
-                      <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">
-                        Promotions
-                      </span>
+                    {!loading && pagination.totalItems > 0 && (
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Page {pagination.currentPage} sur {pagination.totalPages}
+                      </p>
                     )}
                   </div>
-                )}
+
+                  {/* Active Filters Tags */}
+                  {Object.values(filters).some(value => value !== '' && value !== false) && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {filters.search && (
+                        <span className="badge-primary">
+                          Recherche: {filters.search}
+                        </span>
+                      )}
+                      {filters.category && (
+                        <span className="badge-secondary">
+                          {categories.find(c => c.id === filters.category)?.name}
+                        </span>
+                      )}
+                      {filters.featured && (
+                        <span className="badge-warning">Vedettes</span>
+                      )}
+                      {filters.onSale && (
+                        <span className="badge-danger">Promotions</span>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Loading State */}
               {loading && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                   {[...Array(6)].map((_, i) => (
-                    <div key={i} className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 animate-pulse">
-                      <div className="bg-gray-200 h-64 rounded-xl mb-4"></div>
-                      <div className="bg-gray-200 h-6 rounded mb-2"></div>
-                      <div className="bg-gray-200 h-4 rounded mb-4"></div>
-                      <div className="bg-gray-200 h-10 rounded"></div>
+                    <div key={i} className="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/60 animate-pulse">
+                      <div className="bg-gray-200 h-56" />
+                      <div className="p-5 space-y-3">
+                        <div className="bg-gray-200 h-3 rounded w-1/3" />
+                        <div className="bg-gray-200 h-5 rounded w-3/4" />
+                        <div className="bg-gray-200 h-4 rounded w-1/2" />
+                        <div className="bg-gray-200 h-10 rounded-xl mt-4" />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -589,13 +583,15 @@ const ProductsPage = () => {
 
               {/* Error State */}
               {error && (
-                <div className="text-center py-12">
-                  <Frown className="w-8 h-8 text-red-600 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">Oups !</h3>
-                  <p className="text-gray-600 mb-6">{error}</p>
+                <div className="card-glass p-12 text-center">
+                  <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Frown className="w-8 h-8 text-red-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Oups !</h3>
+                  <p className="text-gray-500 mb-6 max-w-sm mx-auto">{error}</p>
                   <button
                     onClick={() => window.location.reload()}
-                    className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl transition-all duration-300"
+                    className="btn-primary cursor-pointer"
                   >
                     Réessayer
                   </button>
@@ -605,7 +601,7 @@ const ProductsPage = () => {
               {/* Products Grid */}
               {!loading && !error && products.length > 0 && (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                     {products.map((product) => (
                       <ProductCard key={product.id} product={product} />
                     ))}
@@ -613,24 +609,24 @@ const ProductsPage = () => {
 
                   {/* Pagination */}
                   {pagination.totalPages > 1 && (
-                    <div className="flex justify-center mt-12">
-                      <div className="flex items-center gap-2">
+                    <div className="flex justify-center mt-10">
+                      <div className="inline-flex items-center gap-1.5 bg-white/80 backdrop-blur-sm rounded-2xl border border-white/60 shadow-sm p-1.5">
                         {pagination.currentPage > 1 && (
                           <Link
                             to={`?${new URLSearchParams({
                               ...Object.fromEntries(searchParams),
                               page: pagination.currentPage - 1
                             })}`}
-                            className="px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 text-gray-700 hover:text-primary-600 rounded-xl transition-all duration-300"
+                            className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-colors duration-200"
                           >
-                            ← Précédent
+                            <ChevronLeft className="w-4 h-4" /> Préc.
                           </Link>
                         )}
 
                         {[...Array(pagination.totalPages)].map((_, i) => {
                           const page = i + 1;
                           const isCurrent = page === pagination.currentPage;
-                          
+
                           return (
                             <Link
                               key={page}
@@ -638,10 +634,10 @@ const ProductsPage = () => {
                                 ...Object.fromEntries(searchParams),
                                 page
                               })}`}
-                              className={`px-4 py-2 rounded-xl transition-all duration-300 ${
+                              className={`min-w-[2.5rem] h-10 flex items-center justify-center rounded-xl text-sm font-semibold transition-all duration-200 ${
                                 isCurrent
-                                  ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white'
-                                  : 'bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 text-gray-700 hover:text-primary-600'
+                                  ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-glow-primary'
+                                  : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
                               }`}
                             >
                               {page}
@@ -655,9 +651,9 @@ const ProductsPage = () => {
                               ...Object.fromEntries(searchParams),
                               page: pagination.currentPage + 1
                             })}`}
-                            className="px-4 py-2 bg-white/80 backdrop-blur-sm border-2 border-gray-200/50 text-gray-700 hover:text-primary-600 rounded-xl transition-all duration-300"
+                            className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-colors duration-200"
                           >
-                            Suivant →
+                            Suiv. <ChevronRight className="w-4 h-4" />
                           </Link>
                         )}
                       </div>
@@ -668,15 +664,17 @@ const ProductsPage = () => {
 
               {/* Empty State */}
               {!loading && !error && products.length === 0 && (
-                <div className="text-center py-12">
-                  <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">Aucun produit trouvé</h3>
-                  <p className="text-gray-600 mb-6">
+                <div className="card-glass p-12 text-center">
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary-500/10 to-secondary-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                    <Package className="w-10 h-10 text-primary-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Aucun produit trouvé</h3>
+                  <p className="text-gray-500 mb-6 max-w-sm mx-auto">
                     Essayez de modifier vos filtres ou de rechercher autre chose
                   </p>
                   <button
                     onClick={clearFilters}
-                    className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl transition-all duration-300"
+                    className="btn-primary cursor-pointer"
                   >
                     Réinitialiser les filtres
                   </button>

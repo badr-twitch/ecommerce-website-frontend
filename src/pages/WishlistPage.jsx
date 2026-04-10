@@ -85,17 +85,11 @@ const WishlistPage = () => {
               Connectez-vous pour accéder à votre wishlist et sauvegarder vos produits préférés !
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link 
-                to="/login" 
-                className="px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white text-lg font-semibold rounded-xl shadow-glow-primary hover:-translate-y-0.5 transition-all duration-300"
-              >
-                <Lock className="w-5 h-5 inline-block mr-2" />Se connecter
+              <Link to="/login" className="btn-primary px-8 py-4 text-lg">
+                <Lock className="w-5 h-5 mr-2" />Se connecter
               </Link>
-              <Link 
-                to="/register" 
-                className="px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 hover:text-primary-600 hover:border-primary-300 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white hover:shadow-lg"
-              >
-                <UserPlus className="w-5 h-5 inline-block mr-2" />Créer un compte
+              <Link to="/register" className="btn-outline px-8 py-4 text-lg">
+                <UserPlus className="w-5 h-5 mr-2" />Créer un compte
               </Link>
             </div>
           </div>
@@ -138,11 +132,11 @@ const WishlistPage = () => {
             <p className="text-xl text-gray-500 mb-8 max-w-md mx-auto">
               {error}
             </p>
-            <button 
+            <button
               onClick={() => window.location.reload()}
-              className="px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white text-lg font-semibold rounded-xl shadow-glow-primary hover:-translate-y-0.5 transition-all duration-300"
+              className="btn-primary px-8 py-4 text-lg cursor-pointer"
             >
-              <RefreshCw className="w-5 h-5 inline mr-1" /> Réessayer
+              <RefreshCw className="w-5 h-5 mr-1" /> Réessayer
             </button>
           </div>
         </div>
@@ -165,17 +159,11 @@ const WishlistPage = () => {
               Commencez à ajouter vos produits préférés à votre wishlist pour les retrouver facilement !
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link 
-                to="/products" 
-                className="px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white text-lg font-semibold rounded-xl shadow-glow-primary hover:-translate-y-0.5 transition-all duration-300"
-              >
-                <ShoppingBag className="w-5 h-5 inline mr-1" /> Découvrir nos produits
+              <Link to="/products" className="btn-primary px-8 py-4 text-lg">
+                <ShoppingBag className="w-5 h-5 mr-1" /> Découvrir nos produits
               </Link>
-              <Link 
-                to="/categories" 
-                className="px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 hover:text-primary-600 hover:border-primary-300 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white hover:shadow-lg"
-              >
-                <FolderOpen className="w-5 h-5 inline mr-1" /> Parcourir les catégories
+              <Link to="/categories" className="btn-outline px-8 py-4 text-lg">
+                <FolderOpen className="w-5 h-5 mr-1" /> Parcourir les catégories
               </Link>
             </div>
           </div>
@@ -192,7 +180,8 @@ const WishlistPage = () => {
           <h1 className="text-4xl font-bold text-gradient mb-2">
             Ma Wishlist
           </h1>
-          <p className="text-gray-500 text-lg">
+          <div className="section-divider mb-0"></div>
+          <p className="text-gray-500 text-lg mt-3">
             {wishlistItems.length} produit{wishlistItems.length > 1 ? 's' : ''} dans votre wishlist
           </p>
         </div>
@@ -202,17 +191,17 @@ const WishlistPage = () => {
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={handleMoveAllToCart}
-              className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center space-x-2"
+              className="btn-primary cursor-pointer"
             >
-              <ShoppingCart className="w-5 h-5" />
-              <span>Ajouter tout au panier</span>
+              <ShoppingCart className="w-4 h-4 mr-1.5" />
+              Ajouter tout au panier
             </button>
             <button
               onClick={handleClearWishlist}
-              className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center space-x-2"
+              className="btn-danger cursor-pointer"
             >
-              <Trash2 className="w-5 h-5" />
-              <span>Vider la wishlist</span>
+              <Trash2 className="w-4 h-4 mr-1.5" />
+              Vider la wishlist
             </button>
           </div>
         </div>
@@ -240,9 +229,9 @@ const WishlistPage = () => {
                 {/* Remove from wishlist button */}
                 <button
                   onClick={() => handleRemoveFromWishlist(product.id)}
-                  className="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer"
                 >
-                  ✕
+                  <X className="w-4 h-4" />
                 </button>
 
                 {/* Sale badge */}
@@ -277,11 +266,15 @@ const WishlistPage = () => {
                     )}
                   </div>
                   
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm">
                     {product.inStock ? (
-                      <span className="text-green-600">✓ En stock</span>
+                      <span className="text-green-600 flex items-center gap-1">
+                        <Check className="w-3.5 h-3.5" /> En stock
+                      </span>
                     ) : (
-                      <span className="text-red-600">✗ Rupture</span>
+                      <span className="text-red-600 flex items-center gap-1">
+                        <X className="w-3.5 h-3.5" /> Rupture
+                      </span>
                     )}
                   </div>
                 </div>
@@ -291,16 +284,16 @@ const WishlistPage = () => {
                   <button
                     onClick={() => handleAddToCart(product)}
                     disabled={!product.inStock}
-                    className="w-full px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold rounded-lg transition-all duration-300 disabled:cursor-not-allowed"
+                    className="btn-primary w-full text-sm py-2 cursor-pointer"
                   >
-                    {product.inStock ? <><ShoppingCart className="w-4 h-4 inline mr-1" /> Ajouter au panier</> : 'Rupture de stock'}
+                    {product.inStock ? <><ShoppingCart className="w-4 h-4 mr-1" /> Ajouter au panier</> : 'Rupture de stock'}
                   </button>
-                  
+
                   <Link
                     to={`/products/${product.id}`}
-                    className="block w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-center font-semibold rounded-lg transition-all duration-300"
+                    className="btn-outline w-full text-sm py-2"
                   >
-                    <Eye className="w-4 h-4 inline mr-1" /> Voir détails
+                    <Eye className="w-4 h-4 mr-1" /> Voir détails
                   </Link>
                 </div>
               </div>
@@ -310,12 +303,9 @@ const WishlistPage = () => {
 
         {/* Continue Shopping */}
         <div className="mt-16 text-center">
-          <Link
-            to="/products"
-            className="inline-flex items-center space-x-2 px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 hover:text-primary-600 hover:border-primary-300 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white hover:shadow-lg"
-          >
-            <ShoppingBag className="w-5 h-5" />
-            <span>Continuer les achats</span>
+          <Link to="/products" className="btn-outline px-8 py-4 text-lg">
+            <ShoppingBag className="w-5 h-5 mr-2" />
+            Continuer les achats
           </Link>
         </div>
       </div>

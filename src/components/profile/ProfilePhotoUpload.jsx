@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import storageService from '../../services/storageService';
 import toast from 'react-hot-toast';
+import { Camera, Trash2, User } from 'lucide-react';
 
 const ProfilePhotoUpload = ({ currentPhotoURL, onPhotoChange, isLoading }) => {
   const { user } = useAuth();
@@ -124,7 +125,7 @@ const ProfilePhotoUpload = ({ currentPhotoURL, onPhotoChange, isLoading }) => {
       <div className="flex items-center space-x-4">
         {/* Current Photo Preview */}
         <div className="relative">
-          <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+          <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-primary-50 to-secondary-50 border-2 border-white shadow-soft flex items-center justify-center">
             {previewURL ? (
               <img
                 src={previewURL}
@@ -132,13 +133,13 @@ const ProfilePhotoUpload = ({ currentPhotoURL, onPhotoChange, isLoading }) => {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="text-gray-400 text-2xl">👤</div>
+              <User className="w-8 h-8 text-gray-400" />
             )}
           </div>
           
           {/* Upload Progress Overlay */}
           {isUploading && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-2xl flex items-center justify-center">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mb-2"></div>
                 <div className="text-white text-xs">{Math.round(uploadProgress)}%</div>
@@ -154,9 +155,9 @@ const ProfilePhotoUpload = ({ currentPhotoURL, onPhotoChange, isLoading }) => {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isLoading || isUploading}
-              className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white font-medium py-2 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary"
             >
-              {isUploading ? 'Téléchargement...' : 'Choisir une image'}
+              {isUploading ? 'Téléchargement...' : <><Camera className="w-4 h-4 mr-1.5" /> Choisir une image</>}
             </button>
             
             {previewURL && (
@@ -164,9 +165,9 @@ const ProfilePhotoUpload = ({ currentPhotoURL, onPhotoChange, isLoading }) => {
                 type="button"
                 onClick={handleRemovePhoto}
                 disabled={isLoading || isUploading}
-                className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-danger"
               >
-                Supprimer
+                <Trash2 className="w-4 h-4 mr-1.5" /> Supprimer
               </button>
             )}
           </div>

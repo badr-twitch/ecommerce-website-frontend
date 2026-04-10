@@ -1,71 +1,65 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { CheckCircle, Mail, Package, Truck, ShoppingBag, ClipboardList } from 'lucide-react';
 
 const OrderSuccessPage = () => {
+  const steps = [
+    { icon: Mail, title: 'Email de confirmation', description: 'Vous recevrez un email de confirmation dans les prochaines minutes' },
+    { icon: Package, title: 'Préparation de la commande', description: 'Notre équipe prépare votre commande pour l\'expédition' },
+    { icon: Truck, title: 'Suivi de livraison', description: 'Vous recevrez un numéro de suivi par email' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-primary-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto text-center">
+    <div className="min-h-screen bg-mesh relative overflow-hidden flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-green-200/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
+      <div className="max-w-2xl mx-auto text-center relative z-10 px-4">
         <div className="mb-8">
-          <div className="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-green-100">
-            <span className="text-4xl">✅</span>
+          <div className="mx-auto flex items-center justify-center h-24 w-24 rounded-2xl bg-gradient-to-br from-green-400 to-green-600 shadow-lg">
+            <CheckCircle className="w-12 h-12 text-white" />
           </div>
         </div>
-        
+
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
           Commande confirmée !
         </h1>
-        
+
         <p className="text-lg text-gray-600 mb-8">
           Merci pour votre commande. Nous avons reçu votre paiement et nous préparons votre expédition.
         </p>
 
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Prochaines étapes</h2>
-          <div className="space-y-4 text-left">
-            <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-primary-600 font-bold">1</span>
-              </div>
-              <div>
-                <h3 className="font-medium text-gray-900">Email de confirmation</h3>
-                <p className="text-sm text-gray-600">Vous recevrez un email de confirmation dans les prochaines minutes</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-primary-600 font-bold">2</span>
-              </div>
-              <div>
-                <h3 className="font-medium text-gray-900">Préparation de la commande</h3>
-                <p className="text-sm text-gray-600">Notre équipe prépare votre commande pour l'expédition</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-primary-600 font-bold">3</span>
-              </div>
-              <div>
-                <h3 className="font-medium text-gray-900">Suivi de livraison</h3>
-                <p className="text-sm text-gray-600">Vous recevrez un numéro de suivi par email</p>
-              </div>
-            </div>
+        <div className="card p-6 mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Prochaines étapes</h2>
+          <div className="space-y-5 text-left">
+            {steps.map((step, index) => {
+              const Icon = step.icon;
+              return (
+                <div key={index} className="flex items-center space-x-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-sm">
+                    <Icon className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-gray-900">{step.title}</h3>
+                    <p className="text-sm text-gray-600">{step.description}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-          >
+          <Link to="/" className="btn-primary inline-flex items-center justify-center gap-2">
+            <ShoppingBag className="w-4 h-4" />
             Continuer les achats
           </Link>
-          
-          <Link
-            to="/orders"
-            className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition-all duration-300"
-          >
+
+          <Link to="/orders" className="btn-outline inline-flex items-center justify-center gap-2">
+            <ClipboardList className="w-4 h-4" />
             Voir mes commandes
           </Link>
         </div>
@@ -78,4 +72,4 @@ const OrderSuccessPage = () => {
   );
 };
 
-export default OrderSuccessPage; 
+export default OrderSuccessPage;

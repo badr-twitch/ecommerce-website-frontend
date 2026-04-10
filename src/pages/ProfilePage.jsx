@@ -13,9 +13,10 @@ import { useOrders } from '../hooks/useOrders';
 import toast from 'react-hot-toast';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import { Package, ShieldCheck, Gift, Gem } from 'lucide-react';
+import { Package, ShieldCheck, Gift, Gem, User, Building2, CreditCard, Truck, Settings, Lock, Sparkles, Check, Star, ArrowRight, LogOut, Trash2 } from 'lucide-react';
 import api, { membershipAPI } from '../services/api';
 import MembershipManageModal from '../components/membership/MembershipManageModal';
+import ProfileSidebarLayout from '../components/profile/ProfileSidebarLayout';
 
 const ProfilePage = () => {
   const { user, updateProfile, changePassword, logout, refreshUser } = useContext(AuthContext);
@@ -1108,6 +1109,15 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
 
 
+  const profileTabs = [
+    { id: 'profile', label: 'Profil', icon: User },
+    { id: 'orders', label: 'Mes Commandes', icon: Package },
+    { id: 'security', label: 'Securite', icon: Lock },
+    { id: 'payment', label: 'Paiement', icon: CreditCard },
+    { id: 'shipping', label: 'Livraison', icon: Truck },
+    { id: 'settings', label: 'Parametres', icon: Settings },
+  ];
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -1126,83 +1136,14 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-xl shadow-sm">
-          {/* Header */}
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h1 className="text-2xl font-semibold text-gray-900">Mon Profil</h1>
-            <p className="text-gray-600">Gérez vos informations personnelles et paramètres</p>
-          </div>
-
-          {/* Navigation Tabs */}
-          <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6">
-              <button
-                onClick={() => setActiveTab('profile')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'profile'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Profil
-              </button>
-              <button
-                onClick={() => setActiveTab('orders')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'orders'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Mes Commandes
-              </button>
-              <button
-                onClick={() => setActiveTab('security')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'security'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Sécurité
-              </button>
-              <button
-                onClick={() => setActiveTab('payment')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'payment'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Paiement
-              </button>
-              <button
-                onClick={() => setActiveTab('shipping')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'shipping'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Livraison
-              </button>
-              <button
-                onClick={() => setActiveTab('settings')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'settings'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Paramètres
-              </button>
-            </nav>
-          </div>
-
-          {/* Content */}
-          <div className="p-6">
+    <ProfileSidebarLayout
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      tabs={profileTabs}
+      user={user}
+      membershipStatus={membershipStatus}
+    >
+      <div className="space-y-6">
             {/* Error and Success Messages */}
             {error && (
               <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -1218,6 +1159,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
             {/* Profile Tab */}
             {activeTab === 'profile' && (
               <div className="space-y-6">
+                <div className="card p-6">
                 <div className="flex items-start space-x-6">
                   <ProfilePhotoUpload
                     currentPhotoURL={profileData.photoURL}
@@ -1241,20 +1183,20 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               id="displayName"
                               value={tempDisplayName}
                               onChange={(e) => setTempDisplayName(e.target.value)}
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
+                              className="input flex-1"
                             />
                             <button
                               type="button"
                               onClick={handleSaveName}
                               disabled={isLoading}
-                              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+                              className="btn-primary"
                             >
                               Sauvegarder
                             </button>
                             <button
                               type="button"
                               onClick={handleCancelEditName}
-                              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                              className="btn-outline"
                             >
                               Annuler
                             </button>
@@ -1307,14 +1249,14 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               <button
                                 type="button"
                                 onClick={handleSendPhoneVerification}
-                                className="px-3 py-1 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm"
+                                className="btn-primary text-sm px-3 py-1.5"
                               >
                                 Changer
                               </button>
                               <button
                                 type="button"
                                 onClick={handleRemovePhone}
-                                className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm"
+                                className="btn-danger text-sm px-3 py-1.5"
                               >
                                 Supprimer
                               </button>
@@ -1331,7 +1273,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               defaultCountry="FR"
                               value={profileData.phone}
                               onChange={(value) => setProfileData({...profileData, phone: value || ''})}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
+                              className="input"
                               placeholder="Entrez votre numéro de téléphone"
                             />
                             <p className="text-xs text-gray-500">
@@ -1343,8 +1285,8 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
                       {/* Phone Verification Modal */}
                       {showPhoneVerification && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in">
+                          <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 p-6 max-w-md w-full mx-4 animate-scale-in">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4">
                               {!user?.phone 
                                 ? 'Ajouter un numéro de téléphone'
@@ -1374,7 +1316,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                     defaultCountry="FR"
                                     value={newPhoneNumber}
                                     onChange={(value) => setNewPhoneNumber(value || '')}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
+                                    className="input"
                                     placeholder="+33 6 12 34 56 78"
                                   />
                                 </div>
@@ -1389,7 +1331,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                       type="text"
                                       value={verificationCode}
                                       onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none text-center text-lg font-mono"
+                                      className="input text-center text-lg font-mono"
                                       placeholder="000000"
                                       maxLength={6}
                                     />
@@ -1398,7 +1340,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                         type="button"
                                         onClick={handleVerifyNewPhone}
                                         disabled={isVerifyingCode || verificationCode.length !== 6}
-                                        className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                                        className="btn-primary flex-1"
                                       >
                                         {isVerifyingCode ? 'Vérification...' : 'Vérifier'}
                                       </button>
@@ -1409,7 +1351,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                           setVerificationCode('');
                                           setNewPhoneNumber('');
                                         }}
-                                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                                        className="btn-outline"
                                       >
                                         Annuler
                                       </button>
@@ -1422,7 +1364,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                       type="button"
                                       onClick={handleSendNewPhoneVerification}
                                       disabled={isSendingVerification || !newPhoneNumber || newPhoneNumber.length < 10}
-                                      className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+                                      className="btn-primary flex-1"
                                     >
                                       {isSendingVerification ? 'Envoi...' : 'Envoyer le code SMS'}
                                     </button>
@@ -1432,7 +1374,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                         setShowPhoneVerification(false);
                                         setNewPhoneNumber('');
                                       }}
-                                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                                      className="btn-outline"
                                     >
                                       Annuler
                                     </button>
@@ -1459,7 +1401,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                     type="text"
                                     value={verificationCode}
                                     onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none text-center text-lg font-mono"
+                                    className="input text-center text-lg font-mono"
                                     placeholder="000000"
                                     maxLength={6}
                                   />
@@ -1473,7 +1415,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                     type="button"
                                     onClick={handleVerifyCurrentPhone}
                                     disabled={isVerifyingCode || verificationCode.length !== 6}
-                                    className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+                                    className="btn-primary flex-1"
                                   >
                                     {isVerifyingCode ? 'Vérification...' : 'Vérifier le numéro actuel'}
                                   </button>
@@ -1485,7 +1427,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                       setNewPhoneNumber('');
                                       setCurrentPhoneVerified(false);
                                     }}
-                                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                                    className="btn-outline"
                                   >
                                     Annuler
                                   </button>
@@ -1515,7 +1457,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                       <button
                                         type="button"
                                         onClick={handleConfirmRemovePhone}
-                                        className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                        className="btn-danger flex-1"
                                       >
                                         Confirmer la suppression
                                       </button>
@@ -1527,7 +1469,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                           setNewPhoneNumber('');
                                           setCurrentPhoneVerified(false);
                                         }}
-                                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                                        className="btn-outline"
                                       >
                                         Annuler
                                       </button>
@@ -1545,7 +1487,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                         defaultCountry="FR"
                                         value={newPhoneNumber}
                                         onChange={setNewPhoneNumber}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
+                                        className="input"
                                         placeholder="Entrez le nouveau numéro"
                                       />
                                     </div>
@@ -1555,7 +1497,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                           type="button"
                                           onClick={handleSetNewPhone}
                                           disabled={isSettingNewPhone || !newPhoneNumber || newPhoneNumber.length < 10}
-                                          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                                          className="btn-primary flex-1"
                                         >
                                           {isSettingNewPhone ? 'Envoi du code...' : 'Envoyer le code de vérification'}
                                         </button>
@@ -1567,7 +1509,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                             setNewPhoneNumber('');
                                             setCurrentPhoneVerified(false);
                                           }}
-                                          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                                          className="btn-outline"
                                         >
                                           Annuler
                                         </button>
@@ -1586,7 +1528,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                             value={newPhoneVerificationCode}
                                             onChange={(e) => setNewPhoneVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                                             placeholder="Entrez le code à 6 chiffres"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                            className="input"
                                             maxLength={6}
                                           />
                                         </div>
@@ -1595,7 +1537,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                             type="button"
                                             onClick={handleVerifyNewPhoneOtp}
                                             disabled={isVerifyingCode || newPhoneVerificationCode.length !== 6}
-                                            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                                            className="btn-primary flex-1"
                                           >
                                             {isVerifyingCode ? 'Vérification...' : 'Vérifier et mettre à jour'}
                                           </button>
@@ -1609,7 +1551,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                               setNewPhoneOtpSent(false);
                                               setNewPhoneVerificationCode('');
                                             }}
-                                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                                            className="btn-outline"
                                           >
                                             Annuler
                                           </button>
@@ -1630,10 +1572,10 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                           Type de compte <span className="text-red-500">*</span>
                         </label>
                         <div className="grid grid-cols-2 gap-4">
-                          <label className={`relative flex cursor-pointer rounded-xl border-2 p-4 transition-all duration-300 ${
+                          <label className={`relative flex cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl border-2 p-4 transition-all duration-300 ${
                             profileData.clientType === 'particulier'
-                              ? 'border-primary-500 bg-primary-50'
-                              : 'border-gray-200 hover:border-gray-300'
+                              ? 'border-primary-500 bg-primary-50/50'
+                              : 'border-gray-200/50 hover:border-gray-300'
                           }`}>
                             <input
                               type="radio"
@@ -1657,15 +1599,15 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               className="sr-only"
                             />
                             <div className="flex flex-col items-center text-center w-full">
-                              <span className="text-2xl mb-2">👤</span>
+                              <User className="w-6 h-6 mb-2 text-gray-700" />
                               <span className="text-sm font-semibold text-gray-900">Particulier</span>
                               <span className="text-xs text-gray-500 mt-1">Achat personnel</span>
                             </div>
                           </label>
-                          <label className={`relative flex cursor-pointer rounded-xl border-2 p-4 transition-all duration-300 ${
+                          <label className={`relative flex cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl border-2 p-4 transition-all duration-300 ${
                             profileData.clientType === 'professionnel'
-                              ? 'border-primary-500 bg-primary-50'
-                              : 'border-gray-200 hover:border-gray-300'
+                              ? 'border-primary-500 bg-primary-50/50'
+                              : 'border-gray-200/50 hover:border-gray-300'
                           }`}>
                             <input
                               type="radio"
@@ -1676,7 +1618,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               className="sr-only"
                             />
                             <div className="flex flex-col items-center text-center w-full">
-                              <span className="text-2xl mb-2">🏢</span>
+                              <Building2 className="w-6 h-6 mb-2 text-gray-700" />
                               <span className="text-sm font-semibold text-gray-900">Professionnel</span>
                               <span className="text-xs text-gray-500 mt-1">Achat entreprise</span>
                             </div>
@@ -1689,7 +1631,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                         <div className="pt-4 border-t border-gray-200 space-y-4">
                           <div className="bg-primary-50 rounded-xl p-4 border border-primary-200">
                             <h3 className="text-sm font-semibold text-primary-900 mb-2 flex items-center">
-                              <span className="mr-2">🏢</span>
+                              <Building2 className="w-4 h-4 mr-2" />
                               Informations professionnelles
                             </h3>
                             <p className="text-xs text-primary-700">
@@ -1708,7 +1650,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               name="companyName"
                               value={profileData.companyName}
                               onChange={(e) => setProfileData({...profileData, companyName: e.target.value})}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
+                              className="input"
                               placeholder="Nom de votre entreprise"
                               required={profileData.clientType === 'professionnel'}
                             />
@@ -1728,7 +1670,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                 const value = e.target.value.replace(/\D/g, '').slice(0, 14);
                                 setProfileData({...profileData, siret: value});
                               }}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
+                              className="input"
                               placeholder="12345678901234"
                               maxLength={14}
                               required={profileData.clientType === 'professionnel'}
@@ -1747,7 +1689,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               name="vatNumber"
                               value={profileData.vatNumber}
                               onChange={(e) => setProfileData({...profileData, vatNumber: e.target.value})}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
+                              className="input"
                               placeholder="FR12345678901"
                             />
                           </div>
@@ -1763,7 +1705,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               name="billingAddress"
                               value={profileData.billingAddress}
                               onChange={(e) => setProfileData({...profileData, billingAddress: e.target.value})}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
+                              className="input"
                               placeholder="Numéro et nom de rue"
                               required={profileData.clientType === 'professionnel'}
                             />
@@ -1781,7 +1723,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                 name="billingCity"
                                 value={profileData.billingCity}
                                 onChange={(e) => setProfileData({...profileData, billingCity: e.target.value})}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
+                                className="input"
                                 placeholder="Ville"
                                 required={profileData.clientType === 'professionnel'}
                               />
@@ -1800,7 +1742,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                                   const value = e.target.value.replace(/\D/g, '').slice(0, 5);
                                   setProfileData({...profileData, billingPostalCode: value});
                                 }}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
+                                className="input"
                                 placeholder="75001"
                                 maxLength={5}
                                 required={profileData.clientType === 'professionnel'}
@@ -1818,7 +1760,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                               name="billingCountry"
                               value={profileData.billingCountry}
                               onChange={(e) => setProfileData({...profileData, billingCountry: e.target.value})}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
+                              className="input"
                             >
                               <option value="France">France</option>
                               <option value="Belgique">Belgique</option>
@@ -1833,7 +1775,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+                        className="btn-primary w-full"
                       >
                         {isLoading ? 'Mise à jour...' : 'Mettre à jour le profil'}
                       </button>
@@ -1841,6 +1783,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
                     </form>
                   </div>
+                </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1871,7 +1814,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       {membershipStatus === 'active' ? (
                         <div className="space-y-4">
                           <div className="flex items-center space-x-4">
-                            <div className="text-4xl">🌟</div>
+                            <Sparkles className="w-8 h-8 text-amber-400" />
                             <div>
                               <p className="text-sm text-white/60">Plan actuel</p>
                               <p className="text-lg font-semibold">{membershipPlanName}</p>
@@ -1895,7 +1838,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                           <ul className="space-y-2 text-sm text-white/70">
                             {displayedMembershipPerks.slice(0, 3).map((perk) => (
                               <li key={perk.title} className="flex items-center space-x-2">
-                                <span className="text-lg text-emerald-300">✔</span>
+                                <Check className="w-4 h-4 text-emerald-300 flex-shrink-0" />
                                 <span>{perk.title}</span>
                               </li>
                             ))}
@@ -1907,7 +1850,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                             className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-white text-slate-900 font-semibold hover:-translate-y-0.5 transition-transform disabled:opacity-60"
                           >
                             {membershipActionLoading ? 'Ouverture...' : 'Gérer mon abonnement'}
-                            <span>→</span>
+                            <ArrowRight className="w-4 h-4" />
                           </button>
                         </div>
                       ) : (
@@ -1929,7 +1872,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                           <ul className="space-y-2 text-sm text-white/70">
                             {displayedMembershipPerks.slice(0, 3).map((perk) => (
                               <li key={perk.title} className="flex items-start space-x-2">
-                                <span className="text-lg">✨</span>
+                                <Star className="w-4 h-4 text-amber-300 flex-shrink-0 mt-0.5" />
                                 <div>
                                   <span className="font-medium">{perk.title}</span>
                                   {perk.description && (
@@ -1945,7 +1888,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                             className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-primary-600 to-secondary-600 font-semibold shadow-lg shadow-primary-500/40 hover:-translate-y-0.5 transition-transform"
                           >
                             Découvrir UMOD Prime
-                            <span>→</span>
+                            <ArrowRight className="w-4 h-4" />
                           </button>
                         </div>
                       )}
@@ -1986,7 +1929,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-gray-800 hover:bg-gray-100 transition"
                     >
                       En savoir plus sur UMOD Prime
-                      <span>→</span>
+                      <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -1995,12 +1938,12 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
             {/* Orders Tab */}
             {activeTab === 'orders' && (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
+              <div className="card p-6">
+                <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold text-gray-900">Mes Commandes</h2>
                   <Link
                     to="/orders"
-                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                    className="btn-primary"
                   >
                     Voir toutes les commandes
                   </Link>
@@ -2035,9 +1978,9 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
             {/* Security Tab */}
             {activeTab === 'security' && (
-              <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-gray-900">Sécurité</h2>
-                
+              <div className="card p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">Sécurité</h2>
+
                 <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-md">
                   <div>
                     <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
@@ -2049,7 +1992,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       value={passwordData.currentPassword}
                       onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
+                      className="input"
                     />
                   </div>
 
@@ -2064,7 +2007,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
                       required
                       minLength="6"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
+                      className="input"
                     />
                   </div>
 
@@ -2079,14 +2022,14 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                       onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
                       required
                       minLength="6"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:outline-none"
+                      className="input"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+                    className="btn-primary w-full"
                   >
                     {isLoading ? 'Modification...' : 'Modifier le mot de passe'}
                   </button>
@@ -2096,12 +2039,12 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
             {/* Payment Tab */}
             {activeTab === 'payment' && (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
+              <div className="card p-6">
+                <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold text-gray-900">Méthodes de paiement</h2>
                   <button
                     onClick={() => setShowAddPayment(true)}
-                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                    className="btn-primary"
                   >
                     Ajouter une méthode
                   </button>
@@ -2117,7 +2060,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                     <p className="text-gray-600">Aucune méthode de paiement enregistrée</p>
                     <button
                       onClick={() => setShowAddPayment(true)}
-                      className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                      className="btn-primary mt-4"
                     >
                       Ajouter votre première méthode
                     </button>
@@ -2125,7 +2068,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                 ) : (
                   <div className="space-y-4">
                     {paymentMethods.map((method) => (
-                      <div key={method.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                      <div key={method.id} className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-2xl border border-white/60 shadow-soft p-4 hover:shadow-medium transition-all duration-300">
                         <div className="flex items-center space-x-3">
                           <div className="w-16 h-6 bg-gray-200 rounded flex items-center justify-center">
                             <span className="text-xs font-bold text-gray-600 uppercase">
@@ -2150,14 +2093,14 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                           {!method.isDefault && (
                             <button
                               onClick={() => handleSetDefaultPayment(method.id)}
-                              className="text-primary-600 hover:text-primary-700 text-sm"
+                              className="btn-outline text-sm px-3 py-1.5"
                             >
                               Définir par défaut
                             </button>
                           )}
                           <button
                             onClick={() => handleDeletePaymentMethod(method.id)}
-                            className="text-red-600 hover:text-red-700 text-sm"
+                            className="btn-danger text-sm px-3 py-1.5"
                           >
                             Supprimer
                           </button>
@@ -2171,12 +2114,12 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
             {/* Shipping Tab */}
             {activeTab === 'shipping' && (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
+              <div className="card p-6">
+                <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold text-gray-900">Adresses de livraison</h2>
                   <button
                     onClick={() => setShowAddAddress(true)}
-                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                    className="btn-primary"
                   >
                     Ajouter une adresse
                   </button>
@@ -2192,7 +2135,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                     <p className="text-gray-600">Aucune adresse de livraison enregistrée</p>
                     <button
                       onClick={() => setShowAddAddress(true)}
-                      className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                      className="btn-primary mt-4"
                     >
                       Ajouter votre première adresse
                     </button>
@@ -2200,7 +2143,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                 ) : (
                   <div className="space-y-4">
                     {shippingAddresses.map((address) => (
-                      <div key={address.id} className="p-4 border border-gray-200 rounded-lg">
+                      <div key={address.id} className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/60 shadow-soft p-4 hover:shadow-medium transition-all duration-300">
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
                             <div className="flex items-center space-x-2 mb-2">
@@ -2232,20 +2175,20 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                             {!address.isDefault && (
                               <button
                                 onClick={() => handleSetDefaultAddress(address.id)}
-                                className="text-primary-600 hover:text-primary-700 text-sm"
+                                className="btn-outline text-sm px-3 py-1.5"
                               >
                                 Définir par défaut
                               </button>
                             )}
                             <button
                               onClick={() => handleEditShippingAddress(address)}
-                              className="text-primary-600 hover:text-primary-700 text-sm"
+                              className="btn-outline text-sm px-3 py-1.5"
                             >
                               Modifier
                             </button>
                             <button
                               onClick={() => handleDeleteShippingAddress(address.id)}
-                              className="text-red-600 hover:text-red-700 text-sm"
+                              className="btn-danger text-sm px-3 py-1.5"
                             >
                               Supprimer
                             </button>
@@ -2260,57 +2203,69 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
             {/* Settings Tab */}
             {activeTab === 'settings' && (
-              <div className="space-y-6">
+              <div className="card p-6 space-y-6">
                 <h2 className="text-xl font-semibold text-gray-900">Paramètres du compte</h2>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50/50 transition-all duration-200">
                     <div>
                       <h3 className="font-medium text-gray-900">Notifications par email</h3>
                       <p className="text-sm text-gray-600">Recevoir les notifications importantes</p>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={accountSettings.emailNotifications}
-                      onChange={(e) => setAccountSettings({...accountSettings, emailNotifications: e.target.checked})}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
+                    <button
+                      role="switch"
+                      aria-checked={accountSettings.emailNotifications}
+                      onClick={() => setAccountSettings({...accountSettings, emailNotifications: !accountSettings.emailNotifications})}
+                      className="toggle-switch"
+                      data-state={accountSettings.emailNotifications ? 'checked' : 'unchecked'}
+                    >
+                      <span className="toggle-switch-knob" />
+                    </button>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50/50 transition-all duration-200">
                     <div>
                       <h3 className="font-medium text-gray-900">Emails marketing</h3>
                       <p className="text-sm text-gray-600">Recevoir les offres et promotions</p>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={accountSettings.marketingEmails}
-                      onChange={(e) => setAccountSettings({...accountSettings, marketingEmails: e.target.checked})}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
+                    <button
+                      role="switch"
+                      aria-checked={accountSettings.marketingEmails}
+                      onClick={() => setAccountSettings({...accountSettings, marketingEmails: !accountSettings.marketingEmails})}
+                      className="toggle-switch"
+                      data-state={accountSettings.marketingEmails ? 'checked' : 'unchecked'}
+                    >
+                      <span className="toggle-switch-knob" />
+                    </button>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50/50 transition-all duration-200">
                     <div>
                       <h3 className="font-medium text-gray-900">Mises à jour de commande</h3>
                       <p className="text-sm text-gray-600">Notifications sur le statut des commandes</p>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={accountSettings.orderUpdates}
-                      onChange={(e) => setAccountSettings({...accountSettings, orderUpdates: e.target.checked})}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
+                    <button
+                      role="switch"
+                      aria-checked={accountSettings.orderUpdates}
+                      onClick={() => setAccountSettings({...accountSettings, orderUpdates: !accountSettings.orderUpdates})}
+                      className="toggle-switch"
+                      data-state={accountSettings.orderUpdates ? 'checked' : 'unchecked'}
+                    >
+                      <span className="toggle-switch-knob" />
+                    </button>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50/50 transition-all duration-200">
                     <div>
                       <h3 className="font-medium text-gray-900">Newsletter</h3>
                       <p className="text-sm text-gray-600">Recevoir notre newsletter mensuelle</p>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={accountSettings.newsletter}
-                      onChange={(e) => setAccountSettings({...accountSettings, newsletter: e.target.checked})}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                    />
+                    <button
+                      role="switch"
+                      aria-checked={accountSettings.newsletter}
+                      onClick={() => setAccountSettings({...accountSettings, newsletter: !accountSettings.newsletter})}
+                      className="toggle-switch"
+                      data-state={accountSettings.newsletter ? 'checked' : 'unchecked'}
+                    >
+                      <span className="toggle-switch-knob" />
+                    </button>
                   </div>
                 </div>
 
@@ -2318,7 +2273,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                   <button
                     onClick={handleSaveNotificationPreferences}
                     disabled={savingSettings}
-                    className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors duration-300"
+                    className="btn-primary"
                   >
                     {savingSettings ? 'Sauvegarde...' : 'Sauvegarder les préférences'}
                   </button>
@@ -2329,26 +2284,28 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                   <div className="space-y-4">
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors duration-300"
+                      className="w-full text-left px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors duration-300 flex items-center gap-3"
                     >
-                      <h3 className="font-medium text-gray-900">Se déconnecter</h3>
-                      <p className="text-sm text-gray-600">Fermer votre session</p>
+                      <LogOut className="w-4 h-4 text-gray-500" />
+                      <div>
+                        <h3 className="font-medium text-gray-900">Se déconnecter</h3>
+                        <p className="text-sm text-gray-600">Fermer votre session</p>
+                      </div>
                     </button>
                     <button
                       onClick={handleDeleteAccount}
-                      className="w-full text-left px-4 py-3 border border-red-300 rounded-xl hover:bg-red-50 transition-colors duration-300"
+                      className="w-full text-left px-4 py-3 border border-red-300 rounded-xl hover:bg-red-50 transition-colors duration-300 flex items-center gap-3"
                     >
-                      <h3 className="font-medium text-red-900">Supprimer le compte</h3>
-                      <p className="text-sm text-red-600">Cette action est irréversible</p>
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                      <div>
+                        <h3 className="font-medium text-red-900">Supprimer le compte</h3>
+                        <p className="text-sm text-red-600">Cette action est irréversible</p>
+                      </div>
                     </button>
                   </div>
                 </div>
               </div>
             )}
-          </div>
-        </div>
-      </div>
-
       {/* Modals */}
       <MembershipManageModal
         isOpen={membershipModalOpen}
@@ -2381,8 +2338,8 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
 
       {/* Delete Account Password Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 p-6 w-full max-w-md mx-4 animate-scale-in">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Confirmer la suppression
             </h3>
@@ -2403,7 +2360,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
               data-form-type="other"
               data-lpignore="true"
               data-1p-ignore="true"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-4"
+              className="input mb-4"
             />
             
             <div className="flex space-x-3">
@@ -2413,14 +2370,14 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
                   setDeletePassword('');
                   setError('');
                 }}
-                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-4 rounded-xl transition-all duration-300"
+                className="btn-outline flex-1"
               >
                 Annuler
               </button>
               <button
                 onClick={handleConfirmDelete}
                 disabled={isLoading}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 disabled:opacity-50"
+                className="btn-danger flex-1"
               >
                 {isLoading ? 'Suppression...' : 'Supprimer'}
               </button>
@@ -2429,6 +2386,7 @@ const membershipBadgeClass = membershipBadgeClasses[membershipStatus] || members
         </div>
       )}
     </div>
+    </ProfileSidebarLayout>
   );
 };
 

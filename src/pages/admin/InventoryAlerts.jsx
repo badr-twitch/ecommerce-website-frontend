@@ -61,7 +61,7 @@ const InventoryTable = React.memo(({ alerts, onPlusClick, onSettingsClick, getSt
 
   // FIXED: Memoize each row individually
   const renderRow = useCallback((product, index) => (
-    <tr key={product.id} className="admin-hover-transition hover:bg-gray-50 transition-colors">
+    <tr key={product.id} className="admin-hover-transition hover:bg-primary-50/30 transition-colors duration-200">
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="admin-flex-container flex items-center">
           {/* FIXED: Use StableImage component with admin CSS classes */}
@@ -88,7 +88,9 @@ const InventoryTable = React.memo(({ alerts, onPlusClick, onSettingsClick, getSt
         {product.minStockLevel}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <span className={`admin-badge px-2 py-1 rounded-full text-xs font-medium ${getStockStatusColor(product)}`}>
+        <span className={`admin-badge px-2.5 py-1 rounded-full text-xs font-medium ${
+          product.stockQuantity === 0 ? 'badge-danger' : product.stockQuantity <= product.minStockLevel ? 'badge-warning' : 'badge-success'
+        }`}>
           {getStockStatusText(product)}
         </span>
       </td>
@@ -96,14 +98,14 @@ const InventoryTable = React.memo(({ alerts, onPlusClick, onSettingsClick, getSt
         <div className="admin-flex-container flex space-x-2">
           <button
             onClick={() => onPlusClick(product)}
-            className="admin-button text-primary-600 hover:text-primary-900 p-1 rounded transition-colors"
+            className="admin-button text-primary-600 hover:text-primary-900 p-1.5 rounded-lg hover:bg-primary-50 transition-colors"
             title="Mettre à jour le stock"
           >
             <Plus className="w-4 h-4 admin-icon" />
           </button>
           <button
             onClick={() => onSettingsClick(product)}
-            className="admin-button text-green-600 hover:text-green-900 p-1 rounded transition-colors"
+            className="admin-button text-green-600 hover:text-green-900 p-1.5 rounded-lg hover:bg-green-50 transition-colors"
             title="Ajuster le stock"
           >
             <Settings className="w-4 h-4 admin-icon" />
@@ -122,7 +124,7 @@ const InventoryTable = React.memo(({ alerts, onPlusClick, onSettingsClick, getSt
   return (
     <div className="overflow-x-auto">
       <table className="admin-table w-full">
-        <thead className="bg-gray-50">
+        <thead className="bg-gray-50/80">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Produit
@@ -350,49 +352,57 @@ const InventoryAlerts = React.memo(() => {
 
       {/* FIXED: Statistics Cards with stable dimensions */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="card-hover p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm">Total Produits</p>
               <p className="text-2xl font-bold text-gray-900">{stableStats.totalProducts || 0}</p>
             </div>
-            <Package className="w-8 h-8 text-primary-600" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-primary-500/10 to-primary-600/10">
+              <Package className="w-5 h-5 text-primary-600" />
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="bg-amber-50/80 backdrop-blur-sm border border-amber-200/60 rounded-2xl p-6 hover:shadow-3d hover:-translate-y-1 transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm">Stock Faible</p>
               <p className="text-2xl font-bold text-yellow-600">{stableStats.lowStockProducts || 0}</p>
             </div>
-            <AlertTriangle className="w-8 h-8 text-yellow-600" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-amber-500/10 to-amber-600/10">
+              <AlertTriangle className="w-5 h-5 text-yellow-600" />
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="bg-red-50/80 backdrop-blur-sm border border-red-200/60 rounded-2xl p-6 hover:shadow-3d hover:-translate-y-1 transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm">Rupture de Stock</p>
               <p className="text-2xl font-bold text-red-600">{stableStats.outOfStockProducts || 0}</p>
             </div>
-            <TrendingUp className="w-8 h-8 text-red-600" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-red-500/10 to-red-600/10">
+              <TrendingUp className="w-5 h-5 text-red-600" />
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="card-hover p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm">Total Stock</p>
               <p className="text-2xl font-bold text-green-600">{stableStats.totalStockValue || 0}</p>
             </div>
-            <Package className="w-8 h-8 text-green-600" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-green-500/10 to-green-600/10">
+              <Package className="w-5 h-5 text-green-600" />
+            </div>
           </div>
         </div>
       </div>
 
       {/* FIXED: Low Stock Products with stable layout */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">Produits en Stock Faible</h3>
         </div>
@@ -416,7 +426,7 @@ const InventoryAlerts = React.memo(() => {
       {/* FIXED: Stock Update Modal with stable positioning */}
       {showStockUpdateModal && selectedProduct && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+          <div className="card-glass shadow-2xl w-full max-w-md">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold text-gray-900">
@@ -443,7 +453,7 @@ const InventoryAlerts = React.memo(() => {
                   <select
                     value={stockUpdateForm.changeType}
                     onChange={(e) => setStockUpdateForm(prev => ({ ...prev, changeType: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
+                    className="select"
                   >
                     <option value="in">Réception (Ajouter)</option>
                     <option value="out">Vente/Utilisation (Retirer)</option>
@@ -461,7 +471,7 @@ const InventoryAlerts = React.memo(() => {
                     onChange={(e) => setStockUpdateForm(prev => ({ ...prev, quantity: e.target.value }))}
                     required
                     min="1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
+                    className="input"
                     placeholder="Quantité"
                   />
                 </div>
@@ -475,7 +485,7 @@ const InventoryAlerts = React.memo(() => {
                     value={stockUpdateForm.reason}
                     onChange={(e) => setStockUpdateForm(prev => ({ ...prev, reason: e.target.value }))}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
+                    className="input"
                     placeholder="Raison du changement"
                   />
                 </div>
@@ -488,7 +498,7 @@ const InventoryAlerts = React.memo(() => {
                     value={stockUpdateForm.notes}
                     onChange={(e) => setStockUpdateForm(prev => ({ ...prev, notes: e.target.value }))}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none"
+                    className="input"
                     placeholder="Notes supplémentaires..."
                   />
                 </div>
@@ -497,13 +507,13 @@ const InventoryAlerts = React.memo(() => {
                   <button
                     type="button"
                     onClick={() => setShowStockUpdateModal(false)}
-                    className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="flex-1 btn-outline"
                   >
                     Annuler
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                    className="flex-1 btn-primary"
                   >
                     Mettre à Jour
                   </button>

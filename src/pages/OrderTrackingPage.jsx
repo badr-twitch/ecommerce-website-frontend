@@ -72,20 +72,28 @@ const OrderTrackingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-mesh relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary-200/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Header */}
         <div className="mb-8">
           <Link
             to="/"
-            className="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500 mb-4"
+            className="inline-flex items-center text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors duration-200 mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour à l'accueil
           </Link>
 
           <div className="text-center">
-            <Package className="mx-auto h-12 w-12 text-indigo-600" />
+            <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-glow-primary">
+              <Package className="h-8 w-8 text-white" />
+            </div>
             <h1 className="mt-4 text-3xl font-bold text-gray-900">
               Suivre ma commande
             </h1>
@@ -96,7 +104,7 @@ const OrderTrackingPage = () => {
         </div>
 
         {/* Search Form */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <div className="card p-6 mb-8">
           <form onSubmit={handleTrack} className="space-y-4">
             <div>
               <label htmlFor="orderNumber" className="block text-sm font-medium text-gray-700 mb-1">
@@ -108,7 +116,7 @@ const OrderTrackingPage = () => {
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
                 placeholder="Ex: ORD-1234567890-001"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                className="input"
               />
             </div>
 
@@ -122,14 +130,14 @@ const OrderTrackingPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="votre@email.com"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                className="input"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 font-medium transition-colors"
+              className="btn-primary w-full flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -148,7 +156,7 @@ const OrderTrackingPage = () => {
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
+          <div className="bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-2xl p-4 mb-8">
             <div className="flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
               <p className="text-sm text-red-700">{error}</p>
@@ -168,7 +176,7 @@ const OrderTrackingPage = () => {
         {order && (
           <div className="space-y-6">
             {/* Order Summary Header */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="card p-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">
@@ -189,19 +197,19 @@ const OrderTrackingPage = () => {
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
                 {order.shippingCity && (
                   <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <MapPin className="h-4 w-4 text-gray-400" />
+                    <MapPin className="h-4 w-4 text-primary-500" />
                     <span>{order.shippingCity}, {order.shippingCountry}</span>
                   </div>
                 )}
                 {order.shippingMethod && (
                   <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Truck className="h-4 w-4 text-gray-400" />
+                    <Truck className="h-4 w-4 text-primary-500" />
                     <span>{order.shippingMethod}</span>
                   </div>
                 )}
                 {order.estimatedDeliveryDate && (
                   <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Calendar className="h-4 w-4 text-gray-400" />
+                    <Calendar className="h-4 w-4 text-primary-500" />
                     <span>Estimée: {new Date(order.estimatedDeliveryDate).toLocaleDateString('fr-FR')}</span>
                   </div>
                 )}
@@ -213,16 +221,18 @@ const OrderTrackingPage = () => {
 
             {/* Tracking Number */}
             {order.trackingNumber && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="card p-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Suivi du colis</h3>
-                <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                <div className="bg-primary-50/80 backdrop-blur-sm border border-primary-200/50 rounded-xl p-4">
                   <div className="flex items-center gap-3">
-                    <Truck className="h-6 w-6 text-indigo-600" />
+                    <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Truck className="h-5 w-5 text-white" />
+                    </div>
                     <div>
-                      <p className="font-medium text-indigo-900">
+                      <p className="font-medium text-gray-900">
                         Numéro de suivi: <span className="font-mono">{order.trackingNumber}</span>
                       </p>
-                      <p className="text-sm text-indigo-700">
+                      <p className="text-sm text-gray-600">
                         Utilisez ce numéro pour suivre votre colis auprès du transporteur
                       </p>
                     </div>
@@ -233,15 +243,15 @@ const OrderTrackingPage = () => {
 
             {/* Order Items */}
             {order.orderItems && order.orderItems.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="card p-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Articles commandés</h3>
                 <div className="space-y-3">
                   {order.orderItems.map((item) => (
-                    <div key={item.id} className="flex items-center gap-4 p-3 border border-gray-100 rounded-lg">
+                    <div key={item.id} className="flex items-center gap-4 p-3 bg-gray-50/50 rounded-xl hover:bg-primary-50/30 transition-colors duration-200">
                       <img
                         src={item.product?.mainImage || '/placeholder-product.jpg'}
                         alt={item.product?.name}
-                        className="w-16 h-16 object-cover rounded-md"
+                        className="w-16 h-16 object-cover rounded-xl"
                       />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-gray-900 truncate">

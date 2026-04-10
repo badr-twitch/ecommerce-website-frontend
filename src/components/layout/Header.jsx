@@ -35,6 +35,16 @@ const Header = () => {
     setUserMenuOpen(false);
   }, [location.pathname]);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileMenuOpen]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     const query = searchQuery.trim();
@@ -119,7 +129,8 @@ const Header = () => {
               {/* Mobile Search Toggle */}
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
-                className="md:hidden p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                aria-label="Rechercher"
+                className="md:hidden p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200 cursor-pointer"
               >
                 <Search className="w-5 h-5" />
               </button>
@@ -127,6 +138,7 @@ const Header = () => {
               {/* Wishlist */}
               <Link
                 to="/wishlist"
+                aria-label={`Wishlist${wishlistCount > 0 ? ` (${wishlistCount})` : ''}`}
                 className="relative p-2.5 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
               >
                 <Heart className="w-5 h-5" />
@@ -140,6 +152,7 @@ const Header = () => {
               {/* Cart */}
               <Link
                 to="/cart"
+                aria-label={`Panier${cartItemCount > 0 ? ` (${cartItemCount})` : ''}`}
                 className="relative p-2.5 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
               >
                 <ShoppingBag className="w-5 h-5" />
@@ -158,7 +171,9 @@ const Header = () => {
                 <div className="relative">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center gap-2.5 p-1.5 pr-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200"
+                    aria-label="Menu utilisateur"
+                    aria-expanded={userMenuOpen}
+                    className="flex items-center gap-2.5 p-1.5 pr-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 cursor-pointer"
                   >
                     {user.photoURL ? (
                       <img
@@ -202,7 +217,7 @@ const Header = () => {
                           <div className="my-1.5 border-t border-gray-100" />
                           <button
                             onClick={() => { setUserMenuOpen(false); logout(); }}
-                            className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                            className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
                           >
                             <LogOut className="w-4 h-4" />
                             <span className="text-sm font-medium">Se deconnecter</span>
@@ -232,7 +247,9 @@ const Header = () => {
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+                aria-expanded={mobileMenuOpen}
+                className="lg:hidden p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200 cursor-pointer"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
@@ -260,10 +277,21 @@ const Header = () => {
 
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-40">
+        <div className="lg:hidden fixed inset-0 z-40" role="dialog" aria-modal="true" aria-label="Menu de navigation">
           <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
           <div className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-2xl animate-slide-in-right overflow-y-auto">
-            <div className="p-6 pt-24">
+            {/* Drawer header with close button */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+              <span className="text-lg font-bold text-gray-900">Menu</span>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Fermer le menu"
+                className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
               <nav className="space-y-1">
                 {navItems.map((item) => (
                   <Link

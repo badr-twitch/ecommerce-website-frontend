@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Lock, CreditCard } from 'lucide-react';
 
 const CARD_ELEMENT_OPTIONS = {
   style: {
@@ -72,19 +73,26 @@ const PaymentForm = ({ total, clientSecret, onPaymentSuccess, onBack, isProcessi
 
   return (
     <div className="space-y-6">
-      <div className="border-b border-gray-200 pb-4">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Paiement</h2>
-        <p className="text-gray-600">Paiement sécurisé via Stripe</p>
+      <div className="border-b border-gray-100 pb-4">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-sm">
+            <CreditCard className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Paiement</h2>
+            <p className="text-gray-500 text-sm">Paiement sécurisé via Stripe</p>
+          </div>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Accepted payment methods */}
-        <div className="bg-gray-50 rounded-xl p-4">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Méthodes de paiement acceptées</h3>
-          <div className="flex items-center space-x-6">
-            <span className="text-sm font-medium text-gray-600 bg-white px-3 py-1.5 rounded-lg border">Visa</span>
-            <span className="text-sm font-medium text-gray-600 bg-white px-3 py-1.5 rounded-lg border">Mastercard</span>
-            <span className="text-sm font-medium text-gray-600 bg-white px-3 py-1.5 rounded-lg border">Amex</span>
+        <div className="bg-primary-50/30 rounded-xl p-4 border border-primary-100/50">
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">Méthodes acceptées</h3>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-medium text-gray-600 bg-white px-3 py-1.5 rounded-lg border border-gray-200">Visa</span>
+            <span className="text-xs font-medium text-gray-600 bg-white px-3 py-1.5 rounded-lg border border-gray-200">Mastercard</span>
+            <span className="text-xs font-medium text-gray-600 bg-white px-3 py-1.5 rounded-lg border border-gray-200">Amex</span>
           </div>
         </div>
 
@@ -93,8 +101,8 @@ const PaymentForm = ({ total, clientSecret, onPaymentSuccess, onBack, isProcessi
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Informations de carte *
           </label>
-          <div className={`border rounded-xl p-4 transition-all duration-300 ${
-            cardError ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
+          <div className={`border-2 rounded-xl p-4 transition-all duration-200 ${
+            cardError ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-white'
           }`}>
             <CardElement options={CARD_ELEMENT_OPTIONS} onChange={handleCardChange} />
           </div>
@@ -104,16 +112,12 @@ const PaymentForm = ({ total, clientSecret, onPaymentSuccess, onBack, isProcessi
         </div>
 
         {/* Security Notice */}
-        <div className="bg-primary-50 rounded-xl p-4 border border-primary-200">
-          <div className="flex items-center space-x-3">
-            <div className="flex-shrink-0">
-              <svg className="w-5 h-5 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-              </svg>
-            </div>
+        <div className="bg-green-50/80 rounded-xl p-4 border border-green-100">
+          <div className="flex items-center gap-3">
+            <Lock className="w-5 h-5 text-green-600 flex-shrink-0" />
             <div>
-              <h4 className="font-medium text-gray-900">Paiement sécurisé</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="text-sm font-semibold text-gray-900">Paiement sécurisé</h4>
+              <p className="text-xs text-gray-500">
                 Vos données bancaires sont traitées directement par Stripe et ne transitent jamais par nos serveurs.
               </p>
             </div>
@@ -121,40 +125,40 @@ const PaymentForm = ({ total, clientSecret, onPaymentSuccess, onBack, isProcessi
         </div>
 
         {/* Terms */}
-        <div className="flex items-start space-x-3">
+        <div className="flex items-start gap-3">
           <input
             type="checkbox"
             id="terms"
             checked={termsAccepted}
             onChange={(e) => setTermsAccepted(e.target.checked)}
-            className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded cursor-pointer"
           />
-          <label htmlFor="terms" className="text-sm text-gray-600">
-            J'accepte les <a href="/terms" className="text-primary-600 hover:text-primary-700">conditions générales</a> et la{' '}
-            <a href="/privacy" className="text-primary-600 hover:text-primary-700">politique de confidentialité</a>
+          <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer">
+            J'accepte les <a href="/terms" className="text-primary-600 hover:text-primary-700 font-medium">conditions générales</a> et la{' '}
+            <a href="/privacy" className="text-primary-600 hover:text-primary-700 font-medium">politique de confidentialité</a>
           </label>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex space-x-4 pt-6">
+        <div className="flex gap-3 pt-4">
           <button
             type="button"
             onClick={onBack}
             disabled={isProcessing}
-            className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-all duration-300 disabled:opacity-50"
+            className="btn-outline flex-1 cursor-pointer"
           >
             Retour
           </button>
           <button
             type="submit"
             disabled={isProcessing || !stripe || !cardComplete || !termsAccepted}
-            className="flex-1 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="btn-primary flex-1 cursor-pointer"
           >
             {isProcessing ? (
-              <div className="flex items-center justify-center space-x-2">
+              <span className="flex items-center justify-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                <span>Traitement en cours...</span>
-              </div>
+                Traitement...
+              </span>
             ) : (
               `Payer ${total.toFixed(2)} DH`
             )}

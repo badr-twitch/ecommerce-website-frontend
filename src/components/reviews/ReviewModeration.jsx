@@ -292,10 +292,10 @@ const ReviewModeration = () => {
   // Get status badge
   const getStatusBadge = (status) => {
     const badges = {
-      pending: 'bg-yellow-100 text-yellow-800',
-      approved: 'bg-green-100 text-green-800',
-      rejected: 'bg-red-100 text-red-800',
-      flagged: 'bg-orange-100 text-orange-800'
+      pending: 'badge-warning',
+      approved: 'badge-success',
+      rejected: 'badge-danger',
+      flagged: 'badge-warning'
     };
 
     const labels = {
@@ -306,7 +306,7 @@ const ReviewModeration = () => {
     };
 
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badges[status]}`}>
+      <span className={`${badges[status]}`}>
         {labels[status]}
       </span>
     );
@@ -315,10 +315,10 @@ const ReviewModeration = () => {
   // Get Trustpilot status badge
   const getTrustpilotBadge = (status) => {
     const badges = {
-      not_synced: 'bg-gray-100 text-gray-800',
-      pending: 'bg-yellow-100 text-yellow-800',
-      synced: 'bg-green-100 text-green-800',
-      failed: 'bg-red-100 text-red-800'
+      not_synced: 'badge-secondary',
+      pending: 'badge-warning',
+      synced: 'badge-success',
+      failed: 'badge-danger'
     };
 
     const labels = {
@@ -329,7 +329,7 @@ const ReviewModeration = () => {
     };
 
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badges[status]}`}>
+      <span className={`${badges[status]}`}>
         {labels[status]}
       </span>
     );
@@ -337,7 +337,7 @@ const ReviewModeration = () => {
 
   if (loading && reviews.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="card p-6">
         <div className="animate-pulse space-y-4">
           <div className="h-6 bg-gray-200 rounded w-1/3"></div>
           <div className="h-4 bg-gray-200 rounded w-1/2"></div>
@@ -352,7 +352,7 @@ const ReviewModeration = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
+    <div className="card">
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
@@ -361,7 +361,7 @@ const ReviewModeration = () => {
             <button
               onClick={syncToTrustpilot}
               disabled={syncingTrustpilot}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors disabled:opacity-50"
+              className="btn-primary inline-flex items-center gap-2 disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${syncingTrustpilot ? 'animate-spin' : ''}`} />
               Sync Trustpilot
@@ -371,25 +371,25 @@ const ReviewModeration = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-primary-50 p-4 rounded-lg">
+          <div className="card p-4 bg-primary-50">
             <div className="text-2xl font-bold text-primary-600">
               {reviews.filter(r => r.status === 'pending').length}
             </div>
             <div className="text-sm text-primary-700">En attente</div>
           </div>
-          <div className="bg-green-50 p-4 rounded-lg">
+          <div className="card p-4 bg-green-50">
             <div className="text-2xl font-bold text-green-600">
               {reviews.filter(r => r.status === 'approved').length}
             </div>
             <div className="text-sm text-green-700">Approuvés</div>
           </div>
-          <div className="bg-red-50 p-4 rounded-lg">
+          <div className="card p-4 bg-red-50">
             <div className="text-2xl font-bold text-red-600">
               {reviews.filter(r => r.status === 'rejected').length}
             </div>
             <div className="text-sm text-red-700">Rejetés</div>
           </div>
-          <div className="bg-orange-50 p-4 rounded-lg">
+          <div className="card p-4 bg-orange-50">
             <div className="text-2xl font-bold text-orange-600">
               {reviews.filter(r => r.status === 'flagged').length}
             </div>
@@ -406,7 +406,7 @@ const ReviewModeration = () => {
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="select w-full"
             >
               <option value="">Tous les statuts</option>
               <option value="pending">En attente</option>
@@ -421,7 +421,7 @@ const ReviewModeration = () => {
             <select
               value={filters.rating}
               onChange={(e) => handleFilterChange('rating', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="select w-full"
             >
               <option value="">Toutes les notes</option>
               <option value="5">5 étoiles</option>
@@ -437,7 +437,7 @@ const ReviewModeration = () => {
             <select
               value={filters.verifiedPurchase}
               onChange={(e) => handleFilterChange('verifiedPurchase', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="select w-full"
             >
               <option value="">Tous</option>
               <option value="true">Vérifiés</option>
@@ -450,7 +450,7 @@ const ReviewModeration = () => {
             <select
               value={filters.hasMedia}
               onChange={(e) => handleFilterChange('hasMedia', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="select w-full"
             >
               <option value="">Tous</option>
               <option value="true">Avec médias</option>
@@ -462,13 +462,13 @@ const ReviewModeration = () => {
             <div className="flex gap-2">
               <button
                 onClick={applyFilters}
-                className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+                className="btn-primary text-sm"
               >
                 Appliquer
               </button>
               <button
                 onClick={resetFilters}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                className="btn-outline text-sm"
               >
                 Réinitialiser
               </button>
@@ -487,21 +487,21 @@ const ReviewModeration = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => bulkModerate('approved')}
-                className="inline-flex items-center gap-2 px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"
+                className="btn-primary text-sm inline-flex items-center gap-2"
               >
                 <CheckCircle className="w-4 h-4" />
                 Approuver
               </button>
               <button
                 onClick={() => bulkModerate('rejected')}
-                className="inline-flex items-center gap-2 px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition-colors"
+                className="btn-danger text-sm inline-flex items-center gap-2"
               >
                 <XCircle className="w-4 h-4" />
                 Rejeter
               </button>
               <button
                 onClick={() => bulkModerate('flagged')}
-                className="inline-flex items-center gap-2 px-3 py-1 bg-orange-600 text-white text-sm rounded-md hover:bg-orange-700 transition-colors"
+                className="btn-outline text-sm inline-flex items-center gap-2"
               >
                 <Flag className="w-4 h-4" />
                 Signaler
@@ -514,7 +514,7 @@ const ReviewModeration = () => {
       {/* Reviews Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50/80">
             <tr>
               <th className="px-6 py-3 text-left">
                 <input
@@ -568,7 +568,12 @@ const ReviewModeration = () => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {reviews.map((review) => (
-              <tr key={review.id} className="hover:bg-gray-50">
+              <tr key={review.id} className={`hover:bg-primary-50/30 transition-colors duration-200 ${
+                review.status === 'approved' ? 'border-l-4 border-emerald-400' :
+                review.status === 'pending' ? 'border-l-4 border-amber-400' :
+                review.status === 'rejected' ? 'border-l-4 border-red-400' :
+                review.status === 'flagged' ? 'border-l-4 border-orange-400' : ''
+              }`}>
                 <td className="px-6 py-4">
                   <input
                     type="checkbox"
@@ -708,7 +713,7 @@ const ReviewModeration = () => {
               <button
                 onClick={() => fetchReviews(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-outline text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Précédent
               </button>
@@ -730,10 +735,10 @@ const ReviewModeration = () => {
                     <button
                       key={pageNum}
                       onClick={() => fetchReviews(pageNum)}
-                      className={`px-3 py-2 text-sm font-medium rounded-md ${
+                      className={`px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${
                         currentPage === pageNum
-                          ? 'bg-primary-600 text-white'
-                          : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
+                          ? 'bg-primary-600 text-white shadow-soft'
+                          : 'text-gray-500 bg-white border border-gray-100 hover:bg-primary-50/30'
                       }`}
                     >
                       {pageNum}
@@ -745,7 +750,7 @@ const ReviewModeration = () => {
               <button
                 onClick={() => fetchReviews(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-outline text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Suivant
               </button>
@@ -756,8 +761,8 @@ const ReviewModeration = () => {
 
       {/* Moderation Modal */}
       {moderationModal.show && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 max-w-md w-full p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               {moderationModal.action === 'approved' ? 'Approuver l\'avis' :
                moderationModal.action === 'rejected' ? 'Rejeter l\'avis' :
@@ -771,7 +776,7 @@ const ReviewModeration = () => {
                 'signaler'} cet avis ?
               </p>
               
-              <div className="bg-gray-50 p-3 rounded-md">
+              <div className="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
                 <h4 className="font-medium text-gray-900 mb-1">
                   {moderationModal.review?.title}
                 </h4>
@@ -789,7 +794,7 @@ const ReviewModeration = () => {
                 value={moderationModal.notes}
                 onChange={(e) => setModerationModal(prev => ({ ...prev, notes: e.target.value }))}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="input w-full"
                 placeholder="Ajoutez des notes sur la décision..."
               />
             </div>
@@ -797,16 +802,16 @@ const ReviewModeration = () => {
             <div className="flex items-center justify-end gap-3">
               <button
                 onClick={closeModerationModal}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                className="btn-outline"
               >
                 Annuler
               </button>
               <button
                 onClick={handleModerationAction}
-                className={`px-4 py-2 text-white rounded-md transition-colors ${
-                  moderationModal.action === 'approved' ? 'bg-green-600 hover:bg-green-700' :
-                  moderationModal.action === 'rejected' ? 'bg-red-600 hover:bg-red-700' :
-                  'bg-orange-600 hover:bg-orange-700'
+                className={`${
+                  moderationModal.action === 'approved' ? 'btn-primary' :
+                  moderationModal.action === 'rejected' ? 'btn-danger' :
+                  'btn-secondary'
                 }`}
               >
                 {moderationModal.action === 'approved' ? 'Approuver' :

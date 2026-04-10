@@ -182,11 +182,7 @@ const LoginPage = () => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   placeholder="votre@email.com"
-                  className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl text-sm transition-colors duration-200 focus:outline-none ${
-                    errors.email && touched.email
-                      ? 'border-red-300 focus:border-red-500'
-                      : 'border-gray-200 focus:border-primary-500'
-                  }`}
+                  className={`input pl-11 ${errors.email && touched.email ? 'border-red-300 focus:border-red-500' : ''}`}
                 />
               </div>
               {errors.email && touched.email && (
@@ -215,16 +211,12 @@ const LoginPage = () => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   placeholder="Votre mot de passe"
-                  className={`w-full pl-11 pr-12 py-3 border-2 rounded-xl text-sm transition-colors duration-200 focus:outline-none ${
-                    errors.password && touched.password
-                      ? 'border-red-300 focus:border-red-500'
-                      : 'border-gray-200 focus:border-primary-500'
-                  }`}
+                  className={`input pl-11 pr-12 ${errors.password && touched.password ? 'border-red-300 focus:border-red-500' : ''}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -240,7 +232,7 @@ const LoginPage = () => {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded cursor-pointer"
               />
               <label htmlFor="remember-me" className="ml-2 text-sm text-gray-600">
                 Se souvenir de moi
@@ -258,7 +250,7 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 py-3.5 px-6 text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 rounded-xl shadow-glow-primary hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]"
+              className="btn-primary w-full py-3.5 cursor-pointer"
             >
               {isLoading ? (
                 <>
@@ -290,7 +282,7 @@ const LoginPage = () => {
               type="button"
               onClick={handleGoogleSignIn}
               disabled={isLoading}
-              className="flex items-center justify-center gap-2 py-3 px-4 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 transition-all duration-200 active:scale-[0.97]"
+              className="btn-outline py-3 cursor-pointer"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -305,7 +297,7 @@ const LoginPage = () => {
               type="button"
               onClick={handleFacebookSignIn}
               disabled={isLoading}
-              className="flex items-center justify-center gap-2 py-3 px-4 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 transition-all duration-200 active:scale-[0.97]"
+              className="btn-outline py-3 cursor-pointer"
             >
               <svg className="w-4 h-4" fill="#1877F2" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M20 10C20 4.477 15.523 0 10 0S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" clipRule="evenodd" />

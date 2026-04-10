@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
-import { ShoppingBag, Truck, CreditCard, Check } from 'lucide-react';
+import { ShoppingBag, Truck, CreditCard, Check, ShieldCheck } from 'lucide-react';
 import { CartContext } from '../contexts/CartContext';
 import { AuthContext } from '../contexts/AuthContext';
 import { paymentService } from '../services/paymentService';
@@ -160,21 +160,21 @@ const CheckoutPage = () => {
 
           {/* Progress Steps */}
           <nav aria-label="Progress" className="mb-8">
-            <ol className="flex items-center justify-center space-x-8">
+            <ol className="flex items-center justify-center">
               {steps.map((step, stepIdx) => {
                 const StepIcon = step.icon;
                 return (
-                  <li key={step.name} className="relative">
-                    {stepIdx !== steps.length - 1 ? (
-                      <div className={`absolute top-4 left-8 -ml-px mt-0.5 h-0.5 w-16 ${
-                        currentStep > step.id ? 'bg-primary-400' : 'bg-gray-200'
+                  <li key={step.name} className="relative flex items-center">
+                    {stepIdx !== 0 && (
+                      <div className={`w-12 sm:w-20 h-0.5 mx-1 sm:mx-2 ${
+                        currentStep > steps[stepIdx - 1].id ? 'bg-primary-400' : 'bg-gray-200'
                       } transition-colors duration-300`} />
-                    ) : null}
-                    <div className="relative flex items-center">
-                      <div className={`relative flex h-10 w-10 items-center justify-center rounded-xl border-2 transition-all duration-300 ${
+                    )}
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className={`relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border-2 transition-all duration-300 ${
                         currentStep > step.id
                           ? 'border-primary-600 bg-primary-600 text-white shadow-glow-primary'
-                          : step.status === 'current'
+                          : currentStep >= step.id
                           ? 'border-primary-600 bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-glow-primary'
                           : 'border-gray-200 bg-white text-gray-400'
                       }`}>
@@ -184,8 +184,8 @@ const CheckoutPage = () => {
                           <StepIcon className="w-5 h-5" />
                         )}
                       </div>
-                      <span className={`ml-3 text-sm font-semibold ${
-                        step.status === 'current' ? 'text-primary-600' : 'text-gray-500'
+                      <span className={`text-sm font-semibold hidden sm:inline ${
+                        currentStep >= step.id ? 'text-primary-600' : 'text-gray-400'
                       }`}>
                         {step.name}
                       </span>
@@ -266,7 +266,7 @@ const CheckoutPage = () => {
           </div>
 
           {/* Order Summary Sidebar */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-4">
             <OrderSummary
               items={cartItems}
               subtotal={total}
@@ -276,6 +276,28 @@ const CheckoutPage = () => {
               isMember={isMember}
               memberDiscount={getMemberDiscount()}
             />
+
+            {/* Trust Signals */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/60 shadow-soft p-4">
+              <div className="flex items-center gap-2.5 mb-3">
+                <ShieldCheck className="w-5 h-5 text-green-600" />
+                <span className="text-sm font-semibold text-gray-900">Achat sécurisé</span>
+              </div>
+              <div className="space-y-2 text-xs text-gray-500">
+                <p className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0" />
+                  Cryptage SSL 256-bit
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0" />
+                  Paiement via Stripe sécurisé
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0" />
+                  Retours sous 30 jours
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

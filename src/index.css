@@ -155,6 +155,40 @@
   .section-divider {
     @apply w-20 h-1 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full mx-auto;
   }
+
+  /* --- Sidebar Navigation --- */
+  .sidebar-nav-item {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 cursor-pointer;
+  }
+
+  .sidebar-nav-active {
+    @apply bg-primary-50 text-primary-700 font-semibold shadow-sm;
+  }
+
+  /* --- Toggle Switch --- */
+  .toggle-switch {
+    @apply relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 cursor-pointer;
+  }
+
+  .toggle-switch[aria-checked="true"] {
+    @apply bg-primary-600;
+  }
+
+  .toggle-switch[aria-checked="false"] {
+    @apply bg-gray-300;
+  }
+
+  .toggle-switch-knob {
+    @apply inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200;
+  }
+
+  .toggle-switch[aria-checked="true"] .toggle-switch-knob {
+    @apply translate-x-6;
+  }
+
+  .toggle-switch[aria-checked="false"] .toggle-switch-knob {
+    @apply translate-x-1;
+  }
 }
 
 /* ========================================

@@ -271,7 +271,8 @@ const HomePage = () => {
                   {/* Wishlist button */}
                   <button
                     onClick={() => handleToggleWishlist(product)}
-                    className={`absolute top-4 right-4 p-2.5 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 ${
+                    aria-label={isInWishlist(product.id) ? 'Retirer de la wishlist' : 'Ajouter a la wishlist'}
+                    className={`absolute top-4 right-4 p-2.5 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 cursor-pointer ${
                       isInWishlist(product.id)
                         ? 'bg-rose-500 text-white'
                         : 'bg-white/90 backdrop-blur-sm text-gray-400 hover:text-rose-500'
@@ -284,7 +285,7 @@ const HomePage = () => {
                   <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-400">
                     <button
                       onClick={() => handleAddToCart(product)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/95 backdrop-blur-sm text-gray-900 font-semibold rounded-xl shadow-lg hover:bg-white transition-colors active:scale-[0.97]"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/95 backdrop-blur-sm text-gray-900 font-semibold rounded-xl shadow-lg hover:bg-white transition-colors active:scale-[0.97] cursor-pointer"
                     >
                       <ShoppingCart className="w-4 h-4" />
                       Ajouter au panier
@@ -346,9 +347,10 @@ const HomePage = () => {
                 <input
                   type="email"
                   placeholder="Votre adresse email"
+                  aria-label="Adresse email pour la newsletter"
                   className="flex-1 px-5 py-3.5 bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:bg-white/25 focus:border-white/40 transition-all duration-300"
                 />
-                <button className="px-6 py-3.5 bg-white text-primary-700 font-semibold rounded-xl hover:bg-white/90 transition-all duration-300 hover:shadow-xl active:scale-[0.97] whitespace-nowrap">
+                <button className="px-6 py-3.5 bg-white text-primary-700 font-semibold rounded-xl hover:bg-white/90 transition-all duration-300 hover:shadow-xl active:scale-[0.97] whitespace-nowrap cursor-pointer">
                   S'abonner
                 </button>
               </div>

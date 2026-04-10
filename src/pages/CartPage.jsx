@@ -2,7 +2,8 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../contexts/CartContext';
 import { AuthContext } from '../contexts/AuthContext';
-import { ShoppingCart, Trash2, Minus, Plus, ShieldCheck, ArrowRight, LogIn, UserPlus, ShoppingBag, FolderOpen, Package } from 'lucide-react';
+import { ShoppingCart, Trash2, Minus, Plus, ShieldCheck, ArrowRight, LogIn, UserPlus, ShoppingBag, FolderOpen, Package, Truck } from 'lucide-react';
+import { ProductRecommendations } from '../components/recommendations';
 import toast from 'react-hot-toast';
 
 const CartPage = () => {
@@ -133,11 +134,11 @@ const CartPage = () => {
 
               <div className="divide-y divide-gray-100">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="p-6 hover:bg-primary-50/30 transition-colors duration-200">
-                    <div className="flex items-center space-x-4">
+                  <div key={item.id} className="p-4 sm:p-6 hover:bg-primary-50/20 transition-colors duration-200">
+                    <div className="flex gap-4">
                       {/* Product Image */}
-                      <div className="flex-shrink-0">
-                        <div className="w-20 h-20 bg-gradient-to-br from-primary-50 to-secondary-50 rounded-xl overflow-hidden shadow-sm">
+                      <Link to={`/products/${item.id || item.productId}`} className="flex-shrink-0">
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary-50 to-secondary-50 rounded-xl overflow-hidden shadow-sm">
                           {item.image ? (
                             <img
                               src={item.image}
@@ -150,53 +151,51 @@ const CartPage = () => {
                             </div>
                           )}
                         </div>
-                      </div>
+                      </Link>
 
-                      {/* Product Details */}
+                      {/* Product Details + Controls */}
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-1 truncate">
-                          {item.name}
-                        </h3>
-                        <p className="text-xl font-bold text-primary-600">
-                          {formatPrice(item.price)}
-                        </p>
-                      </div>
-
-                      {/* Quantity Controls */}
-                      <div className="flex items-center">
-                        <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <h3 className="text-base font-semibold text-gray-900 truncate">
+                              {item.name}
+                            </h3>
+                            <p className="text-sm font-medium text-primary-600 mt-0.5">
+                              {formatPrice(item.price)} / unité
+                            </p>
+                          </div>
                           <button
-                            onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                            className="p-2.5 text-gray-500 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200"
+                            onClick={() => handleRemoveItem(item.id)}
+                            className="flex-shrink-0 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 cursor-pointer"
                           >
-                            <Minus className="w-4 h-4" />
-                          </button>
-                          <span className="px-4 py-2 text-lg font-semibold text-gray-800 min-w-[3rem] text-center">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                            className="p-2.5 text-gray-500 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200"
-                          >
-                            <Plus className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
-                      </div>
 
-                      {/* Item Total */}
-                      <div className="text-right hidden sm:block">
-                        <p className="text-xl font-bold text-gray-800">
-                          {formatPrice(item.price * item.quantity)}
-                        </p>
+                        {/* Quantity + Total row */}
+                        <div className="flex items-center justify-between mt-3">
+                          <div className="flex items-center bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
+                            <button
+                              onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                              className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200 cursor-pointer"
+                            >
+                              <Minus className="w-3.5 h-3.5" />
+                            </button>
+                            <span className="px-3 py-1.5 text-sm font-semibold text-gray-900 min-w-[2.5rem] text-center">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                              className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200 cursor-pointer"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                          <p className="text-lg font-bold text-gray-900">
+                            {formatPrice(item.price * item.quantity)}
+                          </p>
+                        </div>
                       </div>
-
-                      {/* Remove Button */}
-                      <button
-                        onClick={() => handleRemoveItem(item.id)}
-                        className="flex-shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
                     </div>
                   </div>
                 ))}
@@ -206,21 +205,25 @@ const CartPage = () => {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-6 sticky top-24">
-              <h2 className="text-xl font-bold text-gray-800 mb-6">Résumé de la commande</h2>
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 overflow-hidden sticky top-24">
+              <div className="p-5 border-b border-gray-100">
+                <h2 className="text-lg font-bold text-gray-900">Résumé de la commande</h2>
+              </div>
 
-              <div className="space-y-4 mb-6">
-                <div className="flex justify-between items-center">
+              <div className="p-5 space-y-3">
+                <div className="flex justify-between items-center text-sm">
                   <span className="text-gray-500">Sous-total ({itemCount} article{itemCount > 1 ? 's' : ''})</span>
-                  <span className="font-semibold text-gray-800">{formatPrice(total)}</span>
+                  <span className="font-semibold text-gray-900">{formatPrice(total)}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-500">Livraison</span>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500 flex items-center gap-1.5">
+                    <Truck className="w-3.5 h-3.5" /> Livraison
+                  </span>
                   <span className="text-green-600 font-semibold">Gratuite</span>
                 </div>
-                <div className="border-t border-gray-100 pt-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-gray-800">Total</span>
+                <div className="border-t border-gray-100 pt-3 mt-3">
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-base font-bold text-gray-900">Total</span>
                     <span className="text-2xl font-bold text-gradient">
                       {formatPrice(total)}
                     </span>
@@ -228,53 +231,55 @@ const CartPage = () => {
                 </div>
               </div>
 
-              {/* Checkout Button */}
-              <div className="space-y-3">
+              {/* CTA Buttons */}
+              <div className="p-5 pt-0 space-y-2.5">
                 {user ? (
                   <Link
                     to="/checkout"
-                    className="w-full px-6 py-3.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white text-base font-semibold rounded-xl transition-all duration-300 shadow-glow-primary hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                    className="btn-primary w-full py-3.5 text-base flex items-center justify-center gap-2"
                   >
                     Passer la commande
                     <ArrowRight className="w-5 h-5" />
                   </Link>
                 ) : (
-                  <div className="space-y-3">
+                  <>
                     <Link
                       to="/login"
-                      className="w-full px-6 py-3.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white text-base font-semibold rounded-xl transition-all duration-300 shadow-glow-primary hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                      className="btn-primary w-full py-3.5 text-base flex items-center justify-center gap-2"
                     >
                       <LogIn className="w-5 h-5" />
                       Se connecter pour commander
                     </Link>
                     <Link
                       to="/register"
-                      className="w-full px-6 py-3.5 bg-white border-2 border-gray-200 text-gray-700 hover:text-primary-600 hover:border-primary-300 text-base font-semibold rounded-xl transition-all duration-300 hover:bg-primary-50/30 flex items-center justify-center gap-2"
+                      className="btn-outline w-full py-3 text-sm flex items-center justify-center gap-2"
                     >
-                      <UserPlus className="w-5 h-5" />
+                      <UserPlus className="w-4 h-4" />
                       Créer un compte
                     </Link>
-                  </div>
+                  </>
                 )}
 
                 <Link
                   to="/products"
-                  className="w-full px-6 py-3 bg-gray-50 hover:bg-gray-100 text-gray-600 text-center rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
+                  className="w-full px-6 py-2.5 text-sm text-gray-500 hover:text-primary-600 text-center rounded-xl transition-colors duration-200 flex items-center justify-center gap-1.5"
                 >
-                  <ShoppingBag className="w-4 h-4" />
+                  <ShoppingBag className="w-3.5 h-3.5" />
                   Continuer les achats
                 </Link>
               </div>
 
-              {/* Security Info */}
-              <div className="mt-6 p-4 bg-green-50/80 rounded-xl border border-green-100">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <ShieldCheck className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-semibold text-green-800">Paiement sécurisé</span>
+              {/* Trust Signals */}
+              <div className="px-5 pb-5">
+                <div className="p-3.5 bg-green-50/80 rounded-xl border border-green-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <ShieldCheck className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-semibold text-green-800">Paiement sécurisé</span>
+                  </div>
+                  <p className="text-xs text-green-600">
+                    Vos données sont protégées par un cryptage SSL 256-bit
+                  </p>
                 </div>
-                <p className="text-xs text-green-600">
-                  Vos données sont protégées par un cryptage SSL 256-bit
-                </p>
               </div>
             </div>
           </div>
@@ -282,23 +287,11 @@ const CartPage = () => {
 
         {/* Recommended Products */}
         <div className="mt-16">
-          <h2 className="text-3xl font-bold text-gradient mb-8 text-center">
-            Vous pourriez aussi aimer
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="card-3d bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-soft border border-white/60 group">
-                <div className="w-full h-48 bg-gradient-to-br from-primary-50 to-secondary-50 rounded-xl mb-4 flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-300">
-                  <Package className="w-12 h-12 text-gray-300" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Produit Recommandé</h3>
-                <p className="text-xl font-bold text-primary-600 mb-4">1 061 DH</p>
-                <button className="w-full px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl transition-all duration-300 hover:-translate-y-0.5">
-                  Ajouter au panier
-                </button>
-              </div>
-            ))}
-          </div>
+          <ProductRecommendations
+            type="trending"
+            limit={4}
+            showTitle={true}
+          />
         </div>
       </div>
     </div>

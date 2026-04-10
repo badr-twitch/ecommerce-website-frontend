@@ -1,11 +1,12 @@
 import React from 'react';
+import { Gift, Crown, Lock, Truck, Shield, RefreshCw, Check } from 'lucide-react';
 
 const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod, isMember = false, memberDiscount = 0 }) => {
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6 sticky top-8">
-      <div className="border-b border-gray-200 pb-4 mb-6">
-        <h2 className="text-xl font-bold text-gray-900">Résumé de la commande</h2>
-        <p className="text-sm text-gray-600 mt-1">{items.length} article(s)</p>
+    <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-soft border border-white/60 p-6 sticky top-24">
+      <div className="border-b border-gray-100 pb-4 mb-6">
+        <h2 className="text-lg font-bold text-gray-900">Résumé de la commande</h2>
+        <p className="text-sm text-gray-500 mt-1">{items.length} article(s)</p>
       </div>
 
       {/* Cart Items */}
@@ -37,21 +38,21 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod, is
       </div>
 
       {/* Pricing Breakdown */}
-      <div className="space-y-3 border-t border-gray-200 pt-4">
+      <div className="space-y-3 border-t border-gray-100 pt-4">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Sous-total</span>
-          <span className="text-gray-900">{subtotal.toFixed(2)} DH</span>
+          <span className="text-gray-500">Sous-total</span>
+          <span className="text-gray-900 font-medium">{subtotal.toFixed(2)} DH</span>
         </div>
-        
+
         {shippingMethod && (
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">
-              Livraison ({shippingMethod.name})
+            <span className="text-gray-500 flex items-center gap-1.5">
+              <Truck className="w-3.5 h-3.5" /> Livraison
             </span>
             {isMember ? (
-              <span className="text-green-600 font-medium">GRATUITE (UMOD Prime)</span>
+              <span className="text-green-600 font-semibold">GRATUITE</span>
             ) : (
-              <span className="text-gray-900">{shippingCost.toFixed(2)} DH</span>
+              <span className="text-gray-900 font-medium">{shippingCost.toFixed(2)} DH</span>
             )}
           </div>
         )}
@@ -59,16 +60,16 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod, is
         {/* Member discount */}
         {isMember && memberDiscount > 0 && (
           <div className="flex justify-between text-sm">
-            <span className="text-secondary-600 font-medium">Remise UMOD Prime -5%</span>
+            <span className="text-secondary-600 font-medium">Remise Prime -5%</span>
             <span className="text-secondary-600 font-medium">-{memberDiscount.toFixed(2)} DH</span>
           </div>
         )}
 
         {/* Free shipping indicator */}
         {!isMember && subtotal >= 536 && shippingCost === 0 && (
-          <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-            <div className="flex items-center space-x-2">
-              <span className="text-green-600">🎉</span>
+          <div className="bg-green-50/80 rounded-xl p-3 border border-green-100">
+            <div className="flex items-center gap-2">
+              <Gift className="w-4 h-4 text-green-600" />
               <span className="text-sm text-green-800 font-medium">
                 Livraison gratuite !
               </span>
@@ -81,64 +82,60 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod, is
 
         {/* Prime member benefits summary */}
         {isMember && (
-          <div className="bg-gradient-to-r from-indigo-50 to-secondary-50 rounded-lg p-3 border border-secondary-200">
-            <div className="flex items-center space-x-2">
-              <span className="text-secondary-600">👑</span>
+          <div className="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-xl p-3 border border-secondary-100">
+            <div className="flex items-center gap-2">
+              <Crown className="w-4 h-4 text-secondary-600" />
               <span className="text-sm text-secondary-800 font-medium">
-                Avantages UMOD Prime appliqués
+                Avantages UMOD Prime
               </span>
             </div>
             <p className="text-xs text-secondary-600 mt-1">
-              Livraison gratuite + 5% de remise sur votre commande
+              Livraison gratuite + 5% de remise
             </p>
           </div>
         )}
 
-        <div className="border-t border-gray-200 pt-3">
-          <div className="flex justify-between text-lg font-bold">
-            <span>Total</span>
-            <span>{total.toFixed(2)} DH</span>
+        <div className="border-t border-gray-100 pt-3">
+          <div className="flex justify-between items-baseline">
+            <span className="text-base font-bold text-gray-900">Total</span>
+            <span className="text-xl font-bold text-gradient">{total.toFixed(2)} DH</span>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            TVA incluse
-          </p>
+          <p className="text-xs text-gray-400 mt-1">TVA incluse</p>
         </div>
       </div>
 
       {/* Shipping Method Summary */}
       {shippingMethod && (
-        <div className="mt-6 p-4 bg-primary-50 rounded-xl border border-primary-200">
-          <div className="flex items-center space-x-3">
-            <div className="text-xl">{shippingMethod.icon}</div>
+        <div className="mt-6 p-4 bg-primary-50/50 rounded-xl border border-primary-100">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Truck className="w-4 h-4 text-primary-600" />
+            </div>
             <div>
-              <h4 className="font-medium text-gray-900">{shippingMethod.name}</h4>
-              <p className="text-sm text-gray-600">{shippingMethod.description}</p>
-              <p className="text-xs text-gray-500 mt-1">
-                Livraison estimée: {shippingMethod.estimatedDays}
-              </p>
+              <h4 className="text-sm font-semibold text-gray-900">{shippingMethod.name}</h4>
+              <p className="text-xs text-gray-500">{shippingMethod.estimatedDays}</p>
             </div>
           </div>
         </div>
       )}
 
       {/* Security Badge */}
-      <div className="mt-6 p-4 bg-gray-50 rounded-xl">
-        <div className="flex items-center space-x-3">
-          <div className="text-xl">🔒</div>
-          <div>
-            <h4 className="font-medium text-gray-900">Paiement sécurisé</h4>
-            <p className="text-xs text-gray-600">
-              Vos données sont protégées par un cryptage SSL
-            </p>
-          </div>
+      <div className="mt-6 p-3.5 bg-green-50/80 rounded-xl border border-green-100">
+        <div className="flex items-center gap-2 mb-1.5">
+          <Lock className="w-4 h-4 text-green-600" />
+          <span className="text-sm font-semibold text-green-800">Paiement sécurisé</span>
         </div>
+        <p className="text-xs text-green-600">Cryptage SSL 256-bit</p>
       </div>
 
       {/* Return Policy */}
-      <div className="mt-4 text-xs text-gray-500">
-        <p>• Retours gratuits sous 30 jours</p>
-        <p>• Garantie 2 ans sur tous les produits</p>
-        <p>• Service client 24/7</p>
+      <div className="mt-3 space-y-1.5 text-xs text-gray-500">
+        <p className="flex items-center gap-1.5">
+          <RefreshCw className="w-3 h-3 text-gray-400" /> Retours gratuits sous 30 jours
+        </p>
+        <p className="flex items-center gap-1.5">
+          <Shield className="w-3 h-3 text-gray-400" /> Garantie 2 ans
+        </p>
       </div>
     </div>
   );

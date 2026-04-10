@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { MapPin, User, Mail, Phone, Building2, Truck } from 'lucide-react';
 
 const ShippingForm = ({ initialData, onSubmit }) => {
   const [formData, setFormData] = useState(initialData);
@@ -11,36 +12,36 @@ const ShippingForm = ({ initialData, onSubmit }) => {
         if (!value.trim()) return 'Le prénom est requis';
         if (value.trim().length < 2) return 'Le prénom doit contenir au moins 2 caractères';
         return '';
-      
+
       case 'lastName':
         if (!value.trim()) return 'Le nom de famille est requis';
         if (value.trim().length < 2) return 'Le nom doit contenir au moins 2 caractères';
         return '';
-      
+
       case 'email':
         if (!value.trim()) return 'L\'adresse email est requise';
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return 'L\'adresse email n\'est pas valide';
         return '';
-      
+
       case 'phone':
         if (!value.trim()) return 'Le numéro de téléphone est requis';
         if (!/^[\+]?[0-9\s\-\(\)]{10,}$/.test(value.trim())) return 'Le numéro de téléphone n\'est pas valide';
         return '';
-      
+
       case 'address':
         if (!value.trim()) return 'L\'adresse est requise';
         if (value.trim().length < 10) return 'L\'adresse doit contenir au moins 10 caractères';
         return '';
-      
+
       case 'city':
         if (!value.trim()) return 'La ville est requise';
         return '';
-      
+
       case 'postalCode':
         if (!value.trim()) return 'Le code postal est requis';
         if (!/^[0-9]{5}$/.test(value.trim())) return 'Le code postal doit contenir 5 chiffres';
         return '';
-      
+
       default:
         return '';
     }
@@ -68,7 +69,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
       ...touched,
       [name]: true
     });
-    
+
     const fieldError = validateField(name, value);
     setErrors({
       ...errors,
@@ -99,11 +100,21 @@ const ShippingForm = ({ initialData, onSubmit }) => {
     }
   };
 
+  const inputClass = (fieldName) =>
+    `input ${errors[fieldName] && touched[fieldName] ? 'border-red-300 focus:border-red-500' : ''}`;
+
   return (
     <div className="space-y-6">
-      <div className="border-b border-gray-200 pb-4">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Informations de livraison</h2>
-        <p className="text-gray-600">Veuillez fournir vos informations de livraison</p>
+      <div className="border-b border-gray-200/50 pb-4">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-sm">
+            <Truck className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Informations de livraison</h2>
+            <p className="text-gray-500 text-sm">Veuillez fournir vos informations de livraison</p>
+          </div>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -120,11 +131,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               value={formData.firstName}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
-                errors.firstName && touched.firstName 
-                  ? 'border-red-300 focus:ring-red-500' 
-                  : 'border-gray-300'
-              }`}
+              className={inputClass('firstName')}
               placeholder="Votre prénom"
             />
             {errors.firstName && touched.firstName && (
@@ -143,11 +150,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               value={formData.lastName}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
-                errors.lastName && touched.lastName 
-                  ? 'border-red-300 focus:ring-red-500' 
-                  : 'border-gray-300'
-              }`}
+              className={inputClass('lastName')}
               placeholder="Votre nom"
             />
             {errors.lastName && touched.lastName && (
@@ -169,11 +172,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               value={formData.email}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
-                errors.email && touched.email 
-                  ? 'border-red-300 focus:ring-red-500' 
-                  : 'border-gray-300'
-              }`}
+              className={inputClass('email')}
               placeholder="votre@email.com"
             />
             {errors.email && touched.email && (
@@ -192,11 +191,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               value={formData.phone}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
-                errors.phone && touched.phone 
-                  ? 'border-red-300 focus:ring-red-500' 
-                  : 'border-gray-300'
-              }`}
+              className={inputClass('phone')}
               placeholder="06 12 34 56 78"
             />
             {errors.phone && touched.phone && (
@@ -216,7 +211,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
             name="company"
             value={formData.company}
             onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300"
+            className="input"
             placeholder="Nom de votre entreprise"
           />
         </div>
@@ -233,11 +228,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
             value={formData.address}
             onChange={handleChange}
             onBlur={handleBlur}
-            className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 resize-none ${
-              errors.address && touched.address 
-                ? 'border-red-300 focus:ring-red-500' 
-                : 'border-gray-300'
-            }`}
+            className={`input resize-none ${errors.address && touched.address ? 'border-red-300 focus:border-red-500' : ''}`}
             placeholder="Numéro, rue, appartement..."
           />
           {errors.address && touched.address && (
@@ -258,11 +249,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               value={formData.city}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
-                errors.city && touched.city 
-                  ? 'border-red-300 focus:ring-red-500' 
-                  : 'border-gray-300'
-              }`}
+              className={inputClass('city')}
               placeholder="Paris"
             />
             {errors.city && touched.city && (
@@ -281,11 +268,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               value={formData.postalCode}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 ${
-                errors.postalCode && touched.postalCode 
-                  ? 'border-red-300 focus:ring-red-500' 
-                  : 'border-gray-300'
-              }`}
+              className={inputClass('postalCode')}
               placeholder="75001"
             />
             {errors.postalCode && touched.postalCode && (
@@ -304,7 +287,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
             name="country"
             value={formData.country}
             onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300"
+            className="select cursor-pointer"
           >
             <option value="France">France</option>
             <option value="Belgique">Belgique</option>
@@ -326,7 +309,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
             rows="3"
             value={formData.notes}
             onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300 resize-none"
+            className="input resize-none"
             placeholder="Instructions spéciales pour la livraison..."
           />
         </div>
@@ -335,7 +318,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
         <div className="pt-6">
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            className="btn-primary w-full cursor-pointer"
           >
             Continuer vers l'expédition
           </button>
@@ -345,4 +328,4 @@ const ShippingForm = ({ initialData, onSubmit }) => {
   );
 };
 
-export default ShippingForm; 
+export default ShippingForm;

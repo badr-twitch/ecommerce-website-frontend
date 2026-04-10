@@ -72,10 +72,10 @@ const CategoryForm = ({ category = null, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in">
+      <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 w-full max-w-lg animate-scale-in">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-2xl font-bold text-gray-900">
             {isEditing ? 'Modifier la Catégorie' : 'Ajouter une Catégorie'}
           </h2>
@@ -100,7 +100,7 @@ const CategoryForm = ({ category = null, onClose, onSuccess }) => {
               value={formData.name}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none transition-colors"
+              className="input"
               placeholder="Nom de la catégorie"
             />
           </div>
@@ -115,7 +115,7 @@ const CategoryForm = ({ category = null, onClose, onSuccess }) => {
               value={formData.description}
               onChange={handleInputChange}
               rows={3}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none transition-colors"
+              className="textarea"
               placeholder="Description de la catégorie"
             />
           </div>
@@ -129,18 +129,18 @@ const CategoryForm = ({ category = null, onClose, onSuccess }) => {
           />
 
           {/* Actions */}
-          <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className="btn-outline"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center space-x-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="btn-primary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

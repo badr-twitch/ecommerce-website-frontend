@@ -181,8 +181,8 @@ const ContactPage = () => {
                       key={index} 
                       className="flex items-start space-x-4 group p-4 rounded-2xl hover:bg-gradient-to-r hover:from-primary-50 hover:to-secondary-50 transition-all duration-300 cursor-pointer"
                     >
-                      <div className="w-14 h-14 bg-gradient-to-br from-primary-500 via-secondary-500 to-pink-500 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg group-hover:shadow-xl">
-                        {info.icon}
+                      <div className="w-14 h-14 bg-gradient-to-br from-primary-500 via-secondary-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg group-hover:shadow-xl">
+                        <info.icon className="w-6 h-6 text-white" />
                       </div>
                       <div className="flex-1 pt-1">
                         <h3 className="font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
@@ -403,7 +403,7 @@ const ContactPage = () => {
               to="/" 
               className="inline-flex items-center px-8 py-3.5 bg-white/80 backdrop-blur-sm border-2 border-gray-200 hover:border-primary-300 text-gray-700 hover:text-primary-600 font-semibold rounded-xl transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5"
             >
-              <span className="mr-2">←</span>
+              <ArrowLeft className="w-4 h-4 mr-2" />
               Retour à l'accueil
             </Link>
           </div>

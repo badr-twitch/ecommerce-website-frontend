@@ -199,8 +199,8 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
 
   if (!orderDetails) {
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in">
+        <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 w-full max-w-4xl max-h-[90vh] overflow-y-auto animate-scale-in">
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Détails de la Commande</h2>
@@ -219,8 +219,8 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in">
+      <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 w-full max-w-4xl max-h-[90vh] overflow-y-auto animate-scale-in">
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
@@ -237,7 +237,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
           <div className="mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(orderDetails.status)}`}>
+                <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium ${getStatusColor(orderDetails.status)}`}>
                   {getStatusIcon(orderDetails.status)}
                   <span className="ml-2">{getStatusText(orderDetails.status)}</span>
                 </span>
@@ -251,7 +251,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Customer Information */}
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-gray-50/50 rounded-xl p-6">
               <div className="flex items-center space-x-2 mb-4">
                 <User className="w-5 h-5 text-gray-600" />
                 <h3 className="text-lg font-semibold text-gray-900">Informations Client</h3>
@@ -265,7 +265,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
             </div>
 
             {/* Shipping Information */}
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-gray-50/50 rounded-xl p-6">
               <div className="flex items-center space-x-2 mb-4">
                 <MapPin className="w-5 h-5 text-gray-600" />
                 <h3 className="text-lg font-semibold text-gray-900">Adresse de Livraison</h3>
@@ -285,7 +285,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
           {/* Order Items */}
           <div className="mt-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Articles Commandés</h3>
-            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <div className="bg-gray-50/50 rounded-xl overflow-hidden border border-gray-100">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50">
@@ -341,7 +341,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
           </div>
 
           {/* Status Update */}
-          <div className="mt-6 bg-primary-50 rounded-lg p-6">
+          <div className="mt-6 bg-primary-50/50 rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Mettre à Jour le Statut</h3>
             <div className="space-y-4">
               <div>
@@ -352,7 +352,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
                   value={statusComment}
                   onChange={(e) => setStatusComment(e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="textarea"
                   placeholder="Ajouter un commentaire sur la mise à jour du statut..."
                 />
               </div>
@@ -362,10 +362,10 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
                     key={status}
                     onClick={() => handleStatusUpdate(status)}
                     disabled={loading || status === orderDetails.status}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                       status === orderDetails.status
                         ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                        : 'bg-primary-600 text-white hover:bg-primary-700'
+                        : 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm hover:shadow-md'
                     }`}
                   >
                     {getStatusText(status)}
@@ -381,13 +381,13 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
               {!showRefundSection ? (
                 <button
                   onClick={() => setShowRefundSection(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-orange-100 text-orange-700 rounded-xl hover:bg-orange-200 transition-all"
                 >
                   <RefreshCw className="w-4 h-4" />
                   Rembourser cette commande
                 </button>
               ) : (
-                <div className="bg-orange-50 rounded-lg p-6 border border-orange-200">
+                <div className="bg-orange-50/50 rounded-xl p-6 border border-orange-200">
                   <h3 className="text-lg font-semibold text-orange-900 mb-4 flex items-center gap-2">
                     <RefreshCw className="w-5 h-5" />
                     Remboursement
@@ -424,7 +424,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
                         max={parseFloat(orderDetails.totalAmount)}
                         min={0.01}
                         step={0.01}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                        className="input focus:border-orange-500"
                       />
                     )}
                     <textarea
@@ -432,19 +432,19 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
                       onChange={(e) => setRefundReason(e.target.value)}
                       rows={2}
                       placeholder="Raison du remboursement (obligatoire)"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                      className="textarea focus:border-orange-500"
                     />
                     <div className="flex gap-2">
                       <button
                         onClick={handleRefund}
                         disabled={isRefunding || !refundReason.trim()}
-                        className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
+                        className="btn-danger disabled:opacity-50"
                       >
                         {isRefunding ? 'Traitement...' : 'Confirmer le remboursement'}
                       </button>
                       <button
                         onClick={() => { setShowRefundSection(false); setRefundReason(''); setRefundAmount(''); }}
-                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                        className="btn-outline"
                       >
                         Annuler
                       </button>
@@ -456,7 +456,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
           )}
 
           {/* Order Notes */}
-          <div className="mt-6 bg-gray-50 rounded-lg p-6">
+          <div className="mt-6 bg-gray-50/50 rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <MessageSquare className="w-5 h-5" />
               Notes internes ({notes.length})
@@ -470,12 +470,12 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
                 onChange={(e) => setNewNote(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddNote()}
                 placeholder="Ajouter une note..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 text-sm"
+                className="input flex-1 text-sm"
               />
               <button
                 onClick={handleAddNote}
                 disabled={isAddingNote || !newNote.trim()}
-                className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="btn-primary px-3 py-2 disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -485,7 +485,7 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
             {notes.length > 0 ? (
               <div className="space-y-3 max-h-60 overflow-y-auto">
                 {notes.map((note) => (
-                  <div key={note.id} className="bg-white rounded-lg p-3 border border-gray-200 group">
+                  <div key={note.id} className="bg-white/80 rounded-xl p-3 border border-gray-100 group">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <p className="text-sm text-gray-800">{note.content}</p>

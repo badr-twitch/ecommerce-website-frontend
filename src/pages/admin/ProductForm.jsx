@@ -157,10 +157,10 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in">
+      <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-scale-in">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-2xl font-bold text-gray-900">
             {isEditing ? 'Modifier le Produit' : 'Ajouter un Produit'}
           </h2>
@@ -185,7 +185,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
               value={formData.name}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none transition-colors"
+              className="input"
               placeholder="Nom du produit"
             />
           </div>
@@ -201,7 +201,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
               value={formData.sku}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none transition-colors"
+              className="input"
               placeholder="Ex: PROD-001"
             />
           </div>
@@ -217,7 +217,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
               onChange={handleInputChange}
               required
               rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none transition-colors"
+              className="textarea"
               placeholder="Description détaillée du produit"
             />
           </div>
@@ -236,7 +236,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
                 required
                 min="0"
                 step="0.01"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none transition-colors"
+                className="input"
                 placeholder="0.00"
               />
             </div>
@@ -252,7 +252,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
                 onChange={handleInputChange}
                 required
                 min="0"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none transition-colors"
+                className="input"
                 placeholder="0"
               />
             </div>
@@ -297,7 +297,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
                     onChange={handleInputChange}
                     min="0"
                     step="0.01"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                    className="input focus:border-orange-500"
                     placeholder="Prix avant promotion"
                   />
                 </div>
@@ -315,7 +315,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
                       onChange={handleInputChange}
                       min="0"
                       step="0.01"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                      className="input focus:border-orange-500"
                       placeholder="Prix avec promotion"
                     />
                   </div>
@@ -332,7 +332,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
                         onChange={handleInputChange}
                         min="0"
                         max="100"
-                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                        className="input flex-1 focus:border-orange-500"
                         placeholder="Ex: 20"
                       />
                       <button
@@ -368,7 +368,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
                       name="saleStartDate"
                       value={formData.saleStartDate}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                      className="input focus:border-orange-500"
                     />
                   </div>
 
@@ -381,14 +381,14 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
                       name="saleEndDate"
                       value={formData.saleEndDate}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                      className="input focus:border-orange-500"
                     />
                   </div>
                 </div>
 
                 {/* Price Preview */}
                 {formData.originalPrice && formData.price && (
-                  <div className="bg-white border border-orange-200 rounded-lg p-4">
+                  <div className="bg-white/80 border border-orange-200 rounded-xl p-4">
                     <h4 className="text-sm font-medium text-gray-700 mb-2">Aperçu des Prix</h4>
                     <div className="flex items-center space-x-4">
                       <div className="text-lg text-gray-500 line-through">
@@ -450,7 +450,7 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
               onChange={handleInputChange}
               required
               disabled={categoriesLoading}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary-500 focus:outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="select disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
               <option value="">
                 {categoriesLoading ? 'Chargement des catégories...' : 'Sélectionner une catégorie'}
@@ -486,18 +486,18 @@ const ProductForm = ({ product = null, onClose, onSuccess }) => {
           />
 
           {/* Actions */}
-          <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className="btn-outline"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center space-x-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="btn-primary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

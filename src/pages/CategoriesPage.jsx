@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { categoriesAPI } from '../services/api';
-import { Search, FolderOpen, ShoppingBag, Phone, ArrowRight, Package } from 'lucide-react';
+import { Search, FolderOpen, ShoppingBag, Phone, ArrowRight, Package, Smartphone, Shirt, Home, Dumbbell, Sparkles, BookOpen, Puzzle, Apple } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const CategoriesPage = () => {
@@ -40,28 +40,24 @@ const CategoriesPage = () => {
     );
   });
 
-  // Default category icons if not provided
-  const getCategoryIcon = (category) => {
-    if (category.icon) return category.icon;
-    
-    // Default icons based on category name
-    const iconMap = {
-      'électronique': '📱',
-      'mode': '👕',
-      'maison': '🏠',
-      'sport': '⚽',
-      'beauté': '💄',
-      'livres': '📚',
-      'jouets': '🧸',
-      'alimentation': '🍎'
-    };
-    
+  // Default category icons using Lucide
+  const iconMap = {
+    'électronique': Smartphone,
+    'mode': Shirt,
+    'maison': Home,
+    'sport': Dumbbell,
+    'beauté': Sparkles,
+    'livres': BookOpen,
+    'jouets': Puzzle,
+    'alimentation': Apple
+  };
+
+  const getCategoryIconComponent = (category) => {
     const name = category.name?.toLowerCase() || '';
-    for (const [key, icon] of Object.entries(iconMap)) {
-      if (name.includes(key)) return icon;
+    for (const [key, IconComp] of Object.entries(iconMap)) {
+      if (name.includes(key)) return IconComp;
     }
-    
-    return '📦'; // Default icon
+    return Package;
   };
 
   // Get category link
@@ -185,12 +181,17 @@ const CategoriesPage = () => {
                   <Link
                     key={category.id || category._id || index}
                     to={getCategoryLink(category)}
-                    className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-gray-200/50 shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 text-center"
+                    className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-gray-200/50 shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 text-center cursor-pointer"
                   >
                     {/* Category Icon */}
-                    <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center text-4xl mb-6 mx-auto group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 shadow-lg">
-                      {getCategoryIcon(category)}
-                    </div>
+                    {(() => {
+                      const CategoryIcon = getCategoryIconComponent(category);
+                      return (
+                        <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mb-6 mx-auto group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 shadow-lg">
+                          <CategoryIcon className="w-9 h-9 text-white" />
+                        </div>
+                      );
+                    })()}
 
                     {/* Category Name */}
                     <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">
@@ -213,8 +214,8 @@ const CategoriesPage = () => {
 
                     {/* Hover Arrow */}
                     <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-primary-600 font-semibold text-sm">
-                        Explorer →
+                      <span className="text-primary-600 font-semibold text-sm inline-flex items-center gap-1">
+                        Explorer <ArrowRight className="w-4 h-4" />
                       </span>
                     </div>
                   </Link>

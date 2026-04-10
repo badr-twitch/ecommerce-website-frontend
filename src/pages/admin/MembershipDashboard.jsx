@@ -3,9 +3,9 @@ import { adminMembershipAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 
 const STATUS_LABELS = {
-  active: { label: 'Actif', color: 'bg-green-100 text-green-800' },
-  cancelled: { label: 'Annulé', color: 'bg-yellow-100 text-yellow-800' },
-  expired: { label: 'Expiré', color: 'bg-red-100 text-red-800' },
+  active: { label: 'Actif', color: 'badge-success' },
+  cancelled: { label: 'Annulé', color: 'badge-warning' },
+  expired: { label: 'Expiré', color: 'badge-danger' },
   none: { label: 'Aucun', color: 'bg-gray-100 text-gray-600' }
 };
 
@@ -161,12 +161,12 @@ const MembershipDashboard = () => {
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setMemberPage(1); }}
               placeholder="Rechercher par nom ou email..."
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500/50 focus:border-primary-400 outline-none w-64"
+              className="input w-64"
             />
             <select
               value={statusFilter}
               onChange={(e) => { setStatusFilter(e.target.value); setMemberPage(1); }}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500/50 outline-none"
+              className="select"
             >
               <option value="all">Tous les statuts</option>
               <option value="active">Actif</option>
@@ -176,9 +176,9 @@ const MembershipDashboard = () => {
           </div>
 
           {/* Members Table */}
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="card overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50/80 border-b border-gray-200">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Membre</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Statut</th>
@@ -193,13 +193,13 @@ const MembershipDashboard = () => {
                 {members.map(member => {
                   const statusInfo = STATUS_LABELS[member.membershipStatus] || STATUS_LABELS.none;
                   return (
-                    <tr key={member.id} className="hover:bg-gray-50">
+                    <tr key={member.id} className="hover:bg-primary-50/30 transition-colors duration-200">
                       <td className="px-4 py-3">
                         <p className="font-medium text-gray-900">{member.firstName} {member.lastName}</p>
                         <p className="text-xs text-gray-500">{member.email}</p>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${statusInfo.color}`}>
+                        <span className={`${statusInfo.color}`}>
                           {statusInfo.label}
                         </span>
                       </td>
@@ -241,7 +241,7 @@ const MembershipDashboard = () => {
               <button
                 onClick={() => setMemberPage(p => Math.max(1, p - 1))}
                 disabled={memberPage === 1}
-                className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50"
+                className="btn-outline px-3 py-1 text-sm disabled:opacity-50"
               >
                 Précédent
               </button>
@@ -251,7 +251,7 @@ const MembershipDashboard = () => {
               <button
                 onClick={() => setMemberPage(p => Math.min(memberTotalPages, p + 1))}
                 disabled={memberPage === memberTotalPages}
-                className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50"
+                className="btn-outline px-3 py-1 text-sm disabled:opacity-50"
               >
                 Suivant
               </button>
@@ -263,9 +263,9 @@ const MembershipDashboard = () => {
       {/* Transactions Tab */}
       {activeTab === 'transactions' && (
         <div>
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="card overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50/80 border-b border-gray-200">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Date</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">Membre</th>
@@ -277,7 +277,7 @@ const MembershipDashboard = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {transactions.map(tx => (
-                  <tr key={tx.id} className="hover:bg-gray-50">
+                  <tr key={tx.id} className="hover:bg-primary-50/30 transition-colors duration-200">
                     <td className="px-4 py-3 text-gray-600">
                       {new Date(tx.createdAt).toLocaleDateString('fr-FR')}{' '}
                       <span className="text-gray-400">{new Date(tx.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
@@ -296,10 +296,10 @@ const MembershipDashboard = () => {
                       {tx.amount > 0 ? `${parseFloat(tx.amount).toFixed(2)} ${tx.currency}` : '—'}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`text-xs font-medium ${
-                        tx.status === 'succeeded' ? 'text-green-600' :
-                        tx.status === 'refunded' ? 'text-orange-600' :
-                        tx.status === 'failed' ? 'text-red-600' : 'text-gray-500'
+                      <span className={`${
+                        tx.status === 'succeeded' ? 'badge-success' :
+                        tx.status === 'refunded' ? 'badge-warning' :
+                        tx.status === 'failed' ? 'badge-danger' : 'bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-medium'
                       }`}>
                         {tx.status}
                       </span>
@@ -316,7 +316,7 @@ const MembershipDashboard = () => {
               <button
                 onClick={() => setTxPage(p => Math.max(1, p - 1))}
                 disabled={txPage === 1}
-                className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50"
+                className="btn-outline px-3 py-1 text-sm disabled:opacity-50"
               >
                 Précédent
               </button>
@@ -324,7 +324,7 @@ const MembershipDashboard = () => {
               <button
                 onClick={() => setTxPage(p => Math.min(txTotalPages, p + 1))}
                 disabled={txPage === txTotalPages}
-                className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50"
+                className="btn-outline px-3 py-1 text-sm disabled:opacity-50"
               >
                 Suivant
               </button>
@@ -336,7 +336,7 @@ const MembershipDashboard = () => {
       {/* Member Action Modal */}
       {selectedMember && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+          <div className="card-glass shadow-2xl w-full max-w-md p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-1">
               {selectedMember.firstName} {selectedMember.lastName}
             </h3>
@@ -347,7 +347,7 @@ const MembershipDashboard = () => {
                 <button
                   onClick={() => handleAction(selectedMember.id, 'activate')}
                   disabled={actionLoading}
-                  className="w-full px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition disabled:opacity-50"
+                  className="btn-primary w-full !bg-green-600 !hover:bg-green-700 disabled:opacity-50"
                 >
                   Activer (30 jours gratuits)
                 </button>
@@ -360,12 +360,12 @@ const MembershipDashboard = () => {
                     value={extendDays}
                     onChange={(e) => setExtendDays(parseInt(e.target.value) || 30)}
                     min={1}
-                    className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    className="input w-20"
                   />
                   <button
                     onClick={() => handleAction(selectedMember.id, 'extend', { daysToExtend: extendDays })}
                     disabled={actionLoading}
-                    className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition disabled:opacity-50"
+                    className="btn-primary flex-1 disabled:opacity-50"
                   >
                     Prolonger de {extendDays} jours
                   </button>
@@ -376,7 +376,7 @@ const MembershipDashboard = () => {
                 <button
                   onClick={() => handleAction(selectedMember.id, 'cancel')}
                   disabled={actionLoading}
-                  className="w-full px-4 py-2 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 transition disabled:opacity-50"
+                  className="btn-danger w-full !bg-yellow-500 !hover:bg-yellow-600 disabled:opacity-50"
                 >
                   Annuler le renouvellement
                 </button>
@@ -386,7 +386,7 @@ const MembershipDashboard = () => {
                 <button
                   onClick={() => handleAction(selectedMember.id, 'expire')}
                   disabled={actionLoading}
-                  className="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition disabled:opacity-50"
+                  className="btn-danger w-full disabled:opacity-50"
                 >
                   Forcer l'expiration
                 </button>
@@ -395,7 +395,7 @@ const MembershipDashboard = () => {
 
             <button
               onClick={() => setSelectedMember(null)}
-              className="w-full mt-4 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+              className="btn-outline w-full mt-4"
             >
               Fermer
             </button>
@@ -407,7 +407,7 @@ const MembershipDashboard = () => {
 };
 
 const StatCard = ({ label, value, color }) => (
-  <div className="bg-white rounded-xl border border-gray-200 p-4">
+  <div className="card-hover p-4">
     <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
     <p className={`mt-1 text-2xl font-bold ${color}`}>{value}</p>
   </div>
