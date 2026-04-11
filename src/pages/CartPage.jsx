@@ -166,7 +166,8 @@ const CartPage = () => {
                           </div>
                           <button
                             onClick={() => handleRemoveItem(item.id)}
-                            className="flex-shrink-0 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 cursor-pointer"
+                            aria-label="Supprimer l'article"
+                            className="flex-shrink-0 p-1.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 cursor-pointer"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -177,7 +178,8 @@ const CartPage = () => {
                           <div className="flex items-center bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
                             <button
                               onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                              className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200 cursor-pointer"
+                              aria-label="Diminuer la quantité"
+                              className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200 cursor-pointer"
                             >
                               <Minus className="w-3.5 h-3.5" />
                             </button>
@@ -186,7 +188,8 @@ const CartPage = () => {
                             </span>
                             <button
                               onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                              className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200 cursor-pointer"
+                              aria-label="Augmenter la quantité"
+                              className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200 cursor-pointer"
                             >
                               <Plus className="w-3.5 h-3.5" />
                             </button>

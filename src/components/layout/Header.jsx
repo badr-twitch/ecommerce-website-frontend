@@ -116,7 +116,9 @@ const Header = () => {
             <div className="flex items-center gap-1.5">
               {/* Desktop Search */}
               <form onSubmit={handleSearch} className="hidden md:flex items-center relative">
+                <label htmlFor="desktop-search" className="sr-only">Rechercher des produits</label>
                 <input
+                  id="desktop-search"
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -260,7 +262,9 @@ const Header = () => {
           {searchOpen && (
             <div className="md:hidden pb-4 animate-slide-down">
               <form onSubmit={handleSearch} className="relative">
+                <label htmlFor="mobile-search" className="sr-only">Rechercher des produits</label>
                 <input
+                  id="mobile-search"
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}

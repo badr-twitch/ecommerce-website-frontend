@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { membershipAPI } from '../../services/api';
 import toast from 'react-hot-toast';
+import useModal from '../../hooks/useModal';
 
 const GiftMembershipModal = ({ isOpen, onClose, plans }) => {
+  useModal(isOpen, onClose);
   const [recipientEmail, setRecipientEmail] = useState('');
   const [recipientName, setRecipientName] = useState('');
   const [personalMessage, setPersonalMessage] = useState('');
@@ -55,13 +57,13 @@ const GiftMembershipModal = ({ isOpen, onClose, plans }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden" role="dialog" aria-modal="true">
         <div className="bg-gradient-to-r from-secondary-600 to-pink-600 px-6 py-4 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-white">Offrir UMOD Prime</h2>
             <p className="text-sm text-white/80">Faites plaisir avec un abonnement premium</p>
           </div>
-          <button onClick={handleClose} className="text-white/80 hover:text-white text-xl">
+          <button onClick={handleClose} className="text-white/80 hover:text-white text-xl" aria-label="Fermer">
             ✕
           </button>
         </div>

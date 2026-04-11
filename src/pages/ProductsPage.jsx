@@ -370,7 +370,10 @@ const ProductsPage = () => {
   const ProductCard = React.memo(({ product }) => (
     <div
       onClick={() => navigate(`/products/${product.id}`)}
-      className="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 border border-white/60 hover:-translate-y-1 cursor-pointer"
+      onKeyDown={(e) => { if (e.key === 'Enter') navigate(`/products/${product.id}`); }}
+      role="link"
+      tabIndex={0}
+      className="bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 border border-white/60 hover:-translate-y-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none"
     >
       <div className="relative overflow-hidden">
         <img
@@ -399,7 +402,8 @@ const ProductsPage = () => {
         <div className="absolute bottom-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
           <button
             onClick={(e) => { e.stopPropagation(); handleToggleWishlist(product); }}
-            className={`p-2.5 rounded-xl shadow-lg transition-all duration-200 cursor-pointer ${
+            aria-label={isInWishlist(product.id) ? 'Retirer de la wishlist' : 'Ajouter à la wishlist'}
+            className={`p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl shadow-lg transition-all duration-200 cursor-pointer ${
               isInWishlist(product.id)
                 ? 'bg-red-500 text-white hover:bg-red-600'
                 : 'bg-white/90 backdrop-blur-sm text-gray-600 hover:text-red-500'
@@ -410,7 +414,8 @@ const ProductsPage = () => {
           <button
             onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
             disabled={!product.inStock}
-            className="p-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            aria-label="Ajouter au panier"
+            className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             <ShoppingCart className="w-4 h-4" />
           </button>

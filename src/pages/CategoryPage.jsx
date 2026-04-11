@@ -159,8 +159,9 @@ const CategoryPage = () => {
           <div className="flex flex-wrap items-center gap-3">
             {/* Sort */}
             <div className="flex items-center gap-2">
-              <label className="text-sm text-gray-600 font-medium">Trier:</label>
+              <label htmlFor="sort-select" className="text-sm text-gray-600 font-medium">Trier:</label>
               <select
+                id="sort-select"
                 value={sort}
                 onChange={(e) => handleSortChange(e.target.value)}
                 className="select py-2 text-sm cursor-pointer"
@@ -173,7 +174,9 @@ const CategoryPage = () => {
             </div>
 
             {/* Order */}
+            <label htmlFor="order-select" className="sr-only">Ordre de tri</label>
             <select
+              id="order-select"
               value={order}
               onChange={(e) => handleOrderChange(e.target.value)}
               className="select py-2 text-sm cursor-pointer"
@@ -184,7 +187,9 @@ const CategoryPage = () => {
 
             {/* Price range */}
             <div className="flex items-center gap-2">
+              <label htmlFor="min-price" className="sr-only">Prix minimum</label>
               <input
+                id="min-price"
                 type="number"
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
@@ -192,7 +197,9 @@ const CategoryPage = () => {
                 className="input w-24 py-2 text-sm"
               />
               <span className="text-gray-400">-</span>
+              <label htmlFor="max-price" className="sr-only">Prix maximum</label>
               <input
+                id="max-price"
                 type="number"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}

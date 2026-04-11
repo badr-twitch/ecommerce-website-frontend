@@ -123,7 +123,9 @@ const CategoriesPage = () => {
             {/* Search Bar */}
             <div className="max-w-2xl mx-auto">
               <div className="relative">
+                <label htmlFor="category-search" className="sr-only">Rechercher une catégorie</label>
                 <input
+                  id="category-search"
                   type="text"
                   placeholder="Rechercher une catégorie..."
                   value={searchQuery}

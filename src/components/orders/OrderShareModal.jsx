@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Link2, Check, Share2, Gift, Package, Truck } from 'lucide-react';
 import { ordersAPI } from '../../services/api';
 import toast from 'react-hot-toast';
+import useModal from '../../hooks/useModal';
 
 const SHARE_TYPES = [
   {
@@ -29,6 +30,7 @@ const OrderShareModal = ({ order, isOpen, onClose }) => {
   const [shareUrl, setShareUrl] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
+  useModal(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -74,7 +76,7 @@ const OrderShareModal = ({ order, isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={handleClose}>
       <div
-        className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden"
+        className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden" role="dialog" aria-modal="true"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -83,7 +85,7 @@ const OrderShareModal = ({ order, isOpen, onClose }) => {
             <Share2 className="h-5 w-5" />
             <h3 className="text-lg font-semibold">Partager la commande</h3>
           </div>
-          <button onClick={handleClose} className="text-white/80 hover:text-white">
+          <button onClick={handleClose} className="text-white/80 hover:text-white" aria-label="Fermer">
             <X className="h-5 w-5" />
           </button>
         </div>

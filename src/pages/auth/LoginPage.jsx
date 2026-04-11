@@ -182,11 +182,13 @@ const LoginPage = () => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   placeholder="votre@email.com"
+                  aria-invalid={!!(errors.email && touched.email)}
+                  aria-describedby={errors.email && touched.email ? 'email-error' : undefined}
                   className={`input pl-11 ${errors.email && touched.email ? 'border-red-300 focus:border-red-500' : ''}`}
                 />
               </div>
               {errors.email && touched.email && (
-                <p className="mt-1.5 text-sm text-red-500">{errors.email}</p>
+                <p id="email-error" className="mt-1.5 text-sm text-red-500">{errors.email}</p>
               )}
             </div>
 
@@ -211,18 +213,21 @@ const LoginPage = () => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   placeholder="Votre mot de passe"
+                  aria-invalid={!!(errors.password && touched.password)}
+                  aria-describedby={errors.password && touched.password ? 'password-error' : undefined}
                   className={`input pl-11 pr-12 ${errors.password && touched.password ? 'border-red-300 focus:border-red-500' : ''}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                   className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {errors.password && touched.password && (
-                <p className="mt-1.5 text-sm text-red-500">{errors.password}</p>
+                <p id="password-error" className="mt-1.5 text-sm text-red-500">{errors.password}</p>
               )}
             </div>
 
@@ -250,6 +255,7 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={isLoading}
+              aria-busy={isLoading}
               className="btn-primary w-full py-3.5 cursor-pointer"
             >
               {isLoading ? (

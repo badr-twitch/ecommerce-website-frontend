@@ -285,6 +285,7 @@ const HomePage = () => {
                   <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-400">
                     <button
                       onClick={() => handleAddToCart(product)}
+                      aria-label={`Ajouter ${product.name} au panier`}
                       className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/95 backdrop-blur-sm text-gray-900 font-semibold rounded-xl shadow-lg hover:bg-white transition-colors active:scale-[0.97] cursor-pointer"
                     >
                       <ShoppingCart className="w-4 h-4" />

@@ -229,7 +229,8 @@ const WishlistPage = () => {
                 {/* Remove from wishlist button */}
                 <button
                   onClick={() => handleRemoveFromWishlist(product.id)}
-                  className="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer"
+                  aria-label="Retirer de la wishlist"
+                  className="absolute top-2 right-2 w-11 h-11 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>

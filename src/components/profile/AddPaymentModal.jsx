@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { paymentService } from '../../services/paymentService';
+import useModal from '../../hooks/useModal';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
@@ -130,6 +131,7 @@ const AddCardForm = ({ clientSecret, onSuccess, onClose }) => {
 };
 
 const AddPaymentModal = ({ isOpen, onClose, onAdd }) => {
+  useModal(isOpen, onClose);
   const [clientSecret, setClientSecret] = useState(null);
   const [loadingSetup, setLoadingSetup] = useState(false);
   const [setupError, setSetupError] = useState(null);
@@ -182,7 +184,7 @@ const AddPaymentModal = ({ isOpen, onClose, onAdd }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-      <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 max-w-md w-full max-h-[90vh] overflow-y-auto animate-scale-in">
+      <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 max-w-md w-full max-h-[90vh] overflow-y-auto animate-scale-in" role="dialog" aria-modal="true">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-900">
@@ -191,6 +193,7 @@ const AddPaymentModal = ({ isOpen, onClose, onAdd }) => {
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors duration-300"
+              aria-label="Fermer"
             >
               <span className="text-2xl">&times;</span>
             </button>

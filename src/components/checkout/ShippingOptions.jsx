@@ -101,18 +101,22 @@ const ShippingOptions = ({ shippingData, onSelect, onBack, isMember = false }) =
       )}
 
       {/* Shipping Methods */}
-      <div className="space-y-3">
+      <div className="space-y-3" role="radiogroup" aria-label="Méthodes de livraison">
         {shippingMethods.map((method) => {
           const MethodIcon = SHIPPING_ICONS[method.id] || Package;
           return (
           <div
             key={method.id}
-            className={`border-2 rounded-xl p-4 cursor-pointer transition-all duration-200 hover:shadow-sm ${
+            role="radio"
+            aria-checked={selectedMethod?.id === method.id}
+            tabIndex={0}
+            className={`border-2 rounded-xl p-4 cursor-pointer transition-all duration-200 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none ${
               selectedMethod?.id === method.id
                 ? 'border-primary-500 bg-primary-50/50'
                 : 'border-gray-200 hover:border-gray-300'
             }`}
             onClick={() => handleMethodSelect(method)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleMethodSelect(method); } }}
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-3">

@@ -408,9 +408,11 @@ const RegisterPage = () => {
                     onBlur={handleBlur}
                     className={`input ${errors.firstName && touched.firstName ? 'border-red-300 focus:border-red-500' : ''}`}
                     placeholder="Votre prénom"
+                    aria-invalid={!!(errors.firstName && touched.firstName)}
+                    aria-describedby={errors.firstName && touched.firstName ? 'firstName-error' : undefined}
                   />
                   {errors.firstName && touched.firstName && (
-                    <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+                    <p id="firstName-error" className="mt-1 text-sm text-red-600">{errors.firstName}</p>
                   )}
                 </div>
               </div>
@@ -430,9 +432,11 @@ const RegisterPage = () => {
                     onBlur={handleBlur}
                     className={`input ${errors.lastName && touched.lastName ? 'border-red-300 focus:border-red-500' : ''}`}
                     placeholder="Votre nom"
+                    aria-invalid={!!(errors.lastName && touched.lastName)}
+                    aria-describedby={errors.lastName && touched.lastName ? 'lastName-error' : undefined}
                   />
                   {errors.lastName && touched.lastName && (
-                    <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+                    <p id="lastName-error" className="mt-1 text-sm text-red-600">{errors.lastName}</p>
                   )}
                 </div>
               </div>
@@ -454,9 +458,11 @@ const RegisterPage = () => {
                   onBlur={handleBlur}
                   className={`input ${errors.email && touched.email ? 'border-red-300 focus:border-red-500' : ''}`}
                   placeholder="votre@email.com"
+                  aria-invalid={!!(errors.email && touched.email)}
+                  aria-describedby={errors.email && touched.email ? 'email-error' : undefined}
                 />
                 {errors.email && touched.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                  <p id="email-error" className="mt-1 text-sm text-red-600">{errors.email}</p>
                 )}
               </div>
             </div>
@@ -477,10 +483,13 @@ const RegisterPage = () => {
                   onBlur={handleBlur}
                   className={`input pr-12 ${errors.password && touched.password ? 'border-red-300 focus:border-red-500' : ''}`}
                   placeholder="Votre mot de passe"
+                  aria-invalid={!!(errors.password && touched.password)}
+                  aria-describedby={errors.password && touched.password ? 'password-error' : undefined}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                   className="absolute right-3 top-3.5 p-1 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -509,7 +518,7 @@ const RegisterPage = () => {
                   </div>
                 )}
                 {errors.password && touched.password && (
-                  <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                  <p id="password-error" className="mt-1 text-sm text-red-600">{errors.password}</p>
                 )}
               </div>
             </div>
@@ -530,16 +539,19 @@ const RegisterPage = () => {
                   onBlur={handleBlur}
                   className={`input pr-12 ${errors.confirmPassword && touched.confirmPassword ? 'border-red-300 focus:border-red-500' : ''}`}
                   placeholder="Confirmez votre mot de passe"
+                  aria-invalid={!!(errors.confirmPassword && touched.confirmPassword)}
+                  aria-describedby={errors.confirmPassword && touched.confirmPassword ? 'confirmPassword-error' : undefined}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label={showConfirmPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                   className="absolute right-3 top-3.5 p-1 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                 >
                   {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
                 {errors.confirmPassword && touched.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+                  <p id="confirmPassword-error" className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
                 )}
               </div>
             </div>
@@ -572,9 +584,11 @@ const RegisterPage = () => {
                       onBlur={handleBlur}
                       className={`input ${errors.companyName && touched.companyName ? 'border-red-300 focus:border-red-500' : ''}`}
                       placeholder="Nom de votre entreprise"
+                      aria-invalid={!!(errors.companyName && touched.companyName)}
+                      aria-describedby={errors.companyName && touched.companyName ? 'companyName-error' : undefined}
                     />
                     {errors.companyName && touched.companyName && (
-                      <p className="mt-1 text-sm text-red-600">{errors.companyName}</p>
+                      <p id="companyName-error" className="mt-1 text-sm text-red-600">{errors.companyName}</p>
                     )}
                   </div>
                 </div>
@@ -598,9 +612,11 @@ const RegisterPage = () => {
                       className={`input ${errors.siret && touched.siret ? 'border-red-300 focus:border-red-500' : ''}`}
                       placeholder="12345678901234"
                       maxLength={14}
+                      aria-invalid={!!(errors.siret && touched.siret)}
+                      aria-describedby={errors.siret && touched.siret ? 'siret-error' : undefined}
                     />
                     {errors.siret && touched.siret && (
-                      <p className="mt-1 text-sm text-red-600">{errors.siret}</p>
+                      <p id="siret-error" className="mt-1 text-sm text-red-600">{errors.siret}</p>
                     )}
                     <p className="mt-1 text-xs text-gray-500">14 chiffres (sans espaces)</p>
                   </div>
@@ -640,9 +656,11 @@ const RegisterPage = () => {
                       onBlur={handleBlur}
                       className={`input ${errors.billingAddress && touched.billingAddress ? 'border-red-300 focus:border-red-500' : ''}`}
                       placeholder="Numéro et nom de rue"
+                      aria-invalid={!!(errors.billingAddress && touched.billingAddress)}
+                      aria-describedby={errors.billingAddress && touched.billingAddress ? 'billingAddress-error' : undefined}
                     />
                     {errors.billingAddress && touched.billingAddress && (
-                      <p className="mt-1 text-sm text-red-600">{errors.billingAddress}</p>
+                      <p id="billingAddress-error" className="mt-1 text-sm text-red-600">{errors.billingAddress}</p>
                     )}
                   </div>
                 </div>
@@ -663,9 +681,11 @@ const RegisterPage = () => {
                         onBlur={handleBlur}
                         className={`input ${errors.billingCity && touched.billingCity ? 'border-red-300 focus:border-red-500' : ''}`}
                         placeholder="Ville"
+                        aria-invalid={!!(errors.billingCity && touched.billingCity)}
+                        aria-describedby={errors.billingCity && touched.billingCity ? 'billingCity-error' : undefined}
                       />
                       {errors.billingCity && touched.billingCity && (
-                        <p className="mt-1 text-sm text-red-600">{errors.billingCity}</p>
+                        <p id="billingCity-error" className="mt-1 text-sm text-red-600">{errors.billingCity}</p>
                       )}
                     </div>
                   </div>
@@ -688,9 +708,11 @@ const RegisterPage = () => {
                         className={`input ${errors.billingPostalCode && touched.billingPostalCode ? 'border-red-300 focus:border-red-500' : ''}`}
                         placeholder="75001"
                         maxLength={5}
+                        aria-invalid={!!(errors.billingPostalCode && touched.billingPostalCode)}
+                        aria-describedby={errors.billingPostalCode && touched.billingPostalCode ? 'billingPostalCode-error' : undefined}
                       />
                       {errors.billingPostalCode && touched.billingPostalCode && (
-                        <p className="mt-1 text-sm text-red-600">{errors.billingPostalCode}</p>
+                        <p id="billingPostalCode-error" className="mt-1 text-sm text-red-600">{errors.billingPostalCode}</p>
                       )}
                     </div>
                   </div>
@@ -759,6 +781,7 @@ const RegisterPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
+                aria-busy={isLoading}
                 className="btn-primary w-full py-3.5 cursor-pointer"
               >
                 {isLoading ? (

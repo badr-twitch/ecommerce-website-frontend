@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import useModal from '../../hooks/useModal';
 
 const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) => {
+  useModal(isOpen, onClose);
   const [formData, setFormData] = useState({
     name: '',
     firstName: '',
@@ -162,7 +164,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-      <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 max-w-md w-full max-h-[90vh] overflow-y-auto animate-scale-in">
+      <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 max-w-md w-full max-h-[90vh] overflow-y-auto animate-scale-in" role="dialog" aria-modal="true">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-900">
@@ -171,6 +173,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
             <button
               onClick={handleClose}
               className="text-gray-400 hover:text-gray-600 transition-colors duration-300"
+              aria-label="Fermer"
             >
               <span className="text-2xl">×</span>
             </button>

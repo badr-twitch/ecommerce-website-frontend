@@ -137,6 +137,7 @@ const OrderTrackingPage = () => {
             <button
               type="submit"
               disabled={loading}
+              aria-busy={loading}
               className="btn-primary w-full flex items-center justify-center gap-2"
             >
               {loading ? (

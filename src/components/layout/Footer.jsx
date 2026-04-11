@@ -39,7 +39,7 @@ const Footer = () => {
                 <a
                   key={social.label}
                   href={social.href}
-                  className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-all duration-300 cursor-pointer"
+                  className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-all duration-300 cursor-pointer focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 focus-visible:outline-none"
                   aria-label={social.label}
                 >
                   <social.icon className="w-5 h-5 text-gray-300" />
@@ -65,7 +65,7 @@ const Footer = () => {
                 <li key={item.to}>
                   <Link
                     to={item.to}
-                    className="flex items-center space-x-3 text-gray-300 hover:text-white transition-all duration-300 group cursor-pointer"
+                    className="flex items-center space-x-3 text-gray-300 hover:text-white transition-all duration-300 group cursor-pointer focus-visible:text-white focus-visible:outline-none"
                   >
                     <item.icon className="w-4 h-4 text-gray-400 group-hover:text-primary-400 transition-colors duration-300" />
                     <span className="relative">
@@ -96,7 +96,7 @@ const Footer = () => {
                 <li key={item.to}>
                   <Link
                     to={item.to}
-                    className="flex items-center space-x-3 text-gray-300 hover:text-white transition-all duration-300 group cursor-pointer"
+                    className="flex items-center space-x-3 text-gray-300 hover:text-white transition-all duration-300 group cursor-pointer focus-visible:text-white focus-visible:outline-none"
                   >
                     <item.icon className="w-4 h-4 text-gray-400 group-hover:text-primary-400 transition-colors duration-300" />
                     <span className="relative">

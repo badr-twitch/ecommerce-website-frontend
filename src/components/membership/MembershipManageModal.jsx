@@ -2,6 +2,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { membershipAPI } from '../../services/api';
 import toast from 'react-hot-toast';
+import useModal from '../../hooks/useModal';
 
 const statusLabels = {
   active: 'Actif',
@@ -38,6 +39,8 @@ const MembershipManageModal = ({
     membershipExpiresAt,
     membershipAutoRenew = true,
   } = status;
+
+  useModal(isOpen, onClose);
 
   const [transactions, setTransactions] = useState([]);
   const [txLoading, setTxLoading] = useState(false);
@@ -139,7 +142,7 @@ const MembershipManageModal = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm">
       <div className="flex min-h-full items-center justify-center px-4 py-10">
-        <div className="w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-2xl">
+        <div className="w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-2xl" role="dialog" aria-modal="true">
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">UMOD Prime</p>
