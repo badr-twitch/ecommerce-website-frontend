@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { X, Eye, Package, Truck, CheckCircle, XCircle, Clock, User, MapPin, CreditCard, RefreshCw, MessageSquare, Trash2, Send } from 'lucide-react';
+import { X, Eye, Package, Truck, CheckCircle, XCircle, Clock, User, MapPin, CreditCard, RefreshCw, MessageSquare, Trash2, Send, AlertTriangle, Image } from 'lucide-react';
+
+const REFUND_REASON_LABELS = {
+  defective: 'Produit defectueux',
+  wrong_item: 'Mauvais article recu',
+  damaged_in_shipping: 'Endommage pendant la livraison',
+  not_as_described: 'Non conforme a la description',
+  missing_parts: 'Pieces manquantes',
+};
 
 const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
   const [loading, setLoading] = useState(false);
@@ -17,6 +25,12 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState('');
   const [isAddingNote, setIsAddingNote] = useState(false);
+  // Refund review state
+  const [showRejectReason, setShowRejectReason] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [isApprovingRefund, setIsApprovingRefund] = useState(false);
+  const [isRejectingRefund, setIsRejectingRefund] = useState(false);
+  const [fullSizeImage, setFullSizeImage] = useState(null);
 
   useEffect(() => {
     if (order) {
@@ -156,6 +170,8 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
         return <CheckCircle className="w-4 h-4" />;
       case 'cancelled':
         return <XCircle className="w-4 h-4" />;
+      case 'refund_requested':
+        return <AlertTriangle className="w-4 h-4" />;
       default:
         return <Clock className="w-4 h-4" />;
     }
@@ -173,6 +189,8 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
         return 'bg-green-100 text-green-800';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
+      case 'refund_requested':
+        return 'bg-orange-100 text-orange-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -185,15 +203,51 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
       case 'processing':
         return 'En cours de traitement';
       case 'shipped':
-        return 'Expédiée';
+        return 'Expediee';
       case 'delivered':
-        return 'Livrée';
+        return 'Livree';
       case 'cancelled':
-        return 'Annulée';
+        return 'Annulee';
+      case 'refund_requested':
+        return 'Remboursement demande';
       case 'refunded':
-        return 'Remboursée';
+        return 'Remboursee';
       default:
         return status;
+    }
+  };
+
+  const handleApproveRefund = async () => {
+    setIsApprovingRefund(true);
+    try {
+      await axios.post(`${apiBase}/admin/orders/${order.id}/approve-refund`, {}, getAuthHeaders());
+      toast.success('Remboursement approuve avec succes');
+      onStatusUpdate();
+      onClose();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Erreur lors de l\'approbation');
+    } finally {
+      setIsApprovingRefund(false);
+    }
+  };
+
+  const handleRejectRefund = async () => {
+    if (!rejectReason.trim()) {
+      toast.error('Veuillez indiquer la raison du rejet');
+      return;
+    }
+    setIsRejectingRefund(true);
+    try {
+      await axios.post(`${apiBase}/admin/orders/${order.id}/reject-refund`, { reason: rejectReason }, getAuthHeaders());
+      toast.success('Demande de remboursement rejetee');
+      setShowRejectReason(false);
+      setRejectReason('');
+      onStatusUpdate();
+      onClose();
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Erreur lors du rejet');
+    } finally {
+      setIsRejectingRefund(false);
     }
   };
 
@@ -452,6 +506,111 @@ const OrderDetail = ({ order, onClose, onStatusUpdate }) => {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Refund Review Panel */}
+          {orderDetails.status === 'refund_requested' && orderDetails.refundReason && (
+            <div className="mt-6 bg-orange-50/50 rounded-xl p-6 border border-orange-200">
+              <h3 className="text-lg font-semibold text-orange-900 mb-4 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5" />
+                Demande de remboursement à examiner
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <span className="text-sm font-medium text-gray-700">Catégorie : </span>
+                  <span className="text-sm text-gray-900">{REFUND_REASON_LABELS[orderDetails.refundReason] || orderDetails.refundReason}</span>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-gray-700">Description :</span>
+                  <p className="text-sm text-gray-900 mt-1 bg-white/60 rounded-lg p-3">{orderDetails.refundDescription}</p>
+                </div>
+                {orderDetails.refundProofImages?.length > 0 && (
+                  <div>
+                    <span className="text-sm font-medium text-gray-700">Photos de preuve :</span>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {orderDetails.refundProofImages.map((img, i) => (
+                        <button key={i} onClick={() => setFullSizeImage(img)} className="focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-lg">
+                          <img src={img} alt={`Preuve ${i + 1}`} className="w-24 h-24 object-cover rounded-lg border border-orange-200 hover:opacity-80 transition-opacity cursor-pointer" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {orderDetails.refundAffectedItems?.length > 0 && (
+                  <div>
+                    <span className="text-sm font-medium text-gray-700">Articles concernés :</span>
+                    <ul className="mt-1 space-y-1">
+                      {orderDetails.refundAffectedItems.map((itemId, i) => {
+                        const item = orderDetails.orderItems?.find(oi => oi.id === itemId);
+                        return (
+                          <li key={i} className="text-sm text-gray-900 flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-orange-400 rounded-full" />
+                            {item?.product?.name || `Article #${itemId}`}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="border-t border-orange-200 pt-4 space-y-3">
+                  {!showRejectReason ? (
+                    <div className="flex gap-3">
+                      <button
+                        onClick={handleApproveRefund}
+                        disabled={isApprovingRefund}
+                        className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:opacity-50 font-medium transition-colors"
+                      >
+                        {isApprovingRefund ? 'Traitement...' : 'Approuver le remboursement'}
+                      </button>
+                      <button
+                        onClick={() => setShowRejectReason(true)}
+                        className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 font-medium transition-colors"
+                      >
+                        Rejeter la demande
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <textarea
+                        value={rejectReason}
+                        onChange={(e) => setRejectReason(e.target.value)}
+                        rows={3}
+                        placeholder="Raison du rejet (obligatoire)..."
+                        className="w-full px-3 py-2 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleRejectRefund}
+                          disabled={isRejectingRefund || !rejectReason.trim()}
+                          className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50 font-medium transition-colors"
+                        >
+                          {isRejectingRefund ? 'Traitement...' : 'Confirmer le rejet'}
+                        </button>
+                        <button
+                          onClick={() => { setShowRejectReason(false); setRejectReason(''); }}
+                          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors"
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Full Size Image Modal */}
+          {fullSizeImage && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70" onClick={() => setFullSizeImage(null)}>
+              <div className="relative max-w-3xl max-h-[80vh]">
+                <button onClick={() => setFullSizeImage(null)} className="absolute -top-3 -right-3 bg-white rounded-full p-1 shadow-lg hover:bg-gray-100">
+                  <X className="w-5 h-5" />
+                </button>
+                <img src={fullSizeImage} alt="Preuve agrandie" className="max-w-full max-h-[80vh] object-contain rounded-lg" />
+              </div>
             </div>
           )}
 

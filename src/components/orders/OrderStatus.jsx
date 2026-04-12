@@ -63,20 +63,26 @@ const OrderStatus = ({ order, className = '' }) => {
   const steps = getStatusSteps();
   const currentStepIndex = getCurrentStepIndex();
 
-  // Handle cancelled/refunded orders
-  if (['cancelled', 'refunded'].includes(order?.status)) {
+  // Handle cancelled/refund_requested/refunded orders
+  if (['cancelled', 'refund_requested', 'refunded'].includes(order?.status)) {
+    const statusConfig = {
+      cancelled: { bg: 'bg-red-50', border: 'border-red-200', icon: 'text-red-600', title: 'text-red-900', text: 'text-red-700', label: 'Commande annulée', desc: 'Votre commande a été annulée. Contactez le support pour plus d\'informations.' },
+      refund_requested: { bg: 'bg-orange-50', border: 'border-orange-200', icon: 'text-orange-600', title: 'text-orange-900', text: 'text-orange-700', label: 'Remboursement demandé', desc: 'Votre demande de remboursement est en cours d\'examen par notre équipe. Réponse sous 48h.' },
+      refunded: { bg: 'bg-red-50', border: 'border-red-200', icon: 'text-red-600', title: 'text-red-900', text: 'text-red-700', label: 'Commande remboursée', desc: 'Votre commande a été remboursée. Le remboursement sera traité selon votre méthode de paiement.' },
+    };
+    const cfg = statusConfig[order.status];
     return (
-      <div className={`bg-red-50 border border-red-200 rounded-lg p-4 ${className}`}>
+      <div className={`${cfg.bg} border ${cfg.border} rounded-lg p-4 ${className}`}>
         <div className="flex items-center gap-3">
-          <AlertCircle className="h-6 w-6 text-red-600" />
+          <AlertCircle className={`h-6 w-6 ${cfg.icon}`} />
           <div>
-            <h3 className="text-sm font-medium text-red-900">
-              {order.status === 'cancelled' ? 'Commande annulée' : 'Commande remboursée'}
+            <h3 className={`text-sm font-medium ${cfg.title}`}>
+              {cfg.label}
             </h3>
-            <p className="text-sm text-red-700">
-              {order.status === 'cancelled' 
-                ? 'Votre commande a été annulée. Contactez le support pour plus d\'informations.'
-                : 'Votre commande a été remboursée. Le remboursement sera traité selon votre méthode de paiement.'
+            <p className={`text-sm ${cfg.text}`}>
+              {order.refundRejectionReason
+                ? `Votre demande de remboursement a été rejetée : ${order.refundRejectionReason}`
+                : cfg.desc
               }
             </p>
           </div>

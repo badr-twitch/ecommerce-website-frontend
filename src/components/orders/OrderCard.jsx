@@ -63,14 +63,21 @@ const OrderCard = ({ order, showDetails = false, onToggleDetails }) => {
         bgColor: 'bg-green-50',
         progress: 100
       },
-      cancelled: { 
-        label: 'Annulée', 
-        color: 'bg-red-100 text-red-800 border-red-200', 
+      cancelled: {
+        label: 'Annulée',
+        color: 'bg-red-100 text-red-800 border-red-200',
         icon: AlertCircle,
         bgColor: 'bg-red-50',
         progress: 0
       },
-      refunded: { 
+      refund_requested: {
+        label: 'Remboursement demande',
+        color: 'bg-orange-100 text-orange-800 border-orange-200',
+        icon: Clock,
+        bgColor: 'bg-orange-50',
+        progress: 0
+      },
+      refunded: {
         label: 'Remboursée', 
         color: 'bg-gray-100 text-gray-800 border-gray-200', 
         icon: AlertCircle,

@@ -2,16 +2,17 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { ordersAPI } from '../services/api';
+import storageService from '../services/storageService';
 import { OrderStatus } from '../components/orders';
 import OrderActivityFeed from '../components/orders/OrderActivityFeed';
-import { 
-  Package, 
-  Calendar, 
-  MapPin, 
-  CreditCard, 
-  Truck, 
-  CheckCircle, 
-  Clock, 
+import {
+  Package,
+  Calendar,
+  MapPin,
+  CreditCard,
+  Truck,
+  CheckCircle,
+  Clock,
   AlertCircle,
   ArrowLeft,
   Download,
@@ -19,10 +20,21 @@ import {
   Share2,
   Phone,
   Mail,
-  MessageSquare
+  MessageSquare,
+  Upload,
+  X,
+  Image
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import OrderShareModal from '../components/orders/OrderShareModal';
+
+const REFUND_REASON_LABELS = {
+  defective: 'Produit defectueux',
+  wrong_item: 'Mauvais article recu',
+  damaged_in_shipping: 'Endommage pendant la livraison',
+  not_as_described: 'Non conforme a la description',
+  missing_parts: 'Pieces manquantes',
+};
 
 const getStatusInfo = (status) => {
   const statusMap = {
@@ -32,6 +44,7 @@ const getStatusInfo = (status) => {
     shipped: { label: 'Expédiée', color: 'bg-secondary-100 text-secondary-800', icon: Truck },
     delivered: { label: 'Livrée', color: 'bg-green-100 text-green-800', icon: CheckCircle },
     cancelled: { label: 'Annulée', color: 'bg-red-100 text-red-800', icon: AlertCircle },
+    refund_requested: { label: 'Remboursement demandé', color: 'bg-orange-100 text-orange-800', icon: Clock },
     refunded: { label: 'Remboursée', color: 'bg-gray-100 text-gray-800', icon: AlertCircle },
   };
   return statusMap[status] || statusMap.pending;
@@ -47,7 +60,11 @@ const OrderDetailPage = () => {
   const [isCancelling, setIsCancelling] = useState(false);
   const [isRefunding, setIsRefunding] = useState(false);
   const [showRefundModal, setShowRefundModal] = useState(false);
-  const [refundReason, setRefundReason] = useState('');
+  const [refundCategory, setRefundCategory] = useState('');
+  const [refundDescription, setRefundDescription] = useState('');
+  const [refundProofImages, setRefundProofImages] = useState([]);
+  const [refundAffectedItems, setRefundAffectedItems] = useState([]);
+  const [uploadingProof, setUploadingProof] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
@@ -103,28 +120,74 @@ const OrderDetailPage = () => {
   };
 
   const handleRefund = async () => {
-    if (!refundReason.trim()) {
-      toast.error('Veuillez indiquer la raison du remboursement');
+    if (!refundCategory) {
+      toast.error('Veuillez selectionner une categorie de raison');
+      return;
+    }
+    if (refundDescription.trim().length < 20) {
+      toast.error('La description doit contenir au moins 20 caracteres');
+      return;
+    }
+    if (refundProofImages.length === 0) {
+      toast.error('Veuillez ajouter au moins une photo comme preuve');
       return;
     }
 
     try {
       setIsRefunding(true);
-      const response = await ordersAPI.refund(id, { reason: refundReason });
+      const response = await ordersAPI.refund(id, {
+        reason: refundCategory,
+        description: refundDescription,
+        proofImages: refundProofImages,
+        affectedItems: refundAffectedItems,
+      });
 
       if (response.data.success) {
-        toast.success('Remboursement effectué avec succès');
+        toast.success('Demande de remboursement envoyee');
         setShowRefundModal(false);
-        setRefundReason('');
+        setRefundCategory('');
+        setRefundDescription('');
+        setRefundProofImages([]);
+        setRefundAffectedItems([]);
         fetchOrder();
       } else {
-        toast.error(response.data.error || 'Erreur lors du remboursement');
+        toast.error(response.data.error || 'Erreur lors de la demande de remboursement');
       }
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Erreur lors du remboursement');
+      toast.error(error.response?.data?.error || 'Erreur lors de la demande de remboursement');
     } finally {
       setIsRefunding(false);
     }
+  };
+
+  const handleProofUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    setUploadingProof(true);
+    try {
+      for (const file of files) {
+        const url = await storageService.uploadFile(file, `refund-proofs/${id}/${file.name}`);
+        setRefundProofImages(prev => [...prev, url]);
+      }
+      toast.success('Photo(s) ajoutee(s)');
+    } catch (error) {
+      console.error('Error uploading proof:', error);
+      toast.error('Erreur lors du telechargement de la photo');
+    } finally {
+      setUploadingProof(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveProofImage = (index) => {
+    setRefundProofImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const toggleAffectedItem = (itemId) => {
+    setRefundAffectedItems(prev =>
+      prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]
+    );
   };
 
   const formatDate = (dateString) => {
@@ -494,7 +557,7 @@ const OrderDetailPage = () => {
                   </button>
                 )}
 
-                {(order.status === 'delivered' || order.status === 'shipped') && order.paymentStatus !== 'refunded' && (
+                {order.status === 'delivered' && order.paymentStatus !== 'refunded' && (
                   <button
                     onClick={() => setShowRefundModal(true)}
                     className="w-full inline-flex items-center justify-center px-4 py-2 border border-orange-300 rounded-xl shadow-sm text-sm font-medium text-orange-700 bg-white hover:bg-orange-50"
@@ -524,39 +587,173 @@ const OrderDetailPage = () => {
         </div>
       </div>
 
+      {/* Refund Request Details */}
+      {order.status === 'refund_requested' && order.refundReason && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+          <div className="bg-orange-50/80 backdrop-blur-sm rounded-2xl shadow-soft border border-orange-200 p-6">
+            <h2 className="text-lg font-medium text-orange-900 mb-4">Détails de la demande de remboursement</h2>
+            <div className="space-y-3">
+              <div>
+                <span className="text-sm font-medium text-gray-700">Raison : </span>
+                <span className="text-sm text-gray-900">{REFUND_REASON_LABELS[order.refundReason] || order.refundReason}</span>
+              </div>
+              <div>
+                <span className="text-sm font-medium text-gray-700">Description : </span>
+                <p className="text-sm text-gray-900 mt-1">{order.refundDescription}</p>
+              </div>
+              {order.refundProofImages?.length > 0 && (
+                <div>
+                  <span className="text-sm font-medium text-gray-700">Photos :</span>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {order.refundProofImages.map((img, i) => (
+                      <a key={i} href={img} target="_blank" rel="noopener noreferrer">
+                        <img src={img} alt={`Preuve ${i + 1}`} className="w-20 h-20 object-cover rounded-lg border border-orange-200" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Refund Modal */}
       {showRefundModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Demander un remboursement</h3>
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900">Demander un remboursement</h3>
+              <button onClick={() => { setShowRefundModal(false); setRefundCategory(''); setRefundDescription(''); setRefundProofImages([]); setRefundAffectedItems([]); }} className="p-1 text-gray-400 hover:text-gray-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
             <p className="text-sm text-gray-600 mb-4">
-              Commande #{order.orderNumber} — {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'MAD' }).format(order.totalAmount)}
+              Commande #{order.orderNumber} — {formatPrice(order.totalAmount)}
             </p>
+
+            {/* Reason Category */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Raison du remboursement
+                Categorie de raison <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={refundCategory}
+                onChange={(e) => setRefundCategory(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
+                <option value="">-- Selectionnez une raison --</option>
+                {Object.entries(REFUND_REASON_LABELS).map(([key, label]) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
+              </select>
+              {!refundCategory && <p className="text-xs text-red-500 mt-1">La categorie est obligatoire</p>}
+            </div>
+
+            {/* Description */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description detaillee <span className="text-red-500">*</span>
               </label>
               <textarea
-                value={refundReason}
-                onChange={(e) => setRefundReason(e.target.value)}
-                rows={3}
+                value={refundDescription}
+                onChange={(e) => setRefundDescription(e.target.value)}
+                rows={4}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                placeholder="Décrivez la raison de votre demande..."
+                placeholder="Decrivez le probleme en detail (minimum 20 caracteres)..."
               />
+              <div className="flex justify-between mt-1">
+                {refundDescription.length > 0 && refundDescription.length < 20 && (
+                  <p className="text-xs text-red-500">Minimum 20 caracteres requis</p>
+                )}
+                <p className={`text-xs ml-auto ${refundDescription.length < 20 ? 'text-red-500' : 'text-gray-400'}`}>
+                  {refundDescription.length}/20 min
+                </p>
+              </div>
             </div>
+
+            {/* Photo Proof */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Photos de preuve <span className="text-red-500">*</span>
+              </label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {refundProofImages.map((img, i) => (
+                  <div key={i} className="relative group">
+                    <img src={img} alt={`Preuve ${i + 1}`} className="w-20 h-20 object-cover rounded-lg border border-gray-200" />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveProofImage(i)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <label className="inline-flex items-center gap-2 px-4 py-2 border border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-orange-400 hover:bg-orange-50 transition-colors">
+                {uploadingProof ? (
+                  <span className="text-sm text-gray-500">Telechargement...</span>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm text-gray-600">Ajouter des photos</span>
+                  </>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleProofUpload}
+                  disabled={uploadingProof}
+                  className="hidden"
+                />
+              </label>
+              {refundProofImages.length === 0 && (
+                <p className="text-xs text-red-500 mt-1">Au moins une photo est requise</p>
+              )}
+            </div>
+
+            {/* Affected Items */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Articles concernes
+              </label>
+              <div className="space-y-2">
+                {order.orderItems?.map((item) => (
+                  <label key={item.id} className="flex items-center gap-3 p-2 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={refundAffectedItems.includes(item.id)}
+                      onChange={() => toggleAffectedItem(item.id)}
+                      className="rounded text-orange-600 focus:ring-orange-500"
+                    />
+                    <img
+                      src={item.product?.mainImage || '/placeholder-product.jpg'}
+                      alt={item.product?.name}
+                      className="w-10 h-10 object-cover rounded"
+                    />
+                    <span className="text-sm text-gray-900">{item.product?.name}</span>
+                    <span className="text-sm text-gray-500 ml-auto">x{item.quantity}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <p className="text-xs text-gray-500 mb-4">
-              Le remboursement sera traité sous 5 à 10 jours ouvrés sur votre moyen de paiement d'origine.
+              Votre demande sera examinee par notre equipe. Reponse sous 48h ouvrees.
             </p>
+
             <div className="flex gap-3">
               <button
                 onClick={handleRefund}
-                disabled={isRefunding || !refundReason.trim()}
-                className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
+                disabled={isRefunding || !refundCategory || refundDescription.trim().length < 20 || refundProofImages.length === 0}
+                className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isRefunding ? 'Traitement...' : 'Confirmer le remboursement'}
+                {isRefunding ? 'Envoi en cours...' : 'Envoyer la demande'}
               </button>
               <button
-                onClick={() => { setShowRefundModal(false); setRefundReason(''); }}
+                onClick={() => { setShowRefundModal(false); setRefundCategory(''); setRefundDescription(''); setRefundProofImages([]); setRefundAffectedItems([]); }}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
               >
                 Annuler
