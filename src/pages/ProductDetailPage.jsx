@@ -6,6 +6,7 @@ import 'react-image-gallery/styles/css/image-gallery.css';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
+import { useAssistantContext } from '../contexts/AssistantContext';
 import { toast } from 'react-hot-toast';
 import { productsAPI } from '../services/api';
 import { ProductRecommendations, FrequentlyBoughtTogether } from '../components/recommendations';
@@ -60,6 +61,7 @@ const ProductDetailPage = () => {
   const { user } = useAuth();
   const { addItem, cartItems } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { setPageContext, clearPageContext } = useAssistantContext();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -73,14 +75,31 @@ const ProductDetailPage = () => {
     }
   }, [productId]);
 
+  // Contribute safe page context to the shopping assistant — identifiers and
+  // name only. Prices, stock, and descriptions are never injected; the model
+  // resolves "this product" from the context but must still refuse to invent
+  // any property beyond what the knowledge guide provides.
+  useEffect(() => {
+    if (!productId) return undefined;
+    setPageContext({
+      page: 'product',
+      productId: String(productId),
+      ...(product?.name ? { productName: product.name } : {}),
+    });
+    return () => clearPageContext();
+  }, [productId, product?.name, setPageContext, clearPageContext]);
+
   const fetchProduct = async () => {
     try {
       setLoading(true);
       setError(null);
 
       const response = await productsAPI.getById(productId);
-      if (response.data.success) {
-        setProduct(response.data.data);
+      const payload = response.data?.product || response.data?.data;
+      if (payload) {
+        setProduct(payload);
+      } else {
+        setError('Produit non trouvé');
       }
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -354,19 +373,19 @@ const ProductDetailPage = () => {
                 <div className="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center">
                   <Truck className="w-4 h-4 text-primary-600" />
                 </div>
-                <span className="text-xs font-medium text-gray-600">Livraison gratuite</span>
+                <span className="text-xs font-medium text-gray-600">Livraison offerte dès 300 DH</span>
               </div>
               <div className="flex flex-col items-center gap-2 p-3 bg-green-50/40 rounded-xl text-center">
                 <div className="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
                   <Shield className="w-4 h-4 text-green-600" />
                 </div>
-                <span className="text-xs font-medium text-gray-600">Garantie 2 ans</span>
+                <span className="text-xs font-medium text-gray-600">Produits authentiques</span>
               </div>
               <div className="flex flex-col items-center gap-2 p-3 bg-orange-50/40 rounded-xl text-center">
                 <div className="w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center">
                   <RefreshCw className="w-4 h-4 text-orange-500" />
                 </div>
-                <span className="text-xs font-medium text-gray-600">Retours 30 jours</span>
+                <span className="text-xs font-medium text-gray-600">Retour sous 7 jours</span>
               </div>
             </div>
           </div>

@@ -66,15 +66,16 @@ export default function ImageUploader({
         // Resize before upload
         const optimized = await resizeImage(file);
 
-        const url = await storageService.uploadFile(
-          optimized,
-          `${folder}/${Date.now()}-${i}.jpg`,
-          (progress) => {
+        const [category, entityId] = String(folder).split('/');
+        const url = await storageService.uploadFile(optimized, {
+          category,
+          entityId: entityId || 'new',
+          onProgress: (progress) => {
             setUploading(prev =>
               prev.map(u => u.id === entry.id ? { ...u, progress } : u)
             );
-          }
-        );
+          },
+        });
         newUrls.push(url);
       } catch (err) {
         console.error('Upload failed:', err);

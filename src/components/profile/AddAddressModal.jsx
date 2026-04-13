@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import useModal from '../../hooks/useModal';
+import { CANONICAL_COUNTRY, normalizeMoroccanPhone } from '../../utils/morocco';
 
 const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) => {
   useModal(isOpen, onClose);
@@ -10,7 +11,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
     address: '',
     city: '',
     postalCode: '',
-    country: 'France',
+    country: CANONICAL_COUNTRY,
     phone: ''
   });
   
@@ -27,7 +28,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
         address: editingAddress.address || '',
         city: editingAddress.city || '',
         postalCode: editingAddress.postalCode || '',
-        country: editingAddress.country || 'France',
+        country: CANONICAL_COUNTRY,
         phone: editingAddress.phone || ''
       });
     } else {
@@ -38,7 +39,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
         address: '',
         city: '',
         postalCode: '',
-        country: 'France',
+        country: CANONICAL_COUNTRY,
         phone: ''
       });
     }
@@ -78,7 +79,9 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
       
       case 'phone':
         if (!value.trim()) return 'Le numéro de téléphone est requis';
-        if (!/^[\+]?[0-9\s\-\(\)]{10,}$/.test(value.trim())) return 'Le numéro de téléphone n\'est pas valide';
+        if (!normalizeMoroccanPhone(value).valid) {
+          return 'Numéro marocain invalide (ex. 06 12 34 56 78 ou +212 6 12 34 56 78)';
+        }
         return '';
       
       default:
@@ -135,10 +138,18 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
+      // Normalise the phone to +212… on save. Country is already pinned to the
+      // canonical Moroccan value; the backend enforces both again.
+      const phoneResult = normalizeMoroccanPhone(formData.phone);
+      const payload = {
+        ...formData,
+        country: CANONICAL_COUNTRY,
+        phone: phoneResult.valid ? phoneResult.normalized : formData.phone,
+      };
       if (editingAddress) {
-        onUpdate(formData);
+        onUpdate(payload);
       } else {
-        onAdd(formData);
+        onAdd(payload);
       }
       handleClose();
     }
@@ -152,7 +163,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
       address: '',
       city: '',
       postalCode: '',
-      country: 'France',
+      country: CANONICAL_COUNTRY,
       phone: ''
     });
     setErrors({});
@@ -238,10 +249,10 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
               </div>
             </div>
 
-            {/* Phone */}
+            {/* Phone — Moroccan numbers only */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Téléphone *
+                Téléphone (Maroc) *
               </label>
               <input
                 type="tel"
@@ -250,10 +261,16 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={`input ${errors.phone && touched.phone ? 'border-red-300 focus:border-red-500' : ''}`}
-                placeholder="06 12 34 56 78"
+                placeholder="06 12 34 56 78 ou +212 6 12 34 56 78"
+                autoComplete="tel-national"
+                inputMode="tel"
               />
-              {errors.phone && touched.phone && (
+              {errors.phone && touched.phone ? (
                 <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+              ) : (
+                <p className="mt-1 text-xs text-gray-500">
+                  Numéro marocain uniquement — mobile (06/07) ou fixe (05).
+                </p>
               )}
             </div>
 
@@ -289,7 +306,7 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
                   onChange={handleChange}
                   onBlur={handleBlur}
                   className={`input ${errors.city && touched.city ? 'border-red-300 focus:border-red-500' : ''}`}
-                  placeholder="Paris"
+                  placeholder="Casablanca"
                 />
                 {errors.city && touched.city && (
                   <p className="mt-1 text-sm text-red-600">{errors.city}</p>
@@ -307,7 +324,8 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
                   onChange={handleChange}
                   onBlur={handleBlur}
                   className={`input ${errors.postalCode && touched.postalCode ? 'border-red-300 focus:border-red-500' : ''}`}
-                  placeholder="75001"
+                  placeholder="20000"
+                  inputMode="numeric"
                 />
                 {errors.postalCode && touched.postalCode && (
                   <p className="mt-1 text-sm text-red-600">{errors.postalCode}</p>
@@ -315,24 +333,22 @@ const AddAddressModal = ({ isOpen, onClose, onAdd, editingAddress, onUpdate }) =
               </div>
             </div>
 
-            {/* Country */}
+            {/* Country — locked to Morocco (our only delivery zone) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Pays
               </label>
-              <select
+              <input
+                type="text"
                 name="country"
-                value={formData.country}
-                onChange={handleChange}
-                className="select"
-              >
-                <option value="France">France</option>
-                <option value="Belgique">Belgique</option>
-                <option value="Suisse">Suisse</option>
-                <option value="Luxembourg">Luxembourg</option>
-                <option value="Canada">Canada</option>
-                <option value="Autre">Autre</option>
-              </select>
+                value={CANONICAL_COUNTRY}
+                readOnly
+                aria-readonly="true"
+                className="input bg-gray-50 text-gray-700 cursor-not-allowed"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Livraison disponible uniquement au Maroc.
+              </p>
             </div>
 
             {/* Action Buttons */}

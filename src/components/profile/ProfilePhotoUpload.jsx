@@ -1,12 +1,16 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import storageService from '../../services/storageService';
 import toast from 'react-hot-toast';
 import { Camera, Trash2, User } from 'lucide-react';
 
 const ProfilePhotoUpload = ({ currentPhotoURL, onPhotoChange, isLoading }) => {
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const [previewURL, setPreviewURL] = useState(currentPhotoURL);
+
+  useEffect(() => {
+    setPreviewURL(currentPhotoURL);
+  }, [currentPhotoURL]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
@@ -76,8 +80,8 @@ const ProfilePhotoUpload = ({ currentPhotoURL, onPhotoChange, isLoading }) => {
       
       // Upload to Firebase Storage
       const downloadURL = await storageService.uploadProfilePhoto(
-        compressedFile, 
-        user.uid,
+        compressedFile,
+        user.firebaseUid,
         (progress) => setUploadProgress(progress)
       );
       
@@ -94,25 +98,19 @@ const ProfilePhotoUpload = ({ currentPhotoURL, onPhotoChange, isLoading }) => {
   };
 
   const handleRemovePhoto = async () => {
+    setPreviewURL('');
+    onPhotoChange('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     try {
-      // Delete from Firebase Storage if there's an existing photo
-      if (currentPhotoURL && currentPhotoURL.startsWith('https://')) {
-        await storageService.deleteProfilePhoto(currentPhotoURL);
-      }
-      
-      setPreviewURL('');
-      onPhotoChange('');
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      await updateProfile({ photoURL: '' });
+      toast.success('Photo supprimée');
     } catch (error) {
       console.error('Error removing photo:', error);
-      // Still remove from UI even if storage deletion fails
-      setPreviewURL('');
-      onPhotoChange('');
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      toast.error('Erreur lors de la suppression');
+      setPreviewURL(currentPhotoURL);
+      onPhotoChange(currentPhotoURL);
     }
   };
 

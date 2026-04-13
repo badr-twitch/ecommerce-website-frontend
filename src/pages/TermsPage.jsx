@@ -139,17 +139,17 @@ const TermsPage = () => {
                   <ul className="list-disc list-inside space-y-2 ml-4">
                     <li>Toutes les commandes sont soumises à notre acceptation</li>
                     <li>Nous nous réservons le droit de refuser ou d'annuler toute commande</li>
-                    <li>Les prix sont indiqués en euros (EUR) ou dirhams marocains (MAD) selon votre localisation</li>
+                    <li>Les prix sont indiqués en dirhams marocains (MAD)</li>
                     <li>Les prix peuvent être modifiés à tout moment sans préavis</li>
                   </ul>
                 </div>
                 <div className="mt-4">
                   <h3 className="font-semibold text-gray-900 mb-2">Paiement :</h3>
                   <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>Les paiements sont traités de manière sécurisée via nos prestataires de paiement</li>
-                    <li>Nous acceptons les cartes bancaires et autres méthodes de paiement indiquées sur le site</li>
-                    <li>Votre commande ne sera traitée qu'après confirmation du paiement</li>
-                    <li>En cas de problème de paiement, votre commande peut être annulée</li>
+                    <li>Nous acceptons le paiement à la livraison et le paiement par carte bancaire</li>
+                    <li>Les paiements en ligne sont traités de manière sécurisée via nos prestataires</li>
+                    <li>Votre commande est confirmée après validation du paiement ou de la commande en espèces</li>
+                    <li>En cas de problème de paiement, votre commande peut être annulée sans frais</li>
                   </ul>
                 </div>
               </div>

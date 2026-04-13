@@ -1,7 +1,17 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Star, Upload, X, Camera } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 import api from '../../services/api';
+
+const ALLOWED_REVIEW_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const MAX_REVIEW_FILE_BYTES = 10 * 1024 * 1024;
+const S3_PUBLIC_BASE = (
+  import.meta.env.VITE_AWS_S3_PUBLIC_BASE ||
+  (import.meta.env.VITE_AWS_S3_BUCKET && import.meta.env.VITE_AWS_REGION
+    ? `https://${import.meta.env.VITE_AWS_S3_BUCKET}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com`
+    : '')
+).replace(/\/$/, '');
 
 const ReviewForm = ({ productId, productName, onSubmit, onCancel, existingReview = null }) => {
   const [formData, setFormData] = useState({
@@ -15,6 +25,7 @@ const ReviewForm = ({ productId, productName, onSubmit, onCancel, existingReview
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hoveredRating, setHoveredRating] = useState(0);
+  const submittingRef = useRef(false);
 
   // Available tags for reviews
   const availableTags = [
@@ -53,25 +64,27 @@ const ReviewForm = ({ productId, productName, onSubmit, onCancel, existingReview
   const handleFileUpload = useCallback((e) => {
     const files = Array.from(e.target.files);
     const validFiles = files.filter(file => {
-      const isValidType = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4'].includes(file.type);
-      const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB limit
-      
+      const isValidType = ALLOWED_REVIEW_MIME.includes(file.type);
+      const isValidSize = file.size <= MAX_REVIEW_FILE_BYTES;
+
       if (!isValidType) {
-        toast.error(`${file.name} n'est pas un type de fichier supporté`);
+        toast.error(`${file.name} : format non supporté (JPG, PNG, WebP ou GIF uniquement)`);
         return false;
       }
-      
+
       if (!isValidSize) {
-        toast.error(`${file.name} est trop volumineux (max 10MB)`);
+        toast.error(`${file.name} est trop volumineux (max 10 Mo)`);
         return false;
       }
-      
+
       return true;
     });
 
     if (validFiles.length > 0) {
       setUploadedFiles(prev => [...prev, ...validFiles]);
     }
+    // Allow re-selecting the same file after removal
+    e.target.value = '';
   }, []);
 
   // Remove uploaded file
@@ -84,27 +97,38 @@ const ReviewForm = ({ productId, productName, onSubmit, onCancel, existingReview
     setMediaFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Upload files to storage
+  // Upload files via S3 presigned PUT (matches /api/uploads/presign contract)
   const uploadFiles = async () => {
     if (uploadedFiles.length === 0) return [];
+    if (!S3_PUBLIC_BASE) {
+      // Fail loudly: do NOT silently submit a review missing the photos the user attached.
+      const msg = "L'envoi de photos n'est pas configuré. Retirez les photos pour publier l'avis, ou contactez le support.";
+      toast.error(msg, { duration: 6000 });
+      throw new Error('S3_PUBLIC_BASE_MISSING');
+    }
 
     const uploadPromises = uploadedFiles.map(async (file) => {
       try {
-        // Create FormData for file upload
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        // Upload to your storage service
-        const response = await api.post('/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+        const presign = await api.post('/uploads/presign', {
+          category: 'reviews',
+          entityId: String(productId),
+          filename: file.name,
+          contentType: file.type,
+          size: file.size,
         });
-        
-        return response.data.url;
+        const { uploadUrl, key } = presign.data;
+        if (!uploadUrl || !key) throw new Error('Presign response invalide');
+
+        // Bare axios — do not send Authorization header to S3
+        await axios.put(uploadUrl, file, {
+          headers: { 'Content-Type': file.type },
+          transformRequest: [(data) => data],
+        });
+
+        return `${S3_PUBLIC_BASE}/${key}`;
       } catch (error) {
         console.error('File upload failed:', error);
-        toast.error(`Échec de l'upload de ${file.name}`);
+        toast.error(`Échec de l'envoi de ${file.name}`);
         return null;
       }
     });
@@ -116,7 +140,10 @@ const ReviewForm = ({ productId, productName, onSubmit, onCancel, existingReview
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    // Atomic guard against double-submit (faster than state update propagation)
+    if (submittingRef.current || loading) return;
+
     // Validation
     if (!formData.title.trim()) {
       toast.error('Veuillez ajouter un titre à votre avis');
@@ -143,49 +170,49 @@ const ReviewForm = ({ productId, productName, onSubmit, onCancel, existingReview
       return;
     }
 
+    submittingRef.current = true;
     setLoading(true);
-    
+
     try {
       // Upload files first
       const newMediaUrls = await uploadFiles();
       const allMediaUrls = [...mediaFiles, ...newMediaUrls];
-      
-      // Prepare review data
+
+      // productId is a UUID server-side — never coerce with parseInt
       const reviewData = {
         ...formData,
         mediaUrls: allMediaUrls,
-        productId: parseInt(productId)
+        productId
       };
-      
+
       if (existingReview) {
-        // Update existing review
         await api.put(`/reviews/${existingReview.id}`, reviewData);
         toast.success('Avis mis à jour avec succès');
       } else {
-        // Create new review
         await api.post('/reviews', reviewData);
         toast.success('Avis soumis avec succès et en attente de modération');
       }
-      
-      // Reset form
-      setFormData({
-        title: '',
-        content: '',
-        rating: 0,
-        tags: []
-      });
+
+      setFormData({ title: '', content: '', rating: 0, tags: [] });
       setMediaFiles([]);
       setUploadedFiles([]);
-      
-      // Call parent callback
-      if (onSubmit) {
-        onSubmit();
-      }
-      
+
+      if (onSubmit) onSubmit();
     } catch (error) {
       console.error('Review submission failed:', error);
-      toast.error(error.response?.data?.error || 'Erreur lors de la soumission de l\'avis');
+      // S3 misconfig already toasted in uploadFiles — don't double-toast a generic error
+      if (error?.message === 'S3_PUBLIC_BASE_MISSING') {
+        // no-op; uploadFiles already informed the user
+      } else {
+        const code = error.response?.data?.code;
+        if (code === 'PURCHASE_REQUIRED') {
+          toast.error(error.response.data.error, { duration: 6000 });
+        } else {
+          toast.error(error.response?.data?.error || 'Erreur lors de la soumission de l\'avis');
+        }
+      }
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };
@@ -351,7 +378,7 @@ const ReviewForm = ({ productId, productName, onSubmit, onCancel, existingReview
             <input
               type="file"
               multiple
-              accept="image/*,video/mp4"
+              accept="image/jpeg,image/png,image/webp,image/gif"
               onChange={handleFileUpload}
               className="hidden"
               id="media-upload"
@@ -359,10 +386,10 @@ const ReviewForm = ({ productId, productName, onSubmit, onCancel, existingReview
             <label htmlFor="media-upload" className="cursor-pointer">
               <Camera className="mx-auto h-12 w-12 text-gray-400 mb-4" />
               <p className="text-sm text-gray-600">
-                Cliquez pour ajouter des photos ou vidéos
+                Cliquez pour ajouter des photos
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                JPG, PNG, WebP, MP4 (max 10MB par fichier)
+                JPG, PNG, WebP, GIF · 10 Mo max par fichier
               </p>
             </label>
           </div>

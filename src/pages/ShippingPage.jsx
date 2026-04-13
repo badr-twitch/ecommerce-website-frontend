@@ -1,40 +1,34 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Rocket, Store, Truck, Clock, MapPin, FileText, Home, Phone, AlertTriangle } from 'lucide-react';
+import { Package, Banknote, Gift, Truck, Clock, MapPin, FileText, Home, Phone, AlertTriangle } from 'lucide-react';
 
 const ShippingPage = () => {
-  const shippingOptions = [
+  const highlights = [
     {
-      name: 'Livraison Standard',
-      price: '4,99€',
-      freeThreshold: 'Gratuite dès 50€',
-      duration: '3-5 jours ouvrés',
-      description: 'Livraison à domicile ou en point relais',
-      icon: Package
+      name: 'Livraison partout au Maroc',
+      tag: '2 à 5 jours ouvrés',
+      description: 'Nous livrons dans toutes les grandes villes et régions du Royaume.',
+      icon: Truck
     },
     {
-      name: 'Livraison Express',
-      price: '9,99€',
-      freeThreshold: 'Gratuite pour UMOD Prime',
-      duration: '24-48h',
-      description: 'Livraison rapide à domicile uniquement',
-      icon: Rocket
+      name: 'Livraison gratuite dès 300 DH',
+      tag: 'Offerte automatiquement',
+      description: 'Dès que votre panier atteint 300 DH, la livraison devient gratuite.',
+      icon: Gift
     },
     {
-      name: 'Livraison Point Relais',
-      price: 'Gratuite',
-      freeThreshold: 'Toujours gratuite',
-      duration: '3-5 jours ouvrés',
-      description: 'Retrait dans un point relais près de chez vous',
-      icon: Store
+      name: 'Paiement à la livraison',
+      tag: 'Ou par carte bancaire',
+      description: 'Réglez votre commande à la réception, en espèces, ou en ligne par carte.',
+      icon: Banknote
     }
   ];
 
   const steps = [
-    { step: 1, title: 'Commande validée', description: 'Vous recevez un email de confirmation' },
-    { step: 2, title: 'Préparation', description: 'Votre commande est préparée dans nos entrepôts' },
-    { step: 3, title: 'Expédition', description: 'Vous recevez un email avec le numéro de suivi' },
-    { step: 4, title: 'Livraison', description: 'Votre colis arrive à l\'adresse indiquée' }
+    { step: 1, title: 'Commande validée', description: 'Vous recevez un email de confirmation avec le récapitulatif de votre commande.' },
+    { step: 2, title: 'Préparation', description: 'Nous préparons vos produits avec soin sous 24 à 48h ouvrées.' },
+    { step: 3, title: 'Expédition', description: 'Votre commande part vers votre adresse et vous recevez un email de suivi.' },
+    { step: 4, title: 'Livraison', description: 'Vous êtes contacté(e) avant la livraison, puis votre colis vous est remis.' }
   ];
 
   return (
@@ -49,13 +43,13 @@ const ShippingPage = () => {
       {/* Header Section */}
       <section className="relative overflow-hidden py-20 bg-gradient-to-r from-primary-600 via-secondary-600 to-pink-600">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-600/90 via-secondary-600/90 to-pink-600/90"></div>
-        
+
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
           <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
           <div className="absolute bottom-20 right-20 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
           <div className="absolute top-1/2 right-1/4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
         </div>
-        
+
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center">
             <div className="inline-block mb-6">
@@ -67,56 +61,79 @@ const ShippingPage = () => {
               Livraison
             </h1>
             <p className="text-xl md:text-2xl text-primary-100 max-w-2xl mx-auto leading-relaxed">
-              Options de livraison rapides et sécurisées partout en France
+              Livraison rapide et soignée partout au Maroc
             </p>
           </div>
         </div>
       </section>
 
-      {/* Shipping Options */}
+      {/* Highlights */}
       <section className="py-16 relative z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-4">
-              Options de Livraison
+              Comment ça se passe
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Choisissez l'option qui vous convient le mieux
+              Une livraison simple, transparente et pensée pour les clientes et clients marocains.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {shippingOptions.map((option, index) => (
-              <div 
+            {highlights.map((item, index) => (
+              <div
                 key={index}
                 className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-gray-200/50 transform hover:-translate-y-2 transition-all duration-300"
               >
                 <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                  <option.icon className="w-8 h-8 text-white" />
+                  <item.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
-                  {option.name}
+                <h3 className="text-2xl font-bold text-gray-900 mb-3 text-center">
+                  {item.name}
                 </h3>
-                <div className="text-center mb-6">
-                  <div className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-2">
-                    {option.price}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {option.freeThreshold}
-                  </div>
+                <div className="text-center mb-4">
+                  <span className="inline-block px-3 py-1 bg-primary-50 text-primary-700 text-sm font-semibold rounded-full">
+                    {item.tag}
+                  </span>
                 </div>
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-center text-gray-700">
-                    <Clock className="w-4 h-4 mr-2 flex-shrink-0" />
-                    <strong>Délai :</strong> <span className="ml-2">{option.duration}</span>
-                  </div>
-                  <div className="flex items-start text-gray-700">
-                    <MapPin className="w-4 h-4 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>{option.description}</span>
-                  </div>
-                </div>
+                <p className="text-gray-600 text-center leading-relaxed">
+                  {item.description}
+                </p>
               </div>
             ))}
+          </div>
+
+          {/* Delivery pricing row */}
+          <div className="mt-10 bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-gray-200/50">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div className="p-4">
+                <div className="flex items-center justify-center text-gray-500 mb-2">
+                  <MapPin className="w-4 h-4 mr-2" />
+                  <span className="text-sm font-medium">Zone de livraison</span>
+                </div>
+                <p className="text-lg font-bold text-gray-900">Tout le Maroc</p>
+              </div>
+              <div className="p-4">
+                <div className="flex items-center justify-center text-gray-500 mb-2">
+                  <Clock className="w-4 h-4 mr-2" />
+                  <span className="text-sm font-medium">Délai standard</span>
+                </div>
+                <p className="text-lg font-bold text-gray-900">2 à 5 jours ouvrés</p>
+              </div>
+              <div className="p-4">
+                <div className="flex items-center justify-center text-gray-500 mb-2">
+                  <Truck className="w-4 h-4 mr-2" />
+                  <span className="text-sm font-medium">Frais de livraison</span>
+                </div>
+                <p className="text-lg font-bold text-gray-900">
+                  Gratuite dès 300 DH
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {/* TODO : confirmer le tarif exact sous 300 DH */}
+                  Sous 300 DH : tarif indiqué au checkout
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -126,16 +143,16 @@ const ShippingPage = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-4">
-              Processus de Livraison
+              De la commande à la réception
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              De la commande à la réception, suivez votre colis étape par étape
+              Quatre étapes claires, un suivi par email à chaque moment clé.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {steps.map((item, index) => (
-              <div 
+              <div
                 key={index}
                 className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-lg text-center transform hover:-translate-y-1 transition-all duration-300"
               >
@@ -159,15 +176,15 @@ const ShippingPage = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 border border-gray-200/50 space-y-6">
             <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-6">
-              Informations Importantes
+              Informations importantes
             </h2>
-            
+
             <div className="space-y-4 text-gray-700">
               <div className="flex items-start">
                 <FileText className="w-6 h-6 mr-3 flex-shrink-0 text-primary-600" />
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Suivi de commande</h3>
-                  <p>Une fois votre commande expédiée, vous recevrez un email avec un numéro de suivi. Vous pouvez suivre votre colis en temps réel depuis votre compte ou via le lien fourni.</p>
+                  <p>Dès l'expédition, vous recevez un email avec les informations de suivi. Vous pouvez également retrouver votre commande à tout moment depuis votre compte, rubrique « Mes commandes ».</p>
                 </div>
               </div>
 
@@ -175,15 +192,15 @@ const ShippingPage = () => {
                 <Home className="w-6 h-6 mr-3 flex-shrink-0 text-primary-600" />
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Adresse de livraison</h3>
-                  <p>Assurez-vous que l'adresse de livraison est correcte. En cas d'erreur, contactez-nous immédiatement. Les modifications d'adresse après expédition peuvent entraîner des frais supplémentaires.</p>
+                  <p>Vérifiez bien votre adresse et votre numéro de téléphone avant de valider votre commande. En cas d'erreur, contactez-nous le plus vite possible : nous essayons toujours de corriger l'expédition avant le départ du colis.</p>
                 </div>
               </div>
 
               <div className="flex items-start">
                 <Phone className="w-6 h-6 mr-3 flex-shrink-0 text-primary-600" />
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Absence lors de la livraison</h3>
-                  <p>Si vous êtes absent, le transporteur laissera un avis de passage. Vous pourrez reprogrammer la livraison ou récupérer votre colis au point relais indiqué.</p>
+                  <h3 className="font-semibold text-gray-900 mb-1">Contact avant livraison</h3>
+                  <p>Le livreur peut vous appeler avant le passage pour confirmer votre disponibilité. Assurez-vous que le numéro renseigné au checkout soit bien joignable.</p>
                 </div>
               </div>
 
@@ -191,7 +208,18 @@ const ShippingPage = () => {
                 <AlertTriangle className="w-6 h-6 mr-3 flex-shrink-0 text-primary-600" />
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Colis endommagé</h3>
-                  <p>Si votre colis arrive endommagé, refusez-le ou signalez-le immédiatement avec des photos. Nous organiserons un remplacement ou un remboursement.</p>
+                  <p>Si votre colis arrive visiblement abîmé, refusez-le ou prenez des photos avant d'ouvrir. Contactez-nous dans les 48h : nous organiserons un remplacement ou un remboursement selon le cas.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start">
+                <Package className="w-6 h-6 mr-3 flex-shrink-0 text-primary-600" />
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Transporteur</h3>
+                  <p>
+                    {/* TODO : préciser le transporteur exact une fois confirmé côté business */}
+                    Vos commandes sont confiées à un transporteur partenaire couvrant l'ensemble du territoire marocain.
+                  </p>
                 </div>
               </div>
             </div>
@@ -203,11 +231,11 @@ const ShippingPage = () => {
       <section className="py-12 relative z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="bg-gradient-to-r from-primary-600 to-secondary-600 rounded-3xl shadow-2xl p-8 md:p-12 text-white">
-            <h2 className="text-3xl font-bold mb-4">Besoin d'aide ?</h2>
+            <h2 className="text-3xl font-bold mb-4">Une question sur votre livraison ?</h2>
             <p className="text-xl text-primary-100 mb-8">
-              Notre équipe est disponible pour répondre à toutes vos questions sur la livraison
+              Notre équipe est disponible pour vous répondre du lundi au samedi.
             </p>
-            <Link 
+            <Link
               to="/contact"
               className="inline-block px-8 py-4 bg-white text-primary-600 hover:bg-primary-50 font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
@@ -221,4 +249,3 @@ const ShippingPage = () => {
 };
 
 export default ShippingPage;
-

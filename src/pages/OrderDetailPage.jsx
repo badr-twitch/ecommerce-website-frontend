@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { ordersAPI } from '../services/api';
 import storageService from '../services/storageService';
+import SignedImage from '../components/common/SignedImage';
 import { OrderStatus } from '../components/orders';
 import OrderActivityFeed from '../components/orders/OrderActivityFeed';
 import {
@@ -164,11 +165,36 @@ const OrderDetailPage = () => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
 
+    const MAX_PROOFS = 5;
+    const MAX_SIZE_BYTES = 10 * 1024 * 1024;
+    const remaining = MAX_PROOFS - refundProofImages.length;
+    if (remaining <= 0) {
+      toast.error(`Maximum ${MAX_PROOFS} photos`);
+      e.target.value = '';
+      return;
+    }
+    const accepted = files.slice(0, remaining);
+    for (const file of accepted) {
+      if (!file.type.startsWith('image/')) {
+        toast.error(`Fichier non supporte : ${file.name}`);
+        e.target.value = '';
+        return;
+      }
+      if (file.size > MAX_SIZE_BYTES) {
+        toast.error(`Photo trop volumineuse (max 10 Mo) : ${file.name}`);
+        e.target.value = '';
+        return;
+      }
+    }
+    if (files.length > remaining) {
+      toast.error(`Seulement ${remaining} photo(s) restante(s), les autres ont ete ignorees`);
+    }
+
     setUploadingProof(true);
     try {
-      for (const file of files) {
-        const url = await storageService.uploadFile(file, `refund-proofs/${id}/${file.name}`);
-        setRefundProofImages(prev => [...prev, url]);
+      for (const file of accepted) {
+        const key = await storageService.uploadRefundProof(file, id);
+        setRefundProofImages(prev => [...prev, key]);
       }
       toast.success('Photo(s) ajoutee(s)');
     } catch (error) {
@@ -606,9 +632,23 @@ const OrderDetailPage = () => {
                   <span className="text-sm font-medium text-gray-700">Photos :</span>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {order.refundProofImages.map((img, i) => (
-                      <a key={i} href={img} target="_blank" rel="noopener noreferrer">
-                        <img src={img} alt={`Preuve ${i + 1}`} className="w-20 h-20 object-cover rounded-lg border border-orange-200" />
-                      </a>
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            const url = /^(https?:|blob:|data:)/i.test(img)
+                              ? img
+                              : await storageService.fetchSignedUrl(img);
+                            window.open(url, '_blank', 'noopener,noreferrer');
+                          } catch {
+                            toast.error("Impossible d'ouvrir la photo");
+                          }
+                        }}
+                        className="block focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-lg"
+                      >
+                        <SignedImage src={img} alt={`Preuve ${i + 1}`} className="w-20 h-20 object-cover rounded-lg border border-orange-200" />
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -680,7 +720,7 @@ const OrderDetailPage = () => {
               <div className="flex flex-wrap gap-2 mb-2">
                 {refundProofImages.map((img, i) => (
                   <div key={i} className="relative group">
-                    <img src={img} alt={`Preuve ${i + 1}`} className="w-20 h-20 object-cover rounded-lg border border-gray-200" />
+                    <SignedImage src={img} alt={`Preuve ${i + 1}`} className="w-20 h-20 object-cover rounded-lg border border-gray-200" />
                     <button
                       type="button"
                       onClick={() => handleRemoveProofImage(i)}

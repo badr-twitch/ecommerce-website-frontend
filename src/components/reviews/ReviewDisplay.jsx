@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Star, ThumbsUp, ThumbsDown, CheckCircle, MessageCircle, Plus } from 'lucide-react';
+import { Star, ThumbsUp, ThumbsDown, CheckCircle, MessageCircle, Plus, Lock, ShoppingBag } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import ReviewForm from './ReviewForm';
@@ -15,6 +16,7 @@ const ReviewDisplay = ({ productId, productName, productImage }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [sortBy, setSortBy] = useState('newest');
   const [filterRating, setFilterRating] = useState('');
+  const [eligibility, setEligibility] = useState(null); // { canReview, hasPurchased, hasReviewed, reason }
 
   // Fetch reviews and summary
   const fetchReviews = useCallback(async (page = 1, sort = 'newest', rating = '') => {
@@ -107,6 +109,86 @@ const ReviewDisplay = ({ productId, productName, productImage }) => {
   useEffect(() => {
     fetchReviews();
   }, [fetchReviews]);
+
+  // Load eligibility whenever user or product changes
+  useEffect(() => {
+    let cancelled = false;
+    if (!user) {
+      setEligibility(null);
+      return () => { cancelled = true; };
+    }
+    (async () => {
+      try {
+        const res = await api.get(`/reviews/product/${productId}/eligibility`);
+        if (!cancelled && res.data?.success) setEligibility(res.data.data);
+      } catch (err) {
+        if (!cancelled) setEligibility(null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user, productId]);
+
+  // Refresh eligibility after a review is submitted (so the button hides immediately)
+  const handleReviewSubmittedWithRefresh = useCallback(async () => {
+    handleReviewSubmitted();
+    if (user) {
+      try {
+        const res = await api.get(`/reviews/product/${productId}/eligibility`);
+        if (res.data?.success) setEligibility(res.data.data);
+      } catch (_) { /* non-blocking */ }
+    }
+  }, [handleReviewSubmitted, user, productId]);
+
+  // Render the contextual CTA based on eligibility
+  const renderReviewCta = () => {
+    if (!user) {
+      return (
+        <Link
+          to="/login"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+        >
+          <Lock className="w-4 h-4" />
+          Connectez-vous pour laisser un avis
+        </Link>
+      );
+    }
+    if (!eligibility) {
+      return (
+        <button
+          disabled
+          className="inline-flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-500 rounded-lg cursor-wait"
+        >
+          <Plus className="w-4 h-4" />
+          Vérification…
+        </button>
+      );
+    }
+    if (eligibility.hasReviewed) {
+      return (
+        <div className="text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+          <CheckCircle className="w-4 h-4 inline mr-1.5 text-green-600" />
+          Vous avez déjà publié un avis pour ce produit.
+        </div>
+      );
+    }
+    if (!eligibility.hasPurchased) {
+      return (
+        <div className="text-sm text-gray-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 max-w-sm">
+          <ShoppingBag className="w-4 h-4 inline mr-1.5 text-amber-600" />
+          Seuls les clients ayant acheté ce produit peuvent laisser un avis. Une fois votre commande livrée, vous pourrez partager votre expérience.
+        </div>
+      );
+    }
+    return (
+      <button
+        onClick={() => setShowReviewForm(true)}
+        className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+      >
+        <Plus className="w-4 h-4" />
+        Laisser un avis
+      </button>
+    );
+  };
 
   // Render star rating
   const renderStars = (rating, size = 'md') => {
@@ -206,17 +288,11 @@ const ReviewDisplay = ({ productId, productName, productImage }) => {
           </div>
 
           <div className="flex flex-col items-end gap-3">
-            <button
-              onClick={() => setShowReviewForm(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Laisser un avis
-            </button>
-            
+            {renderReviewCta()}
+
             <div className="text-right">
               <div className="text-sm text-gray-600">Partagez votre expérience</div>
-              <div className="text-xs text-gray-500">Aidez d'autres clients</div>
+              <div className="text-xs text-gray-500">Avis vérifiés, par des acheteurs réels</div>
             </div>
           </div>
         </div>
@@ -229,7 +305,7 @@ const ReviewDisplay = ({ productId, productName, productImage }) => {
             <ReviewForm
               productId={productId}
               productName={productName}
-              onSubmit={handleReviewSubmitted}
+              onSubmit={handleReviewSubmittedWithRefresh}
               onCancel={() => setShowReviewForm(false)}
             />
           </div>
@@ -380,13 +456,9 @@ const ReviewDisplay = ({ productId, productName, productImage }) => {
             <p className="text-gray-600 mb-4">
               Soyez le premier à partager votre expérience avec ce produit !
             </p>
-            <button
-              onClick={() => setShowReviewForm(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Laisser un avis
-            </button>
+            <div className="flex justify-center">
+              {renderReviewCta()}
+            </div>
           </div>
         )}
 

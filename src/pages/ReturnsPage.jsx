@@ -1,35 +1,35 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { RotateCcw, CheckCircle, XCircle, RefreshCw, DollarSign, AlertTriangle, Phone } from 'lucide-react';
+import { RotateCcw, CheckCircle, XCircle, RefreshCw, Banknote, AlertTriangle, Phone, ShieldAlert } from 'lucide-react';
 
 const ReturnsPage = () => {
   const returnSteps = [
-    { step: 1, title: 'Connectez-vous', description: 'Accédez à votre compte et allez dans "Mes commandes"' },
-    { step: 2, title: 'Sélectionnez', description: 'Choisissez la commande et les articles à retourner' },
-    { step: 3, title: 'Imprimez l\'étiquette', description: 'Téléchargez et imprimez l\'étiquette de retour gratuite' },
-    { step: 4, title: 'Expédiez', description: 'Collez l\'étiquette sur votre colis et déposez-le en point relais' },
-    { step: 5, title: 'Remboursement', description: 'Une fois reçu, votre remboursement est traité sous 5-10 jours' }
+    { step: 1, title: 'Contactez-nous', description: 'Écrivez-nous dans les 7 jours suivant la réception pour signaler votre demande de retour.' },
+    { step: 2, title: 'Validation', description: 'Nous vérifions ensemble l\'éligibilité du produit et les conditions du retour.' },
+    { step: 3, title: 'Renvoi du colis', description: 'Vous nous renvoyez le produit dans son emballage d\'origine, non ouvert et non utilisé.' },
+    { step: 4, title: 'Contrôle', description: 'À réception, nous inspectons le produit pour confirmer qu\'il est en parfait état.' },
+    { step: 5, title: 'Remboursement', description: 'Le remboursement est déclenché sur votre moyen de paiement initial.' }
   ];
 
   const returnConditions = [
     {
       icon: CheckCircle,
-      title: 'Articles éligibles',
+      title: 'Produits éligibles',
       items: [
-        'Articles non utilisés et dans leur emballage d\'origine',
-        'Accessoires et documentation inclus',
-        'Étiquettes et emballages intacts',
-        'Aucun signe d\'usure ou de dommage'
+        'Produits non ouverts et non utilisés',
+        'Emballage et scellés d\'origine intacts',
+        'Tous les accessoires et notices inclus',
+        'Retour signalé dans les 7 jours après réception'
       ]
     },
     {
       icon: XCircle,
-      title: 'Articles non échangeables',
+      title: 'Produits non retournables',
       items: [
-        'Articles personnalisés ou sur mesure',
-        'Produits défectueux (remplacement direct)',
-        'Articles endommagés par le client',
-        'Produits périmés ou expirés'
+        'Produits ouverts, utilisés ou testés',
+        'Articles dont le scellé d\'hygiène est retiré',
+        'Produits abîmés par le client',
+        'Certains articles pour raisons d\'hygiène (maquillage appliqué, rouges à lèvres ouverts, soins en pot ouverts, etc.)'
       ]
     }
   ];
@@ -46,13 +46,13 @@ const ReturnsPage = () => {
       {/* Header Section */}
       <section className="relative overflow-hidden py-20 bg-gradient-to-r from-primary-600 to-primary-700">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-600/90 to-primary-700/90"></div>
-        
+
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
           <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
           <div className="absolute bottom-20 right-20 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
           <div className="absolute top-1/2 right-1/4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
         </div>
-        
+
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center">
             <div className="inline-block mb-6">
@@ -61,10 +61,10 @@ const ReturnsPage = () => {
               </div>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
-              Retours & Remboursements
+              Retours & remboursements
             </h1>
             <p className="text-xl md:text-2xl text-primary-100 max-w-2xl mx-auto leading-relaxed">
-              Politique de retour simple et gratuite
+              Une politique simple, adaptée aux produits cosmétiques
             </p>
           </div>
         </div>
@@ -77,39 +77,47 @@ const ReturnsPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="text-center p-6 bg-gradient-to-br from-primary-50 to-secondary-50 rounded-2xl">
                 <div className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent mb-2">
-                  14 jours
+                  7 jours
                 </div>
                 <div className="text-gray-600 font-medium">
-                  Délai de retour
+                  Délai pour signaler un retour
                 </div>
               </div>
               <div className="text-center p-6 bg-gradient-to-br from-primary-50 to-secondary-50 rounded-2xl">
                 <div className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent mb-2">
-                  Gratuit
+                  Non ouvert
                 </div>
                 <div className="text-gray-600 font-medium">
-                  Retour offert
+                  Produit dans son état d'origine
                 </div>
               </div>
               <div className="text-center p-6 bg-gradient-to-br from-primary-50 to-secondary-50 rounded-2xl">
                 <div className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent mb-2">
-                  5-10 jours
+                  Sécurisé
                 </div>
                 <div className="text-gray-600 font-medium">
-                  Remboursement
+                  Remboursement après contrôle
                 </div>
               </div>
             </div>
 
             <div className="space-y-4 text-gray-700 leading-relaxed text-lg">
               <p>
-                Vous disposez de <strong>14 jours calendaires</strong> à compter de la réception de votre commande 
-                pour retourner un article qui ne vous convient pas. Le retour est <strong>gratuit</strong> pour tous 
-                nos clients, et encore plus simple pour les membres UMOD Prime.
+                Les cosmétiques sont des produits sensibles : pour des raisons
+                d'hygiène et de sécurité, nous acceptons uniquement les retours de
+                produits <strong>non ouverts, non utilisés et en parfait état</strong>,
+                dans leur emballage d'origine avec tous les scellés intacts.
               </p>
               <p>
-                Une fois votre retour reçu et vérifié, le remboursement est effectué sur votre moyen de paiement 
-                initial sous <strong>5 à 10 jours ouvrés</strong>.
+                Vous disposez de <strong>7 jours calendaires</strong> à compter de la
+                réception de votre commande pour nous signaler votre demande de retour.
+                Passé ce délai, le retour ne pourra plus être accepté.
+              </p>
+              <p className="text-sm text-gray-500 italic">
+                {/* TODO : valider avec le business si certains produits (parfums scellés,
+                    coffrets non ouverts) peuvent faire exception ou non. */}
+                Certains articles peuvent ne pas être retournables pour des raisons
+                d'hygiène, même non ouverts. Cette information est précisée sur la fiche produit le cas échéant.
               </p>
             </div>
           </div>
@@ -121,16 +129,16 @@ const ReturnsPage = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent mb-4">
-              Comment Retourner un Article
+              Comment retourner un produit
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Processus simple en 5 étapes
+              Une procédure claire en 5 étapes
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
             {returnSteps.map((item, index) => (
-              <div 
+              <div
                 key={index}
                 className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-lg text-center transform hover:-translate-y-1 transition-all duration-300"
               >
@@ -154,7 +162,7 @@ const ReturnsPage = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {returnConditions.map((condition, index) => (
-              <div 
+              <div
                 key={index}
                 className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-gray-200/50"
               >
@@ -178,48 +186,63 @@ const ReturnsPage = () => {
         </div>
       </section>
 
-      {/* Exchange & Refund Info */}
+      {/* Hygiene & Refund Info */}
       <section className="py-16 relative z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-12 border border-gray-200/50 space-y-6">
             <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent mb-6">
-              Échange & Remboursement
+              Hygiène, remboursement & cas particuliers
             </h2>
-            
+
             <div className="space-y-6 text-gray-700">
+              <div className="bg-pink-50 p-6 rounded-xl border-l-4 border-pink-500">
+                <h3 className="font-bold text-gray-900 mb-2 flex items-center">
+                  <ShieldAlert className="w-5 h-5 mr-2" />
+                  Règles d'hygiène
+                </h3>
+                <p>
+                  Tout produit dont le scellé, l'opercule ou l'emballage d'hygiène a été
+                  retiré ne peut plus être repris, pour des raisons sanitaires. Merci
+                  de vérifier votre commande avant d'ouvrir les produits.
+                </p>
+              </div>
+
               <div className="bg-primary-50 p-6 rounded-xl border-l-4 border-primary-500">
                 <h3 className="font-bold text-gray-900 mb-2 flex items-center">
                   <RefreshCw className="w-5 h-5 mr-2" />
                   Échange
                 </h3>
                 <p>
-                  Vous souhaitez échanger un article contre une autre taille ou couleur ? 
-                  Contactez notre service client à <a href="mailto:contact@umod.fr" className="text-primary-600 hover:text-primary-700 font-semibold">contact@umod.fr</a>. 
-                  Nous organiserons l'échange rapidement.
+                  Un échange peut être envisagé uniquement si le produit reçu est
+                  différent de celui commandé, ou s'il présente un défaut à la
+                  réception. Contactez-nous avec des photos via la page{' '}
+                  <Link to="/contact" className="text-primary-600 hover:text-primary-700 font-semibold">Contact</Link>.
                 </p>
               </div>
 
               <div className="bg-green-50 p-6 rounded-xl border-l-4 border-green-500">
                 <h3 className="font-bold text-gray-900 mb-2 flex items-center">
-                  <DollarSign className="w-5 h-5 mr-2" />
+                  <Banknote className="w-5 h-5 mr-2" />
                   Remboursement
                 </h3>
                 <p>
-                  Le remboursement est effectué sur votre moyen de paiement initial (carte bancaire, PayPal, etc.) 
-                  sous 5 à 10 jours ouvrés après réception et vérification du retour. Vous recevrez un email de 
-                  confirmation une fois le remboursement traité.
+                  Une fois le retour réceptionné et contrôlé, le remboursement est
+                  effectué sur votre moyen de paiement initial. Pour une commande
+                  réglée à la livraison, nous conviendrons avec vous du mode de
+                  remboursement le plus adapté.
                 </p>
               </div>
 
               <div className="bg-yellow-50 p-6 rounded-xl border-l-4 border-yellow-500">
                 <h3 className="font-bold text-gray-900 mb-2 flex items-center">
                   <AlertTriangle className="w-5 h-5 mr-2" />
-                  Articles défectueux
+                  Produit défectueux ou erreur de préparation
                 </h3>
                 <p>
-                  Si vous recevez un article défectueux, contactez-nous immédiatement. Nous organiserons un 
-                  remplacement direct sans frais supplémentaires. Vous n'avez pas besoin de retourner l'article 
-                  défectueux dans ce cas.
+                  Si vous recevez un produit abîmé, défectueux ou différent de celui
+                  commandé, contactez-nous dans les 48h suivant la réception avec des
+                  photos. Nous prenons en charge le traitement de A à Z, sans frais
+                  supplémentaires de votre côté.
                 </p>
               </div>
             </div>
@@ -233,9 +256,9 @@ const ReturnsPage = () => {
           <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-3xl shadow-2xl p-8 md:p-12 text-white">
             <h2 className="text-3xl font-bold mb-4">Besoin d'aide pour un retour ?</h2>
             <p className="text-xl text-primary-100 mb-8">
-              Notre équipe est disponible pour vous accompagner dans votre démarche
+              Notre équipe vous accompagne pas à pas dans votre demande.
             </p>
-            <Link 
+            <Link
               to="/contact"
               className="inline-block px-8 py-4 bg-white text-primary-600 hover:bg-primary-50 font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
@@ -249,4 +272,3 @@ const ReturnsPage = () => {
 };
 
 export default ReturnsPage;
-

@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { MapPin, User, Mail, Phone, Building2, Truck } from 'lucide-react';
+import { CANONICAL_COUNTRY, normalizeMoroccanPhone } from '../../utils/morocco';
 
 const ShippingForm = ({ initialData, onSubmit }) => {
-  const [formData, setFormData] = useState(initialData);
+  const [formData, setFormData] = useState({
+    ...initialData,
+    country: CANONICAL_COUNTRY,
+  });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
@@ -25,7 +29,9 @@ const ShippingForm = ({ initialData, onSubmit }) => {
 
       case 'phone':
         if (!value.trim()) return 'Le numéro de téléphone est requis';
-        if (!/^[\+]?[0-9\s\-\(\)]{10,}$/.test(value.trim())) return 'Le numéro de téléphone n\'est pas valide';
+        if (!normalizeMoroccanPhone(value).valid) {
+          return 'Numéro marocain invalide (ex. 06 12 34 56 78 ou +212 6 12 34 56 78)';
+        }
         return '';
 
       case 'address':
@@ -96,7 +102,14 @@ const ShippingForm = ({ initialData, onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      onSubmit(formData);
+      // Normalise the phone to +212… and pin country to the canonical value.
+      // Backend enforces both again on order creation.
+      const phoneResult = normalizeMoroccanPhone(formData.phone);
+      onSubmit({
+        ...formData,
+        country: CANONICAL_COUNTRY,
+        phone: phoneResult.valid ? phoneResult.normalized : formData.phone,
+      });
     }
   };
 
@@ -182,7 +195,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
 
           <div>
             <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-              Téléphone *
+              Téléphone (Maroc) *
             </label>
             <input
               type="tel"
@@ -192,10 +205,16 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               onChange={handleChange}
               onBlur={handleBlur}
               className={inputClass('phone')}
-              placeholder="06 12 34 56 78"
+              placeholder="06 12 34 56 78 ou +212 6 12 34 56 78"
+              autoComplete="tel-national"
+              inputMode="tel"
             />
-            {errors.phone && touched.phone && (
+            {errors.phone && touched.phone ? (
               <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+            ) : (
+              <p className="mt-1 text-xs text-gray-500">
+                Numéro marocain uniquement — mobile (06/07) ou fixe (05).
+              </p>
             )}
           </div>
         </div>
@@ -250,7 +269,7 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               onChange={handleChange}
               onBlur={handleBlur}
               className={inputClass('city')}
-              placeholder="Paris"
+              placeholder="Casablanca"
             />
             {errors.city && touched.city && (
               <p className="mt-1 text-sm text-red-600">{errors.city}</p>
@@ -269,7 +288,8 @@ const ShippingForm = ({ initialData, onSubmit }) => {
               onChange={handleChange}
               onBlur={handleBlur}
               className={inputClass('postalCode')}
-              placeholder="75001"
+              placeholder="20000"
+              inputMode="numeric"
             />
             {errors.postalCode && touched.postalCode && (
               <p className="mt-1 text-sm text-red-600">{errors.postalCode}</p>
@@ -277,25 +297,23 @@ const ShippingForm = ({ initialData, onSubmit }) => {
           </div>
         </div>
 
-        {/* Country */}
+        {/* Country — locked to Morocco (our only delivery zone) */}
         <div>
           <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
             Pays
           </label>
-          <select
+          <input
+            type="text"
             id="country"
             name="country"
-            value={formData.country}
-            onChange={handleChange}
-            className="select cursor-pointer"
-          >
-            <option value="France">France</option>
-            <option value="Belgique">Belgique</option>
-            <option value="Suisse">Suisse</option>
-            <option value="Luxembourg">Luxembourg</option>
-            <option value="Canada">Canada</option>
-            <option value="Autre">Autre</option>
-          </select>
+            value={CANONICAL_COUNTRY}
+            readOnly
+            aria-readonly="true"
+            className="input bg-gray-50 text-gray-700 cursor-not-allowed"
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Livraison disponible uniquement au Maroc.
+          </p>
         </div>
 
         {/* Notes */}

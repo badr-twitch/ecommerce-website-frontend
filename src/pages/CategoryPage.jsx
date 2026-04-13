@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { categoriesAPI, productsAPI } from '../services/api';
+import { useAssistantContext } from '../contexts/AssistantContext';
 
 const CategoryPage = () => {
   const { slug } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { setPageContext, clearPageContext } = useAssistantContext();
 
   const [category, setCategory] = useState(null);
   const [products, setProducts] = useState([]);
@@ -57,6 +59,18 @@ const CategoryPage = () => {
     };
     load();
   }, [slug, fetchProducts]);
+
+  // Contribute safe page context to the shopping assistant — slug and display
+  // name only. No product list, no prices, no filters are exposed.
+  useEffect(() => {
+    if (!slug) return undefined;
+    setPageContext({
+      page: 'category',
+      categorySlug: String(slug),
+      ...(category?.name ? { categoryName: category.name } : {}),
+    });
+    return () => clearPageContext();
+  }, [slug, category?.name, setPageContext, clearPageContext]);
 
   const updateFilters = (newParams) => {
     const params = new URLSearchParams(searchParams);

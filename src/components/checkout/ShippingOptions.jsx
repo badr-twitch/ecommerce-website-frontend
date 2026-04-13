@@ -4,45 +4,29 @@ import { Truck, Zap, Award, Package, Clock, Check, Crown, Gift } from 'lucide-re
 const SHIPPING_ICONS = {
   standard: Truck,
   express: Zap,
-  premium: Award,
-  pickup: Package
+  premium: Award
 };
 
 const ShippingOptions = ({ shippingData, onSelect, onBack, isMember = false }) => {
   const [selectedMethod, setSelectedMethod] = useState(null);
 
+  // TODO business : confirmer la grille tarifaire exacte côté transporteur et activer éventuellement une option express
   const shippingMethods = [
     {
       id: 'standard',
       name: 'Livraison standard',
-      description: 'Livraison en 3-5 jours ouvrables',
+      description: 'Livraison partout au Maroc en 2 à 5 jours ouvrés',
       price: 5.99,
-      estimatedDays: '3-5 jours',
-      features: ['Suivi en ligne', 'Livraison à domicile', 'Signature requise']
+      estimatedDays: '2 à 5 jours ouvrés',
+      features: ['Suivi par email', 'Livraison à domicile', 'Contact avant livraison']
     },
     {
       id: 'express',
       name: 'Livraison express',
-      description: 'Livraison en 1-2 jours ouvrables',
+      description: 'Livraison en 1 à 2 jours ouvrés dans les grandes villes',
       price: 12.99,
-      estimatedDays: '1-2 jours',
-      features: ['Livraison prioritaire', 'Suivi en temps réel', 'Livraison garantie']
-    },
-    {
-      id: 'premium',
-      name: 'Livraison premium',
-      description: 'Livraison le jour même (si commandé avant 12h)',
-      price: 19.99,
-      estimatedDays: 'Le jour même',
-      features: ['Livraison le jour même', 'Service premium', 'Contact dédié']
-    },
-    {
-      id: 'pickup',
-      name: 'Point relais',
-      description: 'Retrait en point relais en 2-3 jours',
-      price: 3.99,
-      estimatedDays: '2-3 jours',
-      features: ['Retrait en point relais', 'Horaires étendus', 'Gratuit après 322 DH']
+      estimatedDays: '1 à 2 jours ouvrés',
+      features: ['Livraison prioritaire', 'Suivi par email', 'Contact avant livraison']
     }
   ];
 
@@ -161,9 +145,9 @@ const ShippingOptions = ({ shippingData, onSelect, onBack, isMember = false }) =
                     <div className="text-xl font-bold text-gray-900">
                       {parseFloat(method.price).toFixed(2)} DH
                     </div>
-                    {method.id === 'pickup' && (
+                    {method.id === 'standard' && (
                       <div className="text-xs text-green-600 mt-1">
-                        Gratuit dès 322 DH
+                        Gratuite dès 300 DH
                       </div>
                     )}
                   </div>
@@ -175,14 +159,14 @@ const ShippingOptions = ({ shippingData, onSelect, onBack, isMember = false }) =
         })}
       </div>
 
-      {/* Special Offers */}
+      {/* Shipping benefit */}
       <div className="bg-green-50/50 rounded-xl p-4 border border-green-100">
         <div className="flex items-center gap-3">
           <Gift className="w-5 h-5 text-green-600" />
           <div>
-            <h4 className="text-sm font-semibold text-gray-900">Offres spéciales</h4>
+            <h4 className="text-sm font-semibold text-gray-900">Livraison offerte dès 300 DH</h4>
             <p className="text-xs text-gray-500">
-              Livraison gratuite dès 536 DH d'achat
+              Appliquée automatiquement sur la livraison standard.
             </p>
           </div>
         </div>

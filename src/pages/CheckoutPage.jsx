@@ -5,7 +5,9 @@ import { Elements } from '@stripe/react-stripe-js';
 import { ShoppingBag, Truck, CreditCard, Check, ShieldCheck } from 'lucide-react';
 import { CartContext } from '../contexts/CartContext';
 import { AuthContext } from '../contexts/AuthContext';
+import { useAssistantContext } from '../contexts/AssistantContext';
 import { paymentService } from '../services/paymentService';
+import { CANONICAL_COUNTRY } from '../utils/morocco';
 import ShippingForm from '../components/checkout/ShippingForm';
 import ShippingOptions from '../components/checkout/ShippingOptions';
 import OrderSummary from '../components/checkout/OrderSummary';
@@ -18,6 +20,13 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const { cartItems, total, clearCart } = useContext(CartContext);
   const { user } = useContext(AuthContext);
+  const { setPageContext, clearPageContext } = useAssistantContext();
+
+  // Page-type context only — no shipping data, no cart items, no totals.
+  useEffect(() => {
+    setPageContext({ page: 'checkout' });
+    return () => clearPageContext();
+  }, [setPageContext, clearPageContext]);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [shippingData, setShippingData] = useState({
@@ -28,7 +37,7 @@ const CheckoutPage = () => {
     address: '',
     city: '',
     postalCode: '',
-    country: 'France',
+    country: CANONICAL_COUNTRY,
     company: '',
     notes: ''
   });
@@ -281,20 +290,24 @@ const CheckoutPage = () => {
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/60 shadow-soft p-4">
               <div className="flex items-center gap-2.5 mb-3">
                 <ShieldCheck className="w-5 h-5 text-green-600" />
-                <span className="text-sm font-semibold text-gray-900">Achat sécurisé</span>
+                <span className="text-sm font-semibold text-gray-900">Achat en toute confiance</span>
               </div>
               <div className="space-y-2 text-xs text-gray-500">
                 <p className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0" />
-                  Cryptage SSL 256-bit
+                  Paiement en ligne sécurisé (SSL 256-bit)
                 </p>
                 <p className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0" />
-                  Paiement via Stripe sécurisé
+                  Paiement à la livraison disponible
                 </p>
                 <p className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0" />
-                  Retours sous 30 jours
+                  Livraison partout au Maroc · 2 à 5 jours
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0" />
+                  Retour sous 7 jours (produits non ouverts)
                 </p>
               </div>
             </div>

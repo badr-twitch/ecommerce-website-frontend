@@ -1,5 +1,5 @@
 import React from 'react';
-import { Gift, Crown, Lock, Truck, Shield, RefreshCw, Check } from 'lucide-react';
+import { Gift, Crown, Lock, Truck, Shield, RefreshCw, Check, Banknote } from 'lucide-react';
 
 const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod, isMember = false, memberDiscount = 0 }) => {
   return (
@@ -66,16 +66,16 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod, is
         )}
 
         {/* Free shipping indicator */}
-        {!isMember && subtotal >= 536 && shippingCost === 0 && (
+        {!isMember && subtotal >= 300 && shippingCost === 0 && (
           <div className="bg-green-50/80 rounded-xl p-3 border border-green-100">
             <div className="flex items-center gap-2">
               <Gift className="w-4 h-4 text-green-600" />
               <span className="text-sm text-green-800 font-medium">
-                Livraison gratuite !
+                Livraison offerte
               </span>
             </div>
             <p className="text-xs text-green-600 mt-1">
-              Votre commande dépasse 536 DH
+              Votre panier dépasse 300 DH
             </p>
           </div>
         )}
@@ -128,13 +128,19 @@ const OrderSummary = ({ items, subtotal, shippingCost, total, shippingMethod, is
         <p className="text-xs text-green-600">Cryptage SSL 256-bit</p>
       </div>
 
-      {/* Return Policy */}
+      {/* Trust signals aligned with Moroccan cosmetics policy */}
       <div className="mt-3 space-y-1.5 text-xs text-gray-500">
         <p className="flex items-center gap-1.5">
-          <RefreshCw className="w-3 h-3 text-gray-400" /> Retours gratuits sous 30 jours
+          <Banknote className="w-3 h-3 text-gray-400" /> Paiement à la livraison ou par carte
         </p>
         <p className="flex items-center gap-1.5">
-          <Shield className="w-3 h-3 text-gray-400" /> Garantie 2 ans
+          <Truck className="w-3 h-3 text-gray-400" /> Livraison partout au Maroc · 2 à 5 jours
+        </p>
+        <p className="flex items-center gap-1.5">
+          <RefreshCw className="w-3 h-3 text-gray-400" /> Retour sous 7 jours (produits non ouverts)
+        </p>
+        <p className="flex items-center gap-1.5">
+          <Shield className="w-3 h-3 text-gray-400" /> Produits authentiques, marques sélectionnées
         </p>
       </div>
     </div>

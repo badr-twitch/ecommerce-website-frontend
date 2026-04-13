@@ -1,7 +1,8 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../contexts/CartContext';
 import { AuthContext } from '../contexts/AuthContext';
+import { useAssistantContext } from '../contexts/AssistantContext';
 import { ShoppingCart, Trash2, Minus, Plus, ShieldCheck, ArrowRight, LogIn, UserPlus, ShoppingBag, FolderOpen, Package, Truck } from 'lucide-react';
 import { ProductRecommendations } from '../components/recommendations';
 import toast from 'react-hot-toast';
@@ -9,6 +10,13 @@ import toast from 'react-hot-toast';
 const CartPage = () => {
   const { cartItems, total, itemCount, updateQuantity, removeItem, clearCart } = useContext(CartContext);
   const { user } = useContext(AuthContext);
+  const { setPageContext, clearPageContext } = useAssistantContext();
+
+  // Page-type context only — no cart contents, no totals, no prices.
+  useEffect(() => {
+    setPageContext({ page: 'cart' });
+    return () => clearPageContext();
+  }, [setPageContext, clearPageContext]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('fr-FR', {
@@ -77,7 +85,7 @@ const CartPage = () => {
               Votre panier est vide
             </h1>
             <p className="text-xl text-gray-500 mb-10 max-w-md mx-auto leading-relaxed">
-              Découvrez nos produits exceptionnels et commencez votre shopping dès maintenant !
+              Explorez notre sélection beauté et composez votre prochaine routine.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -222,8 +230,17 @@ const CartPage = () => {
                   <span className="text-gray-500 flex items-center gap-1.5">
                     <Truck className="w-3.5 h-3.5" /> Livraison
                   </span>
-                  <span className="text-green-600 font-semibold">Gratuite</span>
+                  {total >= 300 ? (
+                    <span className="text-green-600 font-semibold">Gratuite</span>
+                  ) : (
+                    <span className="text-gray-500 text-xs">Calculée au checkout</span>
+                  )}
                 </div>
+                {total < 300 && (
+                  <div className="text-xs text-primary-600 bg-primary-50 rounded-lg px-3 py-2 mt-1">
+                    Plus que <strong>{formatPrice(300 - total)}</strong> pour la livraison offerte.
+                  </div>
+                )}
                 <div className="border-t border-gray-100 pt-3 mt-3">
                   <div className="flex justify-between items-baseline">
                     <span className="text-base font-bold text-gray-900">Total</span>

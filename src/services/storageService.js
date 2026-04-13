@@ -1,140 +1,96 @@
-import { 
-  ref, 
-  uploadBytes, 
-  getDownloadURL, 
-  deleteObject,
-  uploadBytesResumable 
-} from 'firebase/storage';
-import { storage } from '../config/firebase';
+import api from './api';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const PUBLIC_CATEGORIES = new Set(['profile-photos', 'products', 'categories']);
+
+function publicProxyUrl(key) {
+  return `${API_BASE}/media/public/${key}`;
+}
+
+function uploadWithProgress(uploadUrl, file, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', uploadUrl);
+    xhr.setRequestHeader('Content-Type', file.type);
+    if (typeof onProgress === 'function') {
+      xhr.upload.onprogress = (evt) => {
+        if (evt.lengthComputable) {
+          onProgress((evt.loaded / evt.total) * 100);
+        }
+      };
+    }
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) resolve();
+      else reject(new Error(`Upload failed with status ${xhr.status}`));
+    };
+    xhr.onerror = () => reject(new Error('Network error during upload'));
+    xhr.send(file);
+  });
+}
 
 class StorageService {
-  // Upload file to Firebase Storage
-  async uploadFile(file, path, onProgress = null) {
-    try {
-      // Create a reference to the file location
-      const storageRef = ref(storage, path);
-      
-      // Upload the file
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      
-      return new Promise((resolve, reject) => {
-        uploadTask.on(
-          'state_changed',
-          (snapshot) => {
-            // Track upload progress
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            if (onProgress) {
-              onProgress(progress);
-            }
-          },
-          (error) => {
-            // Handle upload errors
-            console.error('Upload error:', error);
-            reject(error);
-          },
-          async () => {
-            // Upload completed successfully
-            try {
-              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-              resolve(downloadURL);
-            } catch (error) {
-              reject(error);
-            }
-          }
-        );
-      });
-    } catch (error) {
-      console.error('Storage service error:', error);
-      throw error;
+  /**
+   * Upload a file to S3 via backend-presigned PUT.
+   * Returns the value the caller should persist:
+   *   - public categories → full proxy URL (works directly in <img src>)
+   *   - refund-proofs → bare S3 key (must be rendered via <SignedImage>)
+   */
+  async uploadFile(file, { category, entityId, onProgress } = {}) {
+    if (!category || !entityId) {
+      throw new Error('uploadFile requires { category, entityId }');
     }
+    const { data } = await api.post('/uploads/presign', {
+      category,
+      entityId: String(entityId),
+      filename: file.name || 'upload',
+      contentType: file.type,
+      size: file.size,
+    });
+    if (!data?.success) throw new Error(data?.error || 'Presign failed');
+
+    await uploadWithProgress(data.uploadUrl, file, onProgress);
+
+    return PUBLIC_CATEGORIES.has(category) ? publicProxyUrl(data.key) : data.key;
   }
 
-  // Upload profile photo
-  async uploadProfilePhoto(file, userId) {
-    const timestamp = Date.now();
-    const fileName = `profile-photos/${userId}/${timestamp}.jpg`;
-    
-    return await this.uploadFile(file, fileName);
+  uploadProfilePhoto(file, userId, onProgress) {
+    return this.uploadFile(file, { category: 'profile-photos', entityId: userId, onProgress });
   }
 
-  // Delete file from Firebase Storage
-  async deleteFile(path) {
-    try {
-      const fileRef = ref(storage, path);
-      await deleteObject(fileRef);
-      return true;
-    } catch (error) {
-      console.error('Delete file error:', error);
-      throw error;
-    }
+  uploadProductImage(file, productId, _index = 0, onProgress) {
+    return this.uploadFile(file, { category: 'products', entityId: productId || 'new', onProgress });
   }
 
-  // Delete profile photo by URL (extract path from URL)
-  async deleteProfilePhoto(photoURL) {
-    try {
-      // Extract the path from the Firebase Storage URL
-      const url = new URL(photoURL);
-      const path = url.pathname.split('/o/')[1]?.split('?')[0];
-      
-      if (path) {
-        const decodedPath = decodeURIComponent(path);
-        return await this.deleteFile(decodedPath);
-      }
-      return false;
-    } catch (error) {
-      console.error('Delete profile photo error:', error);
-      throw error;
-    }
+  uploadCategoryImage(file, categoryId, onProgress) {
+    return this.uploadFile(file, { category: 'categories', entityId: categoryId || 'new', onProgress });
   }
 
-  // Upload product image
-  async uploadProductImage(file, productId, index = 0, onProgress = null) {
-    const timestamp = Date.now();
-    const path = `products/${productId}/${timestamp}-${index}.jpg`;
-    return await this.uploadFile(file, path, onProgress);
+  uploadRefundProof(file, orderId, onProgress) {
+    return this.uploadFile(file, { category: 'refund-proofs', entityId: orderId, onProgress });
   }
 
-  // Upload category image
-  async uploadCategoryImage(file, categoryId, onProgress = null) {
-    const timestamp = Date.now();
-    const path = `categories/${categoryId}/${timestamp}.jpg`;
-    return await this.uploadFile(file, path, onProgress);
+  /** Fetch a short-lived signed GET URL for a private S3 key (refund-proofs). */
+  async fetchSignedUrl(key) {
+    const { data } = await api.post('/uploads/sign-get', { key });
+    if (!data?.success) throw new Error(data?.error || 'Sign-get failed');
+    return data.url;
   }
 
-  // Delete image by its download URL (works for any Firebase Storage URL)
-  async deleteImageByURL(url) {
-    try {
-      // Only attempt deletion for Firebase Storage URLs
-      if (!url || !url.includes('firebasestorage.googleapis.com')) {
-        return false;
-      }
-      const parsedUrl = new URL(url);
-      const path = parsedUrl.pathname.split('/o/')[1]?.split('?')[0];
-      if (path) {
-        const decodedPath = decodeURIComponent(path);
-        return await this.deleteFile(decodedPath);
-      }
-      return false;
-    } catch (error) {
-      console.error('Delete image by URL error:', error);
-      return false;
-    }
-  }
+  // Deletes are handled server-side via product/category/order lifecycle hooks.
+  // Kept as no-ops so existing callers don't break.
+  async deleteImageByURL(_url) { return false; }
+  async deleteProfilePhoto(_url) { return false; }
+  async deleteFile(_path) { return false; }
 
-  // Convert data URL to file object
   dataURLtoFile(dataURL, filename) {
     const arr = dataURL.split(',');
     const mime = arr[0].match(/:(.*?);/)[1];
     const bstr = atob(arr[1]);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
-    
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    
+    while (n--) u8arr[n] = bstr.charCodeAt(n);
     return new File([u8arr], filename, { type: mime });
   }
 }
 
-export default new StorageService(); 
+export default new StorageService();

@@ -23,12 +23,12 @@ const Footer = () => {
               </div>
               <div>
                 <h3 className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent mb-2">UMOD</h3>
-                <p className="text-primary-200 text-sm">Votre boutique en ligne</p>
+                <p className="text-primary-200 text-sm">Cosmétiques multi-marques · Maroc</p>
               </div>
             </div>
             <p className="text-gray-300 mb-8 max-w-md leading-relaxed">
-              Votre boutique en ligne de confiance. Nous proposons une large gamme de produits
-              de qualité avec un service client exceptionnel et une expérience d'achat moderne.
+              Votre boutique beauté au Maroc. Une sélection de marques choisies avec soin :
+              soins visage, corps, cheveux, parfums et maquillage, livrés partout au Royaume.
             </p>
             <div className="flex space-x-4">
               {[
@@ -111,22 +111,27 @@ const Footer = () => {
         </div>
 
         {/* Contact Info */}
+        {/* TODO business : renseigner email, téléphone +212 et ville pour remplacer le fallback ci-dessous */}
         <div className="border-t border-white/20 mt-12 pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { icon: Mail, label: "Email", value: "contact@umod.fr" },
-              { icon: Phone, label: "Téléphone", value: "+33 1 23 45 67 89" },
-              { icon: MapPin, label: "Adresse", value: "Paris, France" }
+              { icon: Mail, label: "Email", value: "Via le formulaire de contact", to: "/contact" },
+              { icon: Phone, label: "Service client", value: "Lun - Sam : 9h - 18h", to: "/contact" },
+              { icon: MapPin, label: "Zone de livraison", value: "Partout au Maroc", to: "/shipping" }
             ].map((contact) => (
-              <div key={contact.label} className="flex items-center space-x-4 group">
+              <Link
+                key={contact.label}
+                to={contact.to}
+                className="flex items-center space-x-4 group cursor-pointer focus-visible:outline-none"
+              >
                 <div className="w-12 h-12 bg-gradient-to-r from-primary-500/20 to-secondary-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <contact.icon className="w-5 h-5 text-primary-300" />
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm font-medium">{contact.label}</p>
-                  <p className="text-white font-semibold">{contact.value}</p>
+                  <p className="text-white font-semibold group-hover:text-primary-200 transition-colors">{contact.value}</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -137,7 +142,7 @@ const Footer = () => {
             © {new Date().getFullYear()} <span className="bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent font-bold">UMOD</span>. Tous droits réservés.
           </p>
           <p className="text-gray-500 text-sm mt-2">
-            Conçu pour une expérience d'achat exceptionnelle
+            La beauté, livrée partout au Maroc.
           </p>
         </div>
       </div>

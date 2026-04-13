@@ -11,19 +11,19 @@ const FAQPage = () => {
       questions: [
         {
           q: 'Comment passer une commande ?',
-          a: 'Pour passer une commande, parcourez nos produits, ajoutez-les à votre panier, puis procédez au paiement. Vous recevrez une confirmation par email une fois votre commande validée.'
+          a: 'Parcourez nos catégories (soins de visage, soins de corps, soins capillaires, parfums, maquillage, packages), ajoutez les produits au panier, puis finalisez au checkout. Vous recevez un email de confirmation dès la validation de votre commande.'
         },
         {
           q: 'Puis-je modifier ou annuler ma commande ?',
-          a: 'Vous pouvez modifier ou annuler votre commande dans les 2 heures suivant la validation. Après ce délai, contactez notre service client qui fera de son mieux pour vous aider.'
+          a: 'Tant que votre commande n\'est pas préparée, nous pouvons souvent la modifier ou l\'annuler. Contactez-nous le plus vite possible via la page Contact en précisant votre numéro de commande.'
         },
         {
           q: 'Comment suivre ma commande ?',
-          a: 'Une fois votre commande expédiée, vous recevrez un email avec un numéro de suivi. Vous pouvez également suivre votre commande depuis votre compte dans la section "Mes commandes".'
+          a: 'Une fois expédiée, un email de suivi vous est envoyé. Vous pouvez aussi retrouver l\'état de votre commande à tout moment dans votre compte, rubrique « Mes commandes ».'
         },
         {
           q: 'Quels modes de paiement acceptez-vous ?',
-          a: 'Nous acceptons les cartes bancaires (Visa, Mastercard, American Express), PayPal, et les virements bancaires. Tous les paiements sont sécurisés et cryptés.'
+          a: 'Vous pouvez régler votre commande en paiement à la livraison (en espèces à la réception) ou par carte bancaire en ligne. Les paiements en ligne sont traités de manière sécurisée.'
         }
       ]
     },
@@ -31,20 +31,20 @@ const FAQPage = () => {
       category: 'Livraison',
       questions: [
         {
+          q: 'Où livrez-vous ?',
+          a: 'Nous livrons partout au Maroc, dans toutes les grandes villes et régions du Royaume.'
+        },
+        {
           q: 'Quels sont les délais de livraison ?',
-          a: 'Les délais de livraison varient selon votre localisation : 24-48h pour la France métropolitaine, 3-5 jours pour les DOM-TOM. Vous pouvez consulter les délais exacts lors du processus de commande.'
+          a: 'La livraison standard prend en général 2 à 5 jours ouvrés, selon votre ville et la disponibilité des produits commandés.'
         },
         {
           q: 'Quels sont les frais de livraison ?',
-          a: 'La livraison est gratuite pour les commandes supérieures à 50€ en France métropolitaine. Pour les commandes inférieures, les frais sont de 4,99€. Les membres UMOD Prime bénéficient de la livraison gratuite sur toutes les commandes.'
-        },
-        {
-          q: 'Puis-je choisir le jour de livraison ?',
-          a: 'Oui, lors du processus de commande, vous pouvez sélectionner une date de livraison parmi les créneaux disponibles dans votre région.'
+          a: 'La livraison est gratuite à partir de 300 DH d\'achat. En-dessous de ce montant, les frais de livraison sont indiqués clairement au moment du checkout.'
         },
         {
           q: 'Que faire si mon colis est endommagé ?',
-          a: 'Si votre colis arrive endommagé, contactez immédiatement notre service client avec des photos. Nous organiserons un remplacement ou un remboursement selon votre préférence.'
+          a: 'Si votre colis arrive visiblement abîmé, refusez-le à la livraison ou prenez des photos avant ouverture, puis contactez-nous sous 48h. Nous organisons un remplacement ou un remboursement selon le cas.'
         }
       ]
     },
@@ -53,40 +53,40 @@ const FAQPage = () => {
       questions: [
         {
           q: 'Quelle est votre politique de retour ?',
-          a: 'Vous disposez de 14 jours à compter de la réception pour retourner un article non utilisé et dans son emballage d\'origine. Les retours sont gratuits pour les membres UMOD Prime.'
+          a: 'Pour des raisons d\'hygiène, nous acceptons les retours uniquement sur les produits non ouverts, non utilisés et en parfait état, dans leur emballage d\'origine. Le retour doit être signalé dans les 7 jours suivant la réception.'
         },
         {
-          q: 'Comment retourner un article ?',
-          a: 'Connectez-vous à votre compte, allez dans "Mes commandes", sélectionnez la commande concernée et cliquez sur "Retourner". Vous recevrez une étiquette de retour à imprimer.'
+          q: 'Certains produits ne sont-ils pas retournables ?',
+          a: 'Oui. Tout produit dont le scellé ou l\'opercule d\'hygiène a été retiré ne peut plus être repris. Certains articles peuvent également être non retournables pour des raisons sanitaires, même s\'ils paraissent intacts.'
         },
         {
-          q: 'Quand serai-je remboursé ?',
-          a: 'Une fois le retour reçu et vérifié, le remboursement est effectué sous 5 à 10 jours ouvrés sur votre moyen de paiement initial.'
+          q: 'Comment demander un retour ?',
+          a: 'Contactez-nous via la page Contact en indiquant votre numéro de commande et la raison du retour. Nous revenons vers vous avec la marche à suivre.'
         },
         {
-          q: 'Puis-je échanger un article ?',
-          a: 'Oui, vous pouvez échanger un article contre une autre taille ou couleur. Contactez notre service client pour organiser l\'échange.'
+          q: 'Quand serai-je remboursé(e) ?',
+          a: 'Dès réception et vérification du retour, nous déclenchons le remboursement sur votre moyen de paiement initial. Pour un paiement à la livraison, nous convenons ensemble du mode de remboursement adapté.'
         }
       ]
     },
     {
-      category: 'Compte & Abonnement',
+      category: 'Mon compte',
       questions: [
         {
           q: 'Comment créer un compte ?',
-          a: 'Cliquez sur "S\'inscrire" en haut de la page, remplissez le formulaire avec vos informations et validez votre email. C\'est gratuit et prend moins de 2 minutes !'
+          a: 'Cliquez sur « Inscription » en haut de la page, complétez vos informations et validez. La création de compte est gratuite et vous permet de suivre vos commandes et de gérer votre wishlist.'
         },
         {
-          q: 'Qu\'est-ce que UMOD Prime ?',
-          a: 'UMOD Prime est notre programme d\'abonnement qui offre la livraison gratuite sur toutes les commandes, des réductions exclusives, et un accès prioritaire aux nouveautés.'
-        },
-        {
-          q: 'Comment annuler mon abonnement UMOD Prime ?',
-          a: 'Vous pouvez annuler votre abonnement à tout moment depuis votre compte dans la section "Mon abonnement". L\'annulation prend effet à la fin de la période payée.'
+          q: 'Puis-je commander sans compte ?',
+          a: 'Un compte est nécessaire pour finaliser votre commande : il nous permet de sécuriser vos informations de livraison et de vous donner accès à votre historique et au suivi.'
         },
         {
           q: 'J\'ai oublié mon mot de passe, que faire ?',
-          a: 'Cliquez sur "Mot de passe oublié" sur la page de connexion. Vous recevrez un email avec un lien pour réinitialiser votre mot de passe.'
+          a: 'Cliquez sur « Mot de passe oublié » depuis la page de connexion. Vous recevrez un email avec un lien pour le réinitialiser.'
+        },
+        {
+          q: 'Comment mettre à jour mon adresse ou mon numéro ?',
+          a: 'Rendez-vous dans votre profil, rubrique « Mes informations » ou « Mes adresses ». Vos modifications sont prises en compte immédiatement pour les prochaines commandes.'
         }
       ]
     },
@@ -94,41 +94,37 @@ const FAQPage = () => {
       category: 'Produits',
       questions: [
         {
+          q: 'Vos produits sont-ils authentiques ?',
+          a: 'Oui. UMOD est une boutique multi-marques : nous sélectionnons nos fournisseurs avec soin pour garantir l\'authenticité et la qualité de chaque produit proposé.'
+        },
+        {
           q: 'Comment savoir si un produit est en stock ?',
-          a: 'Le statut du stock est indiqué sur chaque page produit. Si un article est en rupture, vous pouvez activer une alerte pour être notifié dès qu\'il sera à nouveau disponible.'
-        },
-        {
-          q: 'Proposez-vous une garantie sur vos produits ?',
-          a: 'Oui, tous nos produits bénéficient d\'une garantie constructeur. La durée varie selon le type de produit (généralement 1 à 2 ans). Les détails sont indiqués sur chaque fiche produit.'
-        },
-        {
-          q: 'Puis-je voir les avis d\'autres clients ?',
-          a: 'Absolument ! Chaque produit dispose d\'une section avis où vous pouvez lire les commentaires et notes des clients qui ont acheté le produit.'
+          a: 'Le statut de stock est indiqué sur chaque fiche produit. Si un article est en rupture, la fiche affiche clairement l\'information ; vous pouvez nous contacter pour être prévenu(e) dès son retour.'
         },
         {
           q: 'Les photos des produits sont-elles fidèles ?',
-          a: 'Nous nous efforçons de fournir des photos les plus fidèles possible. Cependant, les couleurs peuvent légèrement varier selon votre écran. En cas de doute, n\'hésitez pas à nous contacter.'
+          a: 'Nous faisons notre maximum pour que les visuels reflètent le produit réel. L\'affichage des couleurs peut toutefois légèrement varier selon votre écran, en particulier pour les teintes de maquillage.'
+        },
+        {
+          q: 'Puis-je demander conseil avant d\'acheter ?',
+          a: 'Bien sûr. Contactez-nous via la page Contact en décrivant votre type de peau, de cheveux ou vos préférences : nous vous orienterons vers les produits les plus adaptés.'
         }
       ]
     },
     {
-      category: 'Autres',
+      category: 'Contact & autres',
       questions: [
         {
           q: 'Comment contacter le service client ?',
-          a: 'Vous pouvez nous contacter par email à contact@umod.fr, par téléphone au +33 1 23 45 67 89 (Lun-Ven, 9h-18h), ou via le formulaire de contact sur notre site.'
+          a: 'Vous pouvez nous joindre via le formulaire de la page Contact, par email ou par téléphone (coordonnées affichées en bas de chaque page). Nous répondons du lundi au samedi.'
         },
         {
-          q: 'Proposez-vous des programmes de fidélité ?',
-          a: 'Oui ! En plus d\'UMOD Prime, nous avons un programme de points de fidélité. Vous gagnez des points à chaque achat que vous pouvez convertir en réductions.'
+          q: 'Livrez-vous hors du Maroc ?',
+          a: 'Pour le moment, nous livrons uniquement à l\'intérieur du Maroc.'
         },
         {
-          q: 'Livrez-vous à l\'étranger ?',
-          a: 'Actuellement, nous livrons uniquement en France métropolitaine et dans les DOM-TOM. Nous travaillons sur l\'extension de notre service à d\'autres pays européens.'
-        },
-        {
-          q: 'Comment signaler un problème technique sur le site ?',
-          a: 'Si vous rencontrez un problème technique, contactez-nous à support@umod.fr en décrivant le problème et en incluant une capture d\'écran si possible. Nous traiterons votre demande rapidement.'
+          q: 'Comment signaler un problème sur le site ?',
+          a: 'Si vous rencontrez un problème technique, contactez-nous via la page Contact en décrivant la situation et en joignant une capture d\'écran si possible. Nous revenons vers vous rapidement.'
         }
       ]
     }

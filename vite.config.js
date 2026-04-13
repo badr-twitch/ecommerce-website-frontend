@@ -8,7 +8,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/storage'],
+          'vendor-firebase': ['firebase/app', 'firebase/auth'],
           'vendor-recharts': ['recharts'],
           'vendor-stripe': ['@stripe/stripe-js', '@stripe/react-stripe-js'],
           'vendor-ui': ['lucide-react', 'react-hot-toast'],

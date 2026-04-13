@@ -72,7 +72,7 @@ export const productsAPI = {
   getOnSale: () => api.get('/products', { params: { onSale: true, limit: 8 } }),
   search: (query, params = {}) => api.get('/products', { params: { search: query, ...params } }),
   getBrands: () => api.get('/products/brands'),
-  addReview: (productId, data) => api.post(`/products/${productId}/reviews`, data),
+  addReview: (productId, data) => api.post('/reviews', { productId, ...data }),
 };
 
 // Categories API
@@ -145,7 +145,7 @@ export const healthAPI = {
 };
 
 // Utility functions
-export const formatPrice = (price, currency = 'EUR') => {
+export const formatPrice = (price, currency = 'MAD') => {
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: currency,

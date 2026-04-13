@@ -89,37 +89,40 @@ const ContactPage = () => {
     }
   };
 
+  // TODO business : remplacer les 3 premiers items par l'email, le téléphone +212 et l'adresse réels
   const contactInfo = [
     {
       icon: Mail,
-      title: 'Email',
-      content: 'contact@umod.fr',
-      link: 'mailto:contact@umod.fr'
+      title: 'Écrivez-nous',
+      content: 'Via le formulaire ci-contre',
+      link: null
     },
     {
       icon: Phone,
-      title: 'Téléphone',
-      content: '+33 1 23 45 67 89',
-      link: 'tel:+33123456789'
+      title: 'Service client',
+      content: 'Réponse sous 24h en jours ouvrés',
+      link: null
     },
     {
       icon: MapPin,
-      title: 'Adresse',
-      content: 'Paris, France',
+      title: 'Zone de livraison',
+      content: 'Partout au Maroc',
       link: null
     },
     {
       icon: Clock,
       title: 'Horaires',
-      content: 'Lun - Ven: 9h - 18h',
+      content: 'Lun - Sam : 9h - 18h',
       link: null
     }
   ];
 
   const subjectOptions = [
     'Question générale',
-    'Commande',
-    'Retour produit',
+    'Conseil produit',
+    'Ma commande',
+    'Livraison',
+    'Retour ou échange',
     'Problème technique',
     'Partenariat',
     'Autre'
@@ -157,7 +160,7 @@ const ContactPage = () => {
               Contactez-nous
             </h1>
             <p className="text-xl md:text-2xl text-primary-100 max-w-2xl mx-auto leading-relaxed">
-              Nous sommes là pour vous aider. N'hésitez pas à nous contacter !
+              Une question, un conseil beauté, un suivi de commande : notre équipe vous répond avec plaisir.
             </p>
           </div>
         </div>
@@ -257,7 +260,7 @@ const ContactPage = () => {
                           onChange={handleChange}
                           required
                           className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all bg-white/50 backdrop-blur-sm hover:bg-white hover:border-primary-300 group-hover:shadow-md"
-                          placeholder="Jean Dupont"
+                          placeholder="Votre nom complet"
                         />
                         <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary-500/0 to-secondary-500/0 group-hover:from-primary-500/5 group-hover:to-secondary-500/5 transition-all pointer-events-none"></div>
                       </div>
@@ -276,7 +279,7 @@ const ContactPage = () => {
                           onChange={handleChange}
                           required
                           className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all bg-white/50 backdrop-blur-sm hover:bg-white hover:border-primary-300 group-hover:shadow-md"
-                          placeholder="jean.dupont@example.com"
+                          placeholder="exemple@email.com"
                         />
                         <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary-500/0 to-secondary-500/0 group-hover:from-primary-500/5 group-hover:to-secondary-500/5 transition-all pointer-events-none"></div>
                       </div>
@@ -297,7 +300,7 @@ const ContactPage = () => {
                           value={formData.phone}
                           onChange={handleChange}
                           className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all bg-white/50 backdrop-blur-sm hover:bg-white hover:border-primary-300 group-hover:shadow-md"
-                          placeholder="+33 6 12 34 56 78"
+                          placeholder="+212 6 12 34 56 78"
                         />
                         <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary-500/0 to-secondary-500/0 group-hover:from-primary-500/5 group-hover:to-secondary-500/5 transition-all pointer-events-none"></div>
                       </div>

@@ -7,6 +7,7 @@ import { CartProvider } from './contexts/CartContext';
 import { WishlistProvider } from './contexts/WishlistContext';
 import { AdminProvider } from './contexts/AdminContext';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { AssistantProvider } from './contexts/AssistantContext';
 import { Toaster } from 'react-hot-toast';
 
 // Lazy-loaded page components
@@ -82,6 +83,7 @@ function App() {
         <WishlistProvider>
           <AdminProvider>
             <NotificationProvider>
+            <AssistantProvider>
               <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
               <Router>
                 <EmailVerificationGate>
@@ -124,6 +126,7 @@ function App() {
                 </Layout>
                 </EmailVerificationGate>
               </Router>
+            </AssistantProvider>
             </NotificationProvider>
           </AdminProvider>
         </WishlistProvider>
