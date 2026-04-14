@@ -185,11 +185,11 @@ const Header = () => {
                       />
                     ) : (
                       <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                        {user.firstName?.charAt(0) || user.email?.charAt(0) || 'U'}
+                        {(user.displayName || user.firstName || user.email)?.charAt(0).toUpperCase() || 'U'}
                       </div>
                     )}
                     <span className="hidden sm:block text-sm font-medium max-w-[120px] truncate">
-                      {user.firstName || user.displayName || user.email}
+                      {user.displayName || user.firstName || user.email}
                     </span>
                     {user.membershipStatus === 'active' && (
                       <Crown className="w-4 h-4 text-amber-500" />
