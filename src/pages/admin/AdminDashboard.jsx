@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAdmin } from '../../contexts/AdminContext';
 import ProductForm from './ProductForm';
 import ProductDetail from './ProductDetail';
@@ -100,7 +101,9 @@ StableImage.displayName = 'StableImage';
 
 const AdminDashboard = () => {
   const { adminData, refreshAdminData } = useAdmin();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState(() => location.state?.tab || 'dashboard');
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -374,6 +377,22 @@ const AdminDashboard = () => {
     setSelectedOrder(order);
     setShowOrderDetail(true);
   }, []);
+
+  // Open the order modal when arriving via a notification click (navigation state).
+  useEffect(() => {
+    const navState = location.state;
+    if (!navState) return;
+    if (navState.tab && navState.tab !== activeTab) {
+      setActiveTab(navState.tab);
+    }
+    if (navState.openOrderId) {
+      setSelectedOrder({ id: navState.openOrderId });
+      setShowOrderDetail(true);
+    }
+    // Clear so a refresh / back-nav doesn't re-trigger.
+    navigate(location.pathname, { replace: true, state: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state]);
 
   const handleOrderDetailClose = useCallback(() => {
     setShowOrderDetail(false);

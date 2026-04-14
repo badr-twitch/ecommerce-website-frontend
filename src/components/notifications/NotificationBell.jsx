@@ -57,18 +57,18 @@ const NotificationBell = () => {
       case 'order_new':
       case 'order_status_change':
       case 'order_high_value':
-        if (data.orderId) navigate(`/admin/orders/${data.orderId}`);
+        navigate('/admin', { state: { tab: 'orders', openOrderId: data.orderId } });
         break;
       case 'inventory_low_stock':
       case 'inventory_out_of_stock':
       case 'inventory_restored':
-        navigate('/admin');
+        navigate('/admin', { state: { tab: 'inventory' } });
         break;
       case 'membership':
         navigate('/membership');
         break;
       case 'user_registration':
-        navigate('/admin');
+        navigate('/admin', { state: { tab: 'users' } });
         break;
       default:
         break;

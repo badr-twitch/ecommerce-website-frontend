@@ -65,8 +65,8 @@ const InventoryTable = React.memo(({ alerts, onPlusClick, onSettingsClick, getSt
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="admin-flex-container flex items-center">
           {/* FIXED: Use StableImage component with admin CSS classes */}
-          <StableImage 
-            src={product.imageUrl} 
+          <StableImage
+            src={product.mainImage || product.images?.[0]}
             alt={product.name}
             width={40}
             height={40}
