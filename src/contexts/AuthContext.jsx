@@ -128,7 +128,7 @@ const apiCall = async (endpoint, options = {}) => {
     const data = await response.json();
     
     if (!response.ok) {
-      throw new Error(data.message || 'Erreur de requête');
+      throw new Error(data.error || data.message || 'Erreur de requête');
     }
     
     return data;
