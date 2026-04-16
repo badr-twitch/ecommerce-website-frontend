@@ -1,10 +1,19 @@
 import api from './api';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const PUBLIC_CATEGORIES = new Set(['profile-photos', 'products', 'categories']);
+const PROXY_CATEGORIES = new Set(['products', 'categories']);
 
 function publicProxyUrl(key) {
   return `${API_BASE}/media/public/${key}`;
+}
+
+// Resolves a stored photo value to a renderable <img src>.
+// Accepts either a bare S3 key ("profile-photos/uid/abc.jpg") or a full URL (legacy rows).
+// Bare keys are rewritten against the *current* VITE_API_URL so photos travel between envs.
+export function resolvePublicMediaUrl(value) {
+  if (!value) return '';
+  if (/^(https?:|blob:|data:)/i.test(value)) return value;
+  return publicProxyUrl(value);
 }
 
 function uploadWithProgress(uploadUrl, file, onProgress) {
@@ -32,8 +41,9 @@ class StorageService {
   /**
    * Upload a file to S3 via backend-presigned PUT.
    * Returns the value the caller should persist:
-   *   - public categories → full proxy URL (works directly in <img src>)
-   *   - refund-proofs → bare S3 key (must be rendered via <SignedImage>)
+   *   - products / categories → full proxy URL baked with current API_BASE
+   *   - profile-photos → bare S3 key (render via resolvePublicMediaUrl so URLs travel between envs)
+   *   - refund-proofs / reviews → bare S3 key (render via <SignedImage>)
    */
   async uploadFile(file, { category, entityId, onProgress } = {}) {
     if (!category || !entityId) {
@@ -50,7 +60,7 @@ class StorageService {
 
     await uploadWithProgress(data.uploadUrl, file, onProgress);
 
-    return PUBLIC_CATEGORIES.has(category) ? publicProxyUrl(data.key) : data.key;
+    return PROXY_CATEGORIES.has(category) ? publicProxyUrl(data.key) : data.key;
   }
 
   uploadProfilePhoto(file, userId, onProgress) {

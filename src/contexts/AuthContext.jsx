@@ -494,7 +494,11 @@ export const AuthProvider = ({ children }) => {
           firebaseUpdateData.displayName = userData.displayName;
         }
         if (userData.photoURL !== undefined) {
-          firebaseUpdateData.photoURL = userData.photoURL;
+          // Firebase Auth rejects non-URL strings. Backend DB is the source of truth
+          // for display; mirror to Firebase only if the value already looks like a URL.
+          const isUrl = typeof userData.photoURL === 'string'
+            && /^(https?:|blob:|data:)/i.test(userData.photoURL);
+          firebaseUpdateData.photoURL = isUrl ? userData.photoURL : '';
         }
         
         // Update Firebase profile

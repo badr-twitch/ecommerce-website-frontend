@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import storageService from '../../services/storageService';
+import storageService, { resolvePublicMediaUrl } from '../../services/storageService';
 import toast from 'react-hot-toast';
 import { Camera, Trash2, User } from 'lucide-react';
 
@@ -126,7 +126,7 @@ const ProfilePhotoUpload = ({ currentPhotoURL, onPhotoChange, isLoading }) => {
           <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-primary-50 to-secondary-50 border-2 border-white shadow-soft flex items-center justify-center">
             {previewURL ? (
               <img
-                src={previewURL}
+                src={resolvePublicMediaUrl(previewURL)}
                 alt="Photo de profil"
                 className="w-full h-full object-cover"
               />

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Crown } from 'lucide-react';
+import { resolvePublicMediaUrl } from '../../services/storageService';
 
 const ProfileSidebarLayout = ({ activeTab, onTabChange, tabs, user, membershipStatus, children }) => {
   const initials = (user?.displayName || user?.fullName || user?.email || '?')
@@ -32,7 +33,7 @@ const ProfileSidebarLayout = ({ activeTab, onTabChange, tabs, user, membershipSt
                   {/* Avatar */}
                   {user?.photoURL || user?.profilePhoto ? (
                     <img
-                      src={user.photoURL || user.profilePhoto}
+                      src={resolvePublicMediaUrl(user.photoURL || user.profilePhoto)}
                       alt={user.displayName || 'Avatar'}
                       className="w-20 h-20 rounded-2xl object-cover shadow-medium border-2 border-white"
                     />
@@ -84,7 +85,7 @@ const ProfileSidebarLayout = ({ activeTab, onTabChange, tabs, user, membershipSt
             <div className="flex items-center gap-3 mb-4">
               {user?.photoURL || user?.profilePhoto ? (
                 <img
-                  src={user.photoURL || user.profilePhoto}
+                  src={resolvePublicMediaUrl(user.photoURL || user.profilePhoto)}
                   alt={user.displayName || 'Avatar'}
                   className="w-10 h-10 rounded-xl object-cover border border-white shadow-sm"
                 />

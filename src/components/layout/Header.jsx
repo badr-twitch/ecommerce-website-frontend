@@ -4,6 +4,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { CartContext } from '../../contexts/CartContext';
 import { WishlistContext } from '../../contexts/WishlistContext';
 import NotificationBell from '../notifications/NotificationBell';
+import { resolvePublicMediaUrl } from '../../services/storageService';
 import { Search, Heart, ShoppingBag, Menu, X, User, Package, Settings, LogOut, Crown } from 'lucide-react';
 
 const Header = () => {
@@ -179,7 +180,7 @@ const Header = () => {
                   >
                     {user.photoURL ? (
                       <img
-                        src={user.photoURL}
+                        src={resolvePublicMediaUrl(user.photoURL)}
                         alt=""
                         className="w-8 h-8 rounded-lg object-cover ring-2 ring-gray-200"
                       />
