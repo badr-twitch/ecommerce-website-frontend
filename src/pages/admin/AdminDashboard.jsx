@@ -267,7 +267,7 @@ const AdminDashboard = () => {
       loadCategories();
     } catch (error) {
       console.error('❌ Error deleting category:', error);
-      toast.error('Erreur lors de la suppression de la catégorie');
+      toast.error(error.response?.data?.error || 'Erreur lors de la suppression de la catégorie');
     }
   }, [loadCategories]);
 
