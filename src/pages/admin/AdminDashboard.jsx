@@ -274,7 +274,7 @@ const AdminDashboard = () => {
   const toggleUserStatus = useCallback(async (userId, currentStatus) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.patch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/users/${userId}/toggle-status`, {
+      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/users/${userId}/status`, {
         isActive: !currentStatus
       }, {
         headers: {
@@ -293,7 +293,7 @@ const AdminDashboard = () => {
     try {
       const newRole = currentRole === 'client' ? 'admin' : 'client';
       const token = localStorage.getItem('token');
-      await axios.patch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/users/${userId}/change-role`, {
+      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/users/${userId}/role`, {
         role: newRole
       }, {
         headers: {
@@ -425,7 +425,7 @@ const AdminDashboard = () => {
   const updateOrderStatus = useCallback(async (orderId, newStatus) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.patch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/orders/${orderId}/status`, {
+      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/orders/${orderId}/status`, {
         status: newStatus
       }, {
         headers: {
