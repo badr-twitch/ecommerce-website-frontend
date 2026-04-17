@@ -251,7 +251,7 @@ const AdminDashboard = () => {
       loadProducts();
     } catch (error) {
       console.error('❌ Error deleting product:', error);
-      toast.error('Erreur lors de la suppression du produit');
+      toast.error(error.response?.data?.error || 'Erreur lors de la suppression du produit');
     }
   }, [loadProducts]);
 
@@ -285,7 +285,7 @@ const AdminDashboard = () => {
       loadUsers();
     } catch (error) {
       console.error('❌ Error toggling user status:', error);
-      toast.error('Erreur lors du changement de statut');
+      toast.error(error.response?.data?.error || 'Erreur lors du changement de statut');
     }
   }, [loadUsers]);
 
@@ -304,7 +304,7 @@ const AdminDashboard = () => {
       loadUsers();
     } catch (error) {
       console.error('❌ Error changing user role:', error);
-      toast.error('Erreur lors du changement de rôle');
+      toast.error(error.response?.data?.error || 'Erreur lors du changement de rôle');
     }
   }, [loadUsers]);
 
@@ -436,7 +436,7 @@ const AdminDashboard = () => {
       loadOrders();
     } catch (error) {
       console.error('❌ Error updating order status:', error);
-      toast.error('Erreur lors de la mise à jour du statut');
+      toast.error(error.response?.data?.error || 'Erreur lors de la mise à jour du statut');
     }
   }, [loadOrders]);
 
@@ -491,7 +491,7 @@ const AdminDashboard = () => {
       loadOrders();
     } catch (error) {
       console.error('❌ Error updating bulk order status:', error);
-      toast.error('Erreur lors de la mise à jour en masse');
+      toast.error(error.response?.data?.error || 'Erreur lors de la mise à jour en masse');
     } finally {
       setBulkActionLoading(false);
     }
@@ -538,7 +538,7 @@ const AdminDashboard = () => {
       toast.success(response.data.message);
     } catch (error) {
       console.error('❌ Error exporting orders:', error);
-      toast.error('Erreur lors de l\'export');
+      toast.error(error.response?.data?.error || 'Erreur lors de l\'export');
     } finally {
       setBulkActionLoading(false);
     }
@@ -574,7 +574,7 @@ const AdminDashboard = () => {
       setBulkNotifyForm({ notificationType: 'status_update', customMessage: '' });
     } catch (error) {
       console.error('❌ Error sending bulk notifications:', error);
-      toast.error('Erreur lors de l\'envoi des notifications');
+      toast.error(error.response?.data?.error || 'Erreur lors de l\'envoi des notifications');
     } finally {
       setBulkActionLoading(false);
     }
